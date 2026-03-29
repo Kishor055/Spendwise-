@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { LogOut, Settings, Bell, Shield, HelpCircle, ChevronRight, Wallet } from 'lucide-react';
+import { cn } from '@/lib/utils';
 import Link from 'next/link';
 
 export default function ProfilePage() {

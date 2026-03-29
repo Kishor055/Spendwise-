@@ -116,7 +116,7 @@ export default function AnalyticsPage() {
         <section className="space-y-4">
           <h3 className="text-xl font-bold">Details by Category</h3>
           <div className="space-y-2">
-            {chartData.sort((a: any, b: any) => b.value - a.value).map((item, index) => (
+            {[...chartData].sort((a: any, b: any) => b.value - a.value).map((item, index) => (
               <div key={item.name} className="flex items-center justify-between p-4 glass-card rounded-2xl">
                 <div className="flex items-center gap-3">
                   <div 

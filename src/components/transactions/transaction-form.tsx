@@ -59,7 +59,7 @@ export function TransactionForm({ onSuccess }: { onSuccess?: () => void }) {
   const form = useForm<z.infer<typeof transactionSchema>>({
     resolver: zodResolver(transactionSchema),
     defaultValues: {
-      amount: undefined,
+      amount: 0,
       type: 'expense',
       category: '',
       date: new Date(),
@@ -68,6 +68,12 @@ export function TransactionForm({ onSuccess }: { onSuccess?: () => void }) {
   });
 
   const transactionType = form.watch('type');
+
+  // Reset category whenever type changes so stale category from previous type can't be submitted
+  const handleTypeChange = (value: 'income' | 'expense', fieldOnChange: (v: string) => void) => {
+    fieldOnChange(value);
+    form.setValue('category', '');
+  };
 
   async function onSubmit(values: z.infer<typeof transactionSchema>) {
     if (!user) return;
@@ -100,7 +106,7 @@ export function TransactionForm({ onSuccess }: { onSuccess?: () => void }) {
             <FormItem className="space-y-3">
               <FormControl>
                 <RadioGroup
-                  onValueChange={field.onChange}
+                  onValueChange={(val) => handleTypeChange(val as 'income' | 'expense', field.onChange)}
                   defaultValue={field.value}
                   className="flex gap-4"
                 >
@@ -168,7 +174,7 @@ export function TransactionForm({ onSuccess }: { onSuccess?: () => void }) {
           render={({ field }) => (
             <FormItem>
               <FormLabel>Category</FormLabel>
-              <Select onValueChange={field.onChange} defaultValue={field.value}>
+              <Select onValueChange={(val) => { field.onChange(val); }} value={field.value}>
                 <FormControl>
                   <SelectTrigger>
                     <SelectValue placeholder="Select category" />
