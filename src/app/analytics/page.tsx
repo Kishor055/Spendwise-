@@ -1,9 +1,8 @@
 "use client";
 
-import { useEffect, useState, useMemo } from 'react';
-import { useAuth } from '@/context/auth-context';
-import { db } from '@/lib/firebase';
-import { collection, query, orderBy, onSnapshot } from 'firebase/firestore';
+import { useState, useMemo } from 'react';
+import { useUser, useFirestore, useCollection, useMemoFirebase } from '@/firebase';
+import { collection, query, orderBy } from 'firebase/firestore';
 import { BottomNav } from '@/components/layout/bottom-nav';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { PieChart as ChartIcon, TrendingUp, ChevronLeft } from 'lucide-react';
@@ -21,23 +20,22 @@ interface Transaction {
 const COLORS = ['#523399', '#69A9ED', '#43A047', '#E53935', '#F59E0B', '#10B981', '#6366F1'];
 
 export default function AnalyticsPage() {
-  const { user } = useAuth();
-  const [transactions, setTransactions] = useState<Transaction[]>([]);
+  const { user } = useUser();
+  const firestore = useFirestore();
   const [activeTab, setActiveTab] = useState<'expense' | 'income'>('expense');
 
-  useEffect(() => {
-    if (!user) return;
-    const q = query(collection(db, 'users', user.uid, 'transactions'), orderBy('date', 'desc'));
-    const unsub = onSnapshot(q, (snapshot) => {
-      setTransactions(snapshot.docs.map(doc => ({ ...doc.data(), id: doc.id } as Transaction)));
-    });
-    return () => unsub();
-  }, [user]);
+  const transactionsQuery = useMemoFirebase(() => {
+    if (!firestore || !user) return null;
+    return query(collection(firestore, 'users', user.uid, 'transactions'), orderBy('date', 'desc'));
+  }, [firestore, user]);
+
+  const { data: transactions } = useCollection<Transaction>(transactionsQuery);
 
   const chartData = useMemo(() => {
+    if (!transactions) return [];
     const data = transactions
       .filter(tx => tx.type === activeTab)
-      .reduce((acc: any, curr) => {
+      .reduce((acc: Record<string, number>, curr) => {
         acc[curr.category] = (acc[curr.category] || 0) + curr.amount;
         return acc;
       }, {});

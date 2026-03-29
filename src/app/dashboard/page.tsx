@@ -1,12 +1,11 @@
 "use client";
 
-import { useEffect, useState } from 'react';
-import { useAuth } from '@/context/auth-context';
-import { db } from '@/lib/firebase';
-import { collection, query, orderBy, limit, onSnapshot, where } from 'firebase/firestore';
+import { useMemo } from 'react';
+import { useUser, useFirestore, useCollection, useMemoFirebase } from '@/firebase';
+import { collection, query, orderBy } from 'firebase/firestore';
 import { BottomNav } from '@/components/layout/bottom-nav';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { ArrowUpRight, ArrowDownRight, CreditCard, Loader2, Plus } from 'lucide-react';
+import { ArrowUpRight, ArrowDownRight, CreditCard, Loader2 } from 'lucide-react';
 import { format } from 'date-fns';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
@@ -18,6 +17,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import { useState } from 'react';
 
 interface Transaction {
   id: string;
@@ -29,35 +29,39 @@ interface Transaction {
 }
 
 export default function DashboardPage() {
-  const { user, loading: authLoading } = useAuth();
-  const [transactions, setTransactions] = useState<Transaction[]>([]);
-  const [summary, setSummary] = useState({ balance: 0, income: 0, expense: 0 });
-  const [loading, setLoading] = useState(true);
+  const { user, isUserLoading } = useUser();
+  const firestore = useFirestore();
   const [isAddOpen, setIsAddOpen] = useState(false);
 
-  useEffect(() => {
-    if (!user) return;
+  const transactionsQuery = useMemoFirebase(() => {
+    if (!firestore || !user) return null;
+    return query(
+      collection(firestore, 'users', user.uid, 'transactions'),
+      orderBy('date', 'desc')
+    );
+  }, [firestore, user]);
 
-    // Listen to all transactions for summary
-    const qAll = query(collection(db, 'users', user.uid, 'transactions'), orderBy('date', 'desc'));
-    const unsubAll = onSnapshot(qAll, (snapshot) => {
-      let inc = 0;
-      let exp = 0;
-      const txs = snapshot.docs.map(doc => {
-        const data = doc.data() as Transaction;
-        if (data.type === 'income') inc += data.amount;
-        else exp += data.amount;
-        return { ...data, id: doc.id };
-      });
-      setSummary({ balance: inc - exp, income: inc, expense: exp });
-      setTransactions(txs.slice(0, 5)); // Just the recent 5
-      setLoading(false);
-    });
+  const { data: transactions, isLoading: isTransactionsLoading } = useCollection<Transaction>(transactionsQuery);
 
-    return () => unsubAll();
-  }, [user]);
+  const summary = useMemo(() => {
+    if (!transactions) return { balance: 0, income: 0, expense: 0 };
+    return transactions.reduce((acc, tx) => {
+      if (tx.type === 'income') {
+        acc.income += tx.amount;
+        acc.balance += tx.amount;
+      } else {
+        acc.expense += tx.amount;
+        acc.balance -= tx.amount;
+      }
+      return acc;
+    }, { balance: 0, income: 0, expense: 0 });
+  }, [transactions]);
 
-  if (authLoading || (loading && !user)) {
+  const recentTransactions = useMemo(() => {
+    return transactions?.slice(0, 5) || [];
+  }, [transactions]);
+
+  if (isUserLoading || (isTransactionsLoading && !transactions)) {
     return (
       <div className="h-screen w-full flex items-center justify-center">
         <Loader2 className="h-8 w-8 animate-spin text-primary" />
@@ -102,7 +106,7 @@ export default function DashboardPage() {
           </CardContent>
         </Card>
 
-        {/* Categories / Quick Actions */}
+        {/* Transactions List */}
         <section className="space-y-4">
           <div className="flex items-center justify-between">
             <h2 className="text-xl font-bold">Recent Transactions</h2>
@@ -112,7 +116,7 @@ export default function DashboardPage() {
           </div>
 
           <div className="space-y-3">
-            {transactions.length === 0 ? (
+            {recentTransactions.length === 0 ? (
               <div className="text-center py-10 glass-card rounded-3xl">
                 <CreditCard className="h-12 w-12 text-muted-foreground mx-auto mb-2 opacity-20" />
                 <p className="text-muted-foreground">No transactions yet.</p>
@@ -129,7 +133,7 @@ export default function DashboardPage() {
                 </Dialog>
               </div>
             ) : (
-              transactions.map((tx) => (
+              recentTransactions.map((tx) => (
                 <div key={tx.id} className="flex items-center justify-between p-4 glass-card rounded-2xl transition-all hover:translate-x-1">
                   <div className="flex items-center gap-4">
                     <div className={cn(

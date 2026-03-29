@@ -1,15 +1,24 @@
 "use client";
 
-import { useAuth } from '@/context/auth-context';
+import { useUser, useAuth } from '@/firebase';
 import { BottomNav } from '@/components/layout/bottom-nav';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { LogOut, Settings, Bell, Shield, HelpCircle, ChevronRight, Wallet } from 'lucide-react';
-import Link from 'next/link';
+import { cn } from '@/lib/utils';
+import { signOut } from 'firebase/auth';
+import { useRouter } from 'next/navigation';
 
 export default function ProfilePage() {
-  const { user, logout } = useAuth();
+  const { user } = useUser();
+  const auth = useAuth();
+  const router = useRouter();
+
+  const handleLogout = async () => {
+    await signOut(auth);
+    router.push('/login');
+  };
 
   const menuItems = [
     { icon: Settings, label: 'Settings', color: 'text-primary bg-primary/10' },
@@ -72,7 +81,7 @@ export default function ProfilePage() {
         <Button 
           variant="destructive" 
           className="w-full h-14 rounded-2xl text-lg font-bold shadow-lg shadow-destructive/20"
-          onClick={() => logout()}
+          onClick={handleLogout}
         >
           <LogOut className="mr-2 h-5 w-5" />
           Log Out

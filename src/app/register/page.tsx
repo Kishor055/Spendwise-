@@ -3,8 +3,8 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { createUserWithEmailAndPassword, updateProfile } from 'firebase/auth';
-import { auth, db } from '@/lib/firebase';
-import { doc, setDoc, serverTimestamp } from 'firebase/firestore';
+import { useAuth, useFirestore, setDocumentNonBlocking } from '@/firebase';
+import { doc, serverTimestamp } from 'firebase/firestore';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
@@ -19,6 +19,8 @@ export default function RegisterPage() {
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const router = useRouter();
+  const auth = useAuth();
+  const firestore = useFirestore();
   const { toast } = useToast();
 
   const handleRegister = async (e: React.FormEvent) => {
@@ -31,11 +33,13 @@ export default function RegisterPage() {
       await updateProfile(user, { displayName: name });
 
       // Initialize user document
-      await setDoc(doc(db, 'users', user.uid), {
+      const userRef = doc(firestore, 'users', user.uid);
+      setDocumentNonBlocking(userRef, {
+        id: user.uid, // Required by rules/schema
         name,
         email,
         createdAt: serverTimestamp(),
-      });
+      }, { merge: true });
 
       router.push('/dashboard');
     } catch (error: any) {

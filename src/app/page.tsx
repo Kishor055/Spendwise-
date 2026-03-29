@@ -2,13 +2,13 @@
 
 import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { useAuth } from '@/context/auth-context';
+import { useUser } from '@/firebase';
 import { Loader2, ArrowRight, Wallet, TrendingUp, ShieldCheck } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
 
 export default function Home() {
-  const { user, loading } = useAuth();
+  const { user, isUserLoading: loading } = useUser();
   const router = useRouter();
 
   useEffect(() => {

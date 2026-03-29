@@ -12,7 +12,6 @@ import { Calendar } from '@/components/ui/calendar';
 import {
   Form,
   FormControl,
-  FormDescription,
   FormField,
   FormItem,
   FormLabel,
@@ -33,9 +32,8 @@ import {
 } from '@/components/ui/select';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Label } from '@/components/ui/label';
-import { collection, addDoc, serverTimestamp, Timestamp } from 'firebase/firestore';
-import { db } from '@/lib/firebase';
-import { useAuth } from '@/context/auth-context';
+import { collection, serverTimestamp, Timestamp } from 'firebase/firestore';
+import { useUser, useFirestore, addDocumentNonBlocking } from '@/firebase';
 import { useToast } from '@/hooks/use-toast';
 
 const transactionSchema = z.object({
@@ -53,7 +51,8 @@ const CATEGORIES = {
 
 export function TransactionForm({ onSuccess }: { onSuccess?: () => void }) {
   const [loading, setLoading] = useState(false);
-  const { user } = useAuth();
+  const { user } = useUser();
+  const firestore = useFirestore();
   const { toast } = useToast();
 
   const form = useForm<z.infer<typeof transactionSchema>>({
@@ -70,21 +69,24 @@ export function TransactionForm({ onSuccess }: { onSuccess?: () => void }) {
   const transactionType = form.watch('type');
 
   async function onSubmit(values: z.infer<typeof transactionSchema>) {
-    if (!user) return;
+    if (!user || !firestore) return;
 
     setLoading(true);
     try {
-      await addDoc(collection(db, 'users', user.uid, 'transactions'), {
+      const colRef = collection(firestore, 'users', user.uid, 'transactions');
+      addDocumentNonBlocking(colRef, {
         ...values,
+        userId: user.uid, // Explicit userId as per schema/rules
         date: Timestamp.fromDate(values.date),
         createdAt: serverTimestamp(),
       });
+      
       toast({ title: 'Success', description: 'Transaction added successfully' });
       form.reset();
       onSuccess?.();
     } catch (error) {
-      console.error(error);
-      toast({ variant: 'destructive', title: 'Error', description: 'Failed to add transaction' });
+      // Errors handled by non-blocking emitter but we catch local issues
+      toast({ variant: 'destructive', title: 'Error', description: 'Failed to initiate transaction' });
     } finally {
       setLoading(false);
     }

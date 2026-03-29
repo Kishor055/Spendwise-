@@ -1,9 +1,8 @@
 "use client";
 
-import { useEffect, useState } from 'react';
-import { useAuth } from '@/context/auth-context';
-import { db } from '@/lib/firebase';
-import { collection, query, orderBy, onSnapshot, doc, deleteDoc } from 'firebase/firestore';
+import { useState, useMemo } from 'react';
+import { useUser, useFirestore, useCollection, useMemoFirebase, deleteDocumentNonBlocking } from '@/firebase';
+import { collection, query, orderBy, doc } from 'firebase/firestore';
 import { BottomNav } from '@/components/layout/bottom-nav';
 import { ArrowUpRight, ArrowDownRight, Search, Trash2, Filter, ChevronLeft } from 'lucide-react';
 import { format } from 'date-fns';
@@ -34,39 +33,35 @@ interface Transaction {
 }
 
 export default function TransactionsPage() {
-  const { user } = useAuth();
-  const [transactions, setTransactions] = useState<Transaction[]>([]);
+  const { user } = useUser();
+  const firestore = useFirestore();
   const [search, setSearch] = useState('');
   const [filter, setFilter] = useState<'all' | 'income' | 'expense'>('all');
   const { toast } = useToast();
 
-  useEffect(() => {
-    if (!user) return;
+  const transactionsQuery = useMemoFirebase(() => {
+    if (!firestore || !user) return null;
+    return query(collection(firestore, 'users', user.uid, 'transactions'), orderBy('date', 'desc'));
+  }, [firestore, user]);
 
-    const q = query(collection(db, 'users', user.uid, 'transactions'), orderBy('date', 'desc'));
-    const unsub = onSnapshot(q, (snapshot) => {
-      setTransactions(snapshot.docs.map(doc => ({ ...doc.data(), id: doc.id } as Transaction)));
-    });
+  const { data: transactions } = useCollection<Transaction>(transactionsQuery);
 
-    return () => unsub();
-  }, [user]);
-
-  const handleDelete = async (id: string) => {
-    if (!user) return;
-    try {
-      await deleteDoc(doc(db, 'users', user.uid, 'transactions', id));
-      toast({ title: 'Deleted', description: 'Transaction removed successfully' });
-    } catch (error) {
-      toast({ variant: 'destructive', title: 'Error', description: 'Failed to delete' });
-    }
+  const handleDelete = (transactionId: string) => {
+    if (!user || !firestore) return;
+    const docRef = doc(firestore, 'users', user.uid, 'transactions', transactionId);
+    deleteDocumentNonBlocking(docRef);
+    toast({ title: 'Deleted', description: 'Transaction removed successfully' });
   };
 
-  const filteredTransactions = transactions.filter(tx => {
-    const matchesSearch = tx.category.toLowerCase().includes(search.toLowerCase()) || 
-                          (tx.note && tx.note.toLowerCase().includes(search.toLowerCase()));
-    const matchesFilter = filter === 'all' || tx.type === filter;
-    return matchesSearch && matchesFilter;
-  });
+  const filteredTransactions = useMemo(() => {
+    if (!transactions) return [];
+    return transactions.filter(tx => {
+      const matchesSearch = tx.category.toLowerCase().includes(search.toLowerCase()) || 
+                            (tx.note && tx.note.toLowerCase().includes(search.toLowerCase()));
+      const matchesFilter = filter === 'all' || tx.type === filter;
+      return matchesSearch && matchesFilter;
+    });
+  }, [transactions, search, filter]);
 
   return (
     <div className="min-h-screen bg-background pb-24">
