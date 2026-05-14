@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useMemo, useState } from 'react';
@@ -16,7 +17,9 @@ import {
   Sparkles,
   Trophy,
   Target,
-  ChevronRight
+  ChevronRight,
+  Flame,
+  Rocket
 } from 'lucide-react';
 import { format } from 'date-fns';
 import { cn } from '@/lib/utils';
@@ -51,11 +54,20 @@ export default function DashboardPage() {
     return query(
       collection(firestore, 'users', user.uid, 'transactions'),
       orderBy('date', 'desc'),
-      limit(10)
+      limit(20)
+    );
+  }, [firestore, user]);
+
+  const goalsQuery = useMemoFirebase(() => {
+    if (!firestore || !user) return null;
+    return query(
+      collection(firestore, 'users', user.uid, 'goals'),
+      limit(3)
     );
   }, [firestore, user]);
 
   const { data: transactions, isLoading: isTransactionsLoading } = useCollection<Transaction>(transactionsQuery);
+  const { data: goals } = useCollection(goalsQuery);
 
   const summary = useMemo(() => {
     if (!transactions) return { balance: 0, income: 0, expense: 0, budget: 2500 };
@@ -97,7 +109,7 @@ export default function DashboardPage() {
         </div>
         <div className="flex gap-2">
           <Button variant="ghost" size="icon" className="rounded-2xl glass h-10 w-10 text-primary" asChild>
-            <Link href="/ai-assistant"><Sparkles className="h-5 w-5" /></Link>
+            <Link href="/wrapped"><Flame className="h-5 w-5 text-orange-500 animate-pulse" /></Link>
           </Button>
           <Dialog open={isAddOpen} onOpenChange={setIsAddOpen}>
             <DialogTrigger asChild>
@@ -201,24 +213,32 @@ export default function DashboardPage() {
               <Target className="h-5 w-5 text-accent" />
               Wealth Goals
             </h2>
-            <Button variant="ghost" size="sm" className="font-bold text-accent rounded-full">View All</Button>
+            <Button variant="ghost" size="sm" className="font-bold text-accent rounded-full" asChild>
+              <Link href="/goals">View All</Link>
+            </Button>
           </div>
           <div className="flex gap-4 overflow-x-auto pb-4 scrollbar-hide">
-            {[
-              { label: 'Vacation', current: 1200, target: 3000, icon: Trophy, color: 'text-accent bg-accent/10' },
-              { label: 'New Car', current: 5000, target: 15000, icon: Wallet, color: 'text-primary bg-primary/10' },
-            ].map((goal, i) => (
-              <div key={i} className="min-w-[200px] glass p-5 rounded-[2rem] flex flex-col gap-4 border-none shadow-sm">
-                <div className={cn("w-10 h-10 rounded-2xl flex items-center justify-center", goal.color)}>
-                  <goal.icon className="h-5 w-5" />
+            {!goals || goals.length === 0 ? (
+              <Link href="/goals" className="w-full">
+                <div className="glass p-8 rounded-[2rem] border-dashed border-2 flex flex-col items-center justify-center text-muted-foreground hover:bg-muted/30 transition-colors">
+                  <Rocket className="h-8 w-8 mb-2 opacity-30" />
+                  <p className="text-xs font-black uppercase tracking-widest">Set your first goal</p>
                 </div>
-                <div>
-                  <p className="text-[10px] font-black text-muted-foreground uppercase">{goal.label}</p>
-                  <p className="text-base font-black">${goal.current.toLocaleString()} / ${goal.target.toLocaleString()}</p>
+              </Link>
+            ) : (
+              goals.map((goal: any) => (
+                <div key={goal.id} className="min-w-[200px] glass p-5 rounded-[2rem] flex flex-col gap-4 border-none shadow-sm transition-transform active:scale-95">
+                  <div className="w-10 h-10 rounded-2xl bg-accent/10 flex items-center justify-center text-accent">
+                    <Trophy className="h-5 w-5" />
+                  </div>
+                  <div>
+                    <p className="text-[10px] font-black text-muted-foreground uppercase">{goal.title}</p>
+                    <p className="text-base font-black">${goal.currentAmount.toLocaleString()} / ${goal.targetAmount.toLocaleString()}</p>
+                  </div>
+                  <Progress value={(goal.currentAmount/goal.targetAmount)*100} className="h-1.5 bg-background" indicatorClassName="bg-accent" />
                 </div>
-                <Progress value={(goal.current/goal.target)*100} className="h-1.5 bg-background" />
-              </div>
-            ))}
+              ))
+            )}
           </div>
         </section>
 

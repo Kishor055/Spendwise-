@@ -45,6 +45,22 @@
         "createdAt": { "type": "string", "format": "date-time" }
       },
       "required": ["id", "userId", "title", "targetAmount", "createdAt"]
+    },
+    "Subscription": {
+      "title": "Subscription",
+      "type": "object",
+      "description": "Recurring subscription services.",
+      "properties": {
+        "id": { "type": "string" },
+        "userId": { "type": "string" },
+        "name": { "type": "string" },
+        "amount": { "type": "number" },
+        "billingCycle": { "type": "string", "enum": ["monthly", "yearly"] },
+        "category": { "type": "string" },
+        "nextBillingDate": { "type": "string", "format": "date-time" },
+        "active": { "type": "boolean", "default": true }
+      },
+      "required": ["id", "userId", "name", "amount", "billingCycle"]
     }
   },
   "auth": {
@@ -62,6 +78,10 @@
     "/users/{userId}/goals/{goalId}": {
       "schema": { "$ref": "#/entities/Goal" },
       "description": "User financial goals."
+    },
+    "/users/{userId}/subscriptions/{subscriptionId}": {
+      "schema": { "$ref": "#/entities/Subscription" },
+      "description": "User recurring subscriptions."
     }
   }
 }

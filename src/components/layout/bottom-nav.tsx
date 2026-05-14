@@ -1,8 +1,9 @@
+
 "use client";
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { LayoutDashboard, ReceiptText, PieChart, Sparkles, UserCircle, Plus } from 'lucide-react';
+import { LayoutDashboard, ReceiptText, PieChart, Sparkles, UserCircle, Plus, Target, CreditCard } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import {
@@ -18,8 +19,8 @@ import { useState } from 'react';
 const navItems = [
   { href: '/dashboard', label: 'Home', icon: LayoutDashboard },
   { href: '/transactions', label: 'History', icon: ReceiptText },
-  { href: '/ai-assistant', label: 'Advisor', icon: Sparkles },
-  { href: '/analytics', label: 'Insights', icon: PieChart },
+  { href: '/goals', label: 'Goals', icon: Target },
+  { href: '/subscriptions', label: 'Subs', icon: CreditCard },
   { href: '/profile', label: 'Profile', icon: UserCircle },
 ];
 
