@@ -1,134 +1,67 @@
+
 {
   "entities": {
     "UserProfile": {
-      "$schema": "http://json-schema.org/draft-07/schema#",
       "title": "UserProfile",
       "type": "object",
-      "description": "Represents a user's profile information within the Spendwise application. This entity stores basic user details, excluding sensitive authentication credentials handled by Firebase Authentication.",
+      "description": "User profile with basic settings and preferences.",
       "properties": {
-        "id": {
-          "type": "string",
-          "description": "Unique identifier for the UserProfile entity."
-        },
-        "name": {
-          "type": "string",
-          "description": "The user's display name."
-        },
-        "email": {
-          "type": "string",
-          "description": "The user's email address, used for identification and contact.",
-          "format": "email"
-        },
-        "createdAt": {
-          "type": "string",
-          "description": "Timestamp indicating when the user profile was created.",
-          "format": "date-time"
-        }
+        "id": { "type": "string" },
+        "name": { "type": "string" },
+        "email": { "type": "string", "format": "email" },
+        "currency": { "type": "string", "default": "USD" },
+        "monthlyBudget": { "type": "number", "default": 2000 },
+        "createdAt": { "type": "string", "format": "date-time" }
       },
-      "required": [
-        "id",
-        "name",
-        "email",
-        "createdAt"
-      ]
+      "required": ["id", "name", "email", "createdAt"]
     },
     "Transaction": {
-      "$schema": "http://json-schema.org/draft-07/schema#",
       "title": "Transaction",
       "type": "object",
-      "description": "Represents a single financial transaction, either an income or an expense, recorded by a user.",
+      "description": "Financial transaction records.",
       "properties": {
-        "id": {
-          "type": "string",
-          "description": "Unique identifier for the Transaction entity."
-        },
-        "userId": {
-          "type": "string",
-          "description": "Reference to the UserProfile this transaction belongs to. (Relationship: UserProfile 1:N Transaction)"
-        },
-        "type": {
-          "type": "string",
-          "description": "The type of the transaction, either 'income' or 'expense'."
-        },
-        "amount": {
-          "type": "number",
-          "description": "The monetary amount of the transaction."
-        },
-        "category": {
-          "type": "string",
-          "description": "A descriptive category for the transaction (e.g., 'Food', 'Travel', 'Salary')."
-        },
-        "note": {
-          "type": "string",
-          "description": "An optional short description or note for the transaction."
-        },
-        "date": {
-          "type": "string",
-          "description": "The date and time when the transaction occurred.",
-          "format": "date-time"
-        },
-        "createdAt": {
-          "type": "string",
-          "description": "Timestamp indicating when the transaction record was created in the system.",
-          "format": "date-time"
-        }
+        "id": { "type": "string" },
+        "userId": { "type": "string" },
+        "type": { "type": "string", "enum": ["income", "expense"] },
+        "amount": { "type": "number" },
+        "category": { "type": "string" },
+        "note": { "type": "string" },
+        "date": { "type": "string", "format": "date-time" },
+        "createdAt": { "type": "string", "format": "date-time" }
       },
-      "required": [
-        "id",
-        "userId",
-        "type",
-        "amount",
-        "category",
-        "date",
-        "createdAt"
-      ]
+      "required": ["id", "userId", "type", "amount", "category", "date", "createdAt"]
+    },
+    "Goal": {
+      "title": "Goal",
+      "type": "object",
+      "description": "Financial savings goals.",
+      "properties": {
+        "id": { "type": "string" },
+        "userId": { "type": "string" },
+        "title": { "type": "string" },
+        "targetAmount": { "type": "number" },
+        "currentAmount": { "type": "number", "default": 0 },
+        "deadline": { "type": "string", "format": "date-time" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["id", "userId", "title", "targetAmount", "createdAt"]
     }
   },
   "auth": {
-    "providers": [
-      "password",
-      "anonymous"
-    ]
+    "providers": ["password", "google"]
   },
   "firestore": {
-    "structure": [
-      {
-        "path": "/users/{userId}",
-        "definition": {
-          "entityName": "UserProfile",
-          "schema": {
-            "$ref": "#/backend/entities/UserProfile"
-          },
-          "description": "Stores individual user profile data. Access is strictly limited to the user specified by `userId`. The `id` field in the document MUST match the `userId` in the path and `request.auth.uid`.",
-          "params": [
-            {
-              "name": "userId",
-              "description": "The unique identifier of the user, corresponding to Firebase Authentication UID."
-            }
-          ]
-        }
-      },
-      {
-        "path": "/users/{userId}/transactions/{transactionId}",
-        "definition": {
-          "entityName": "Transaction",
-          "schema": {
-            "$ref": "#/backend/entities/Transaction"
-          },
-          "description": "Stores financial transactions (income/expense) for a specific user. Each transaction includes a `userId` field which MUST match the parent `userId` in the path and `request.auth.uid` for authorization independence.",
-          "params": [
-            {
-              "name": "userId",
-              "description": "The unique identifier of the user, corresponding to Firebase Authentication UID."
-            },
-            {
-              "name": "transactionId",
-              "description": "The unique identifier of the transaction document."
-            }
-          ]
-        }
-      }
-    ],
-    "reasoning": "The Firestore structure for the Spendwise application utilizes a hierarchical, user-centric model that perfectly aligns with the core design principles and strategy mandates. \n\n**Authorization Independence:** This is achieved by anchoring all user-specific data directly under a `/users/{userId}` path. The `UserProfile` document is located at `/users/{userId}`, where `{userId}` directly corresponds to the Firebase Authentication UID (`request.auth.uid`). Similarly, `Transaction` documents are stored in a subcollection at `/users/{userId}/transactions/{transactionId}`. This design is critical for authorization independence because the ownership is implicitly defined by the path. Firestore security rules can simply check `request.auth.uid == userId` without needing to perform `get()` calls to parent documents or other collections to determine access rights. For the `Transaction` entity, the `userId` field within each document explicitly denormalizes this ownership, reinforcing the path-based authorization and further enhancing rule clarity and debuggability.\n\n**QAPs (Rules are not Filters):** The structural segregation mandates that all documents within a given path share the same security posture. For `/users/{userId}`, only the authenticated user matching `userId` can read or write their profile. For `/users/{userId}/transactions/{transactionId}`, only the authenticated user matching `userId` can manage their transactions. This ensures that any `list` operation initiated by the client is inherently restricted to the current user's data (e.g., `db.collection(\"users\", auth.currentUser.uid, \"transactions\")`). The security rules then simply enforce that the `userId` in the path matches `request.auth.uid`, thus preventing users from accidentally or maliciously querying other users' data. The client-side queries are pre-filtered by the application logic, and the security rules validate that these pre-filters are indeed respected, satisfying the QAP principle.\n\n**Structural Segregation:** By placing user profiles at `/users/{userId}` and their respective transactions in a subcollection, data with different access requirements (i.e., different users' data) are naturally segregated. Each `UserProfile` and its `transactions` subcollection form a secure, self-contained unit, simplifying security rules immensely as they only need to consider the `userId` parameter in the path.\n\n**Access Modeling & Data Clarity:** The chosen path-based ownership is the most secure and debuggable pattern for private user data. The naming conventions for collections (`users`, `transactions`) and path parameters (`userId`, `transactionId`) are consistent and semantic, making the data structure easy to understand and predict. The `Transaction` schema explicitly includes `userId`, ensuring that ownership is clearly defined within the document itself, even if it's already implied by the path."
+    "/users/{userId}": {
+      "schema": { "$ref": "#/entities/UserProfile" },
+      "description": "User profile data."
+    },
+    "/users/{userId}/transactions/{transactionId}": {
+      "schema": { "$ref": "#/entities/Transaction" },
+      "description": "User transactions."
+    },
+    "/users/{userId}/goals/{goalId}": {
+      "schema": { "$ref": "#/entities/Goal" },
+      "description": "User financial goals."
+    }
   }
 }

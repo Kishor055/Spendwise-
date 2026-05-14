@@ -1,8 +1,9 @@
+
 "use client";
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { LayoutDashboard, ReceiptText, PieChart, Plus, UserCircle } from 'lucide-react';
+import { LayoutDashboard, ReceiptText, PieChart, Sparkles, UserCircle, Plus } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import {
@@ -18,6 +19,7 @@ import { useState } from 'react';
 const navItems = [
   { href: '/dashboard', label: 'Home', icon: LayoutDashboard },
   { href: '/transactions', label: 'History', icon: ReceiptText },
+  { href: '/ai-assistant', label: 'Advisor', icon: Sparkles },
   { href: '/analytics', label: 'Insights', icon: PieChart },
   { href: '/profile', label: 'Profile', icon: UserCircle },
 ];
@@ -31,11 +33,11 @@ export function BottomNav() {
       {navItems.slice(0, 2).map((item) => (
         <Link key={item.href} href={item.href} className="flex flex-col items-center gap-1 group">
           <item.icon className={cn(
-            "h-6 w-6 transition-colors",
+            "h-5 w-5 transition-colors",
             pathname === item.href ? "text-primary" : "text-muted-foreground group-hover:text-primary"
           )} />
           <span className={cn(
-            "text-[10px] font-medium transition-colors",
+            "text-[9px] font-black uppercase tracking-tighter transition-colors",
             pathname === item.href ? "text-primary" : "text-muted-foreground"
           )}>{item.label}</span>
         </Link>
@@ -43,13 +45,13 @@ export function BottomNav() {
 
       <Dialog open={isAddOpen} onOpenChange={setIsAddOpen}>
         <DialogTrigger asChild>
-          <Button size="icon" className="h-12 w-12 rounded-full -mt-8 shadow-xl border-4 border-background bg-primary hover:bg-primary/90">
+          <Button size="icon" className="h-12 w-12 rounded-full -mt-8 shadow-2xl border-4 border-background bg-primary hover:bg-primary/90 transition-transform active:scale-90">
             <Plus className="h-6 w-6 text-white" />
           </Button>
         </DialogTrigger>
-        <DialogContent className="sm:max-w-[425px]">
+        <DialogContent className="sm:max-w-[425px] rounded-[2.5rem] border-none">
           <DialogHeader>
-            <DialogTitle>Add Transaction</DialogTitle>
+            <DialogTitle className="text-2xl font-black">Quick Record</DialogTitle>
           </DialogHeader>
           <TransactionForm onSuccess={() => setIsAddOpen(false)} />
         </DialogContent>
@@ -58,11 +60,11 @@ export function BottomNav() {
       {navItems.slice(2).map((item) => (
         <Link key={item.href} href={item.href} className="flex flex-col items-center gap-1 group">
           <item.icon className={cn(
-            "h-6 w-6 transition-colors",
+            "h-5 w-5 transition-colors",
             pathname === item.href ? "text-primary" : "text-muted-foreground group-hover:text-primary"
           )} />
           <span className={cn(
-            "text-[10px] font-medium transition-colors",
+            "text-[9px] font-black uppercase tracking-tighter transition-colors",
             pathname === item.href ? "text-primary" : "text-muted-foreground"
           )}>{item.label}</span>
         </Link>

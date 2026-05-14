@@ -1,96 +1,19 @@
+
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
+    function isSignedIn() { return request.auth != null; }
+    function isOwner(userId) { return isSignedIn() && request.auth.uid == userId; }
 
-    /**
-     * Spendwise Security Rules
-     *
-     * Core Philosophy:
-     * This ruleset enforces a strict user-ownership model where all data is private by default.
-     * Access is granted based on the user's authenticated identity and their relationship
-     * to the data path.
-     *
-     * Data Structure:
-     * The database follows a hierarchical, user-centric structure. All data is nested
-     * under the /users/{userId} path, where {userId} corresponds to the Firebase
-     * Authentication UID.
-     *
-     * Key Security Decisions:
-     * - Authorization Independence: Ownership is primarily determined by the document path,
-     *   allowing for high-performance rules without cross-document lookups.
-     * - Structural Segregation: User profiles and their associated transactions are
-     *   isolated into user-specific trees, preventing cross-user data leakage.
-     * - Relational Integrity: On creation, documents must include internal fields (e.g., id, userId)
-     *    matching the path to ensure data consistency. These fields are immutable.
-     * - Prototyping Mode: Rules strictly control access (Who) but remain flexible regarding
-     *   data types and schema (What) to support rapid development.
-     */
-
-    // --- Helper Functions ---
-
-    /**
-     * @description Checks if the request is from an authenticated user.
-     */
-    function isSignedIn() {
-      return request.auth != null;
-    }
-
-    /**
-     * @description Verifies if the authenticated user matches the provided userId.
-     */
-    function isOwner(userId) {
-      return isSignedIn() && request.auth.uid == userId;
-    }
-
-    /**
-     * @description Ensures the user is the owner and the document currently exists.
-     * Used for update and delete operations to prevent actions on non-existent data.
-     */
-    function isExistingOwner(userId) {
-      return isOwner(userId) && resource != null;
-    }
-
-    /**
-     * @description Validates that the internal 'id' field matches the path and is immutable.
-     */
-    function isValidUserProfile(userId) {
-      return request.resource.data.id == userId;
-    }
-
-    /**
-     * @description Validates that the internal 'userId' field matches the path and is immutable.
-     */
-    function isValidTransaction(userId) {
-      return request.resource.data.userId == userId;
-    }
-
-    // --- Collection Rules ---
-
-    /**
-     * @description Rules for the UserProfile entity. Users can only manage their own profile.
-     * @path /users/{userId}
-     * @allow (get) If the user is signed in and their UID matches the userId in the path.
-     * @deny (create) If the internal 'id' field does not match the userId in the path.
-     * @principle Restricts access to a user's own data tree and enforces path-to-data consistency.
-     */
     match /users/{userId} {
-      allow get, list: if isOwner(userId);
-      allow create: if isOwner(userId) && isValidUserProfile(userId);
-      allow update: if isExistingOwner(userId) && request.resource.data.id == resource.data.id;
-      allow delete: if isExistingOwner(userId);
-
-      /**
-       * @description Rules for the Transaction entity. Users can only manage their own financial records.
-       * @path /users/{userId}/transactions/{transactionId}
-       * @allow (list) A user listing their own transactions via /users/my_uid/transactions.
-       * @deny (update) Attempting to change the 'userId' field to a different user's ID.
-       * @principle Enforces document ownership for writes and ensures query security for list operations.
-       */
+      allow get, list, create, update, delete: if isOwner(userId);
+      
       match /transactions/{transactionId} {
-        allow get, list: if isOwner(userId);
-        allow create: if isOwner(userId) && isValidTransaction(userId);
-        allow update: if isExistingOwner(userId) && request.resource.data.userId == resource.data.userId;
-        allow delete: if isExistingOwner(userId);
+        allow get, list, create, update, delete: if isOwner(userId);
+      }
+      
+      match /goals/{goalId} {
+        allow get, list, create, update, delete: if isOwner(userId);
       }
     }
   }
