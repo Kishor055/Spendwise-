@@ -83,7 +83,6 @@ export default function DashboardPage() {
 
   return (
     <div className="min-h-screen pb-32">
-      {/* Dynamic Header */}
       <header className="px-6 pt-12 pb-6 flex justify-between items-center sticky top-0 z-50 bg-background/50 backdrop-blur-xl">
         <div className="flex items-center gap-3">
           <div className="w-10 h-10 rounded-2xl glass flex items-center justify-center shadow-lg">
@@ -117,11 +116,8 @@ export default function DashboardPage() {
       </header>
 
       <main className="px-6 space-y-8 max-w-4xl mx-auto">
-        {/* Main Wallet Glass Card */}
         <section className="relative">
           <div className="absolute -top-10 -right-10 w-40 h-40 bg-primary/10 rounded-full blur-[80px]" />
-          <div className="absolute -bottom-10 -left-10 w-40 h-40 bg-accent/10 rounded-full blur-[80px]" />
-          
           <Card className="glass-dark border-none overflow-hidden rounded-[3rem] relative z-10">
             <CardHeader className="pb-2">
               <div className="flex justify-between items-center">
@@ -169,16 +165,19 @@ export default function DashboardPage() {
                     </span>
                   </div>
                 </div>
-                <Progress value={budgetProgress} className="h-2.5 bg-background" indicatorClassName={cn(
-                  "transition-all duration-1000",
-                  budgetProgress > 85 ? "bg-destructive" : budgetProgress > 65 ? "bg-orange-400" : "bg-primary"
-                )} />
+                <Progress 
+                  value={budgetProgress} 
+                  className="h-2.5 bg-background" 
+                  indicatorClassName={cn(
+                    "transition-all duration-1000",
+                    budgetProgress > 85 ? "bg-destructive" : budgetProgress > 65 ? "bg-orange-400" : "bg-primary"
+                  )} 
+                />
               </div>
             </CardContent>
           </Card>
         </section>
 
-        {/* AI Insight Pill */}
         <Link href="/ai-assistant">
           <div className="glass rounded-[2rem] p-5 border-none flex items-center gap-4 group cursor-pointer hover:shadow-xl transition-all hover:-translate-y-1">
             <div className="h-12 w-12 rounded-2xl bg-primary/10 flex items-center justify-center text-primary group-hover:rotate-12 transition-transform">
@@ -196,7 +195,6 @@ export default function DashboardPage() {
           </div>
         </Link>
 
-        {/* Goals Strip */}
         <section className="space-y-4">
           <div className="flex items-center justify-between">
             <h2 className="text-lg font-black tracking-tight flex items-center gap-2">
@@ -224,7 +222,6 @@ export default function DashboardPage() {
           </div>
         </section>
 
-        {/* Activity Feed */}
         <section className="space-y-4">
           <div className="flex items-center justify-between">
             <h2 className="text-lg font-black tracking-tight">Recent Activity</h2>

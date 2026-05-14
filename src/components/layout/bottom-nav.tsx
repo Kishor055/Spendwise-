@@ -28,7 +28,7 @@ export function BottomNav() {
   const [isAddOpen, setIsAddOpen] = useState(false);
 
   return (
-    <nav className="fixed bottom-6 left-6 right-6 z-50 glass-nav rounded-[2.5rem] py-3 px-6 flex items-center justify-between shadow-[0_20px_50px_rgba(0,0,0,0.1)] md:hidden">
+    <nav className="fixed bottom-6 left-6 right-6 z-50 glass rounded-[2.5rem] py-3 px-6 flex items-center justify-between shadow-[0_20px_50px_rgba(0,0,0,0.1)] md:hidden">
       {navItems.slice(0, 2).map((item) => (
         <Link key={item.href} href={item.href} className="flex flex-col items-center gap-1 group">
           <item.icon className={cn(

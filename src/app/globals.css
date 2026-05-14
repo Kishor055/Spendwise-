@@ -71,7 +71,7 @@
 }
 
 .glass-nav {
-  @apply bg-white/60 backdrop-blur-2xl border-t border-white/40;
+  @apply bg-white/60 backdrop-blur-2xl border border-white/40;
 }
 
 .scrollbar-hide::-webkit-scrollbar {
