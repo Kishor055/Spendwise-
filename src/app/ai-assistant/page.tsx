@@ -1,4 +1,3 @@
-
 'use client';
 
 import { useState, useRef, useEffect } from 'react';
@@ -8,8 +7,7 @@ import { askFinancialAdvisor } from '@/ai/flows/financial-advisor-flow';
 import { BottomNav } from '@/components/layout/bottom-nav';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Card, CardContent } from '@/components/ui/card';
-import { Sparkles, Send, Bot, User, Loader2, Wallet, ChevronLeft } from 'lucide-react';
+import { Sparkles, Send, Bot, User, Loader2, ChevronLeft } from 'lucide-react';
 import Link from 'next/link';
 import { cn } from '@/lib/utils';
 
@@ -23,7 +21,7 @@ export default function AIAssistantPage() {
   const firestore = useFirestore();
   const [input, setInput] = useState('');
   const [messages, setMessages] = useState<Message[]>([
-    { role: 'assistant', content: "Hi! I'm your Spendwise AI advisor. How can I help you manage your finances today?" }
+    { role: 'assistant', content: "Hi! I'm Spendwise AI. I can analyze your transactions and give you advice. What's on your mind?" }
   ]);
   const [isTyping, setIsTyping] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
@@ -61,23 +59,23 @@ export default function AIAssistantPage() {
         })),
         userProfile: {
           name: user.displayName || 'User',
-          monthlyBudget: 2000 // Default or fetch from profile
+          monthlyBudget: 2000
         }
       });
 
       setMessages(prev => [...prev, { role: 'assistant', content: response.answer }]);
     } catch (error) {
-      setMessages(prev => [...prev, { role: 'assistant', content: "Sorry, I encountered an error. Please try again." }]);
+      setMessages(prev => [...prev, { role: 'assistant', content: "I'm having trouble connecting to my brain right now. Please try again later." }]);
     } finally {
       setIsTyping(false);
     }
   };
 
   return (
-    <div className="min-h-screen bg-background flex flex-col pb-20">
-      <header className="px-6 py-6 bg-background/80 backdrop-blur-md sticky top-0 z-50 border-b flex items-center justify-between">
-        <div className="flex items-center gap-3">
-          <Button variant="ghost" size="icon" className="rounded-full" asChild>
+    <div className="min-h-screen flex flex-col pb-32">
+      <header className="px-6 py-8 bg-background/50 backdrop-blur-xl sticky top-0 z-50 border-b flex items-center justify-between">
+        <div className="flex items-center gap-4">
+          <Button variant="ghost" size="icon" className="rounded-2xl glass h-10 w-10" asChild>
             <Link href="/dashboard"><ChevronLeft className="h-5 w-5" /></Link>
           </Button>
           <div>
@@ -85,7 +83,7 @@ export default function AIAssistantPage() {
               <Sparkles className="h-5 w-5 text-primary animate-pulse" />
               AI Advisor
             </h1>
-            <p className="text-[10px] text-muted-foreground font-bold uppercase tracking-wider">Powered by Gemini</p>
+            <p className="text-[10px] text-muted-foreground font-black uppercase tracking-widest">Powered by Gemini</p>
           </div>
         </div>
       </header>
@@ -94,14 +92,14 @@ export default function AIAssistantPage() {
         {messages.map((msg, i) => (
           <div key={i} className={cn("flex w-full", msg.role === 'user' ? "justify-end" : "justify-start")}>
             <div className={cn(
-              "max-w-[85%] p-4 rounded-[1.5rem] shadow-sm",
+              "max-w-[85%] p-5 rounded-[2rem] shadow-sm transition-all animate-in fade-in slide-in-from-bottom-2",
               msg.role === 'user' 
                 ? "bg-primary text-primary-foreground rounded-tr-none" 
-                : "glass-card rounded-tl-none border-none"
+                : "glass rounded-tl-none border-none"
             )}>
               <div className="flex items-start gap-3">
                 {msg.role === 'assistant' && <Bot className="h-5 w-5 mt-1 shrink-0 text-primary" />}
-                <p className="text-sm font-medium leading-relaxed">{msg.content}</p>
+                <p className="text-sm font-bold leading-relaxed">{msg.content}</p>
                 {msg.role === 'user' && <User className="h-5 w-5 mt-1 shrink-0 opacity-50" />}
               </div>
             </div>
@@ -109,26 +107,26 @@ export default function AIAssistantPage() {
         ))}
         {isTyping && (
           <div className="flex justify-start">
-            <div className="glass-card p-4 rounded-[1.5rem] rounded-tl-none border-none flex items-center gap-2">
+            <div className="glass p-5 rounded-[2rem] rounded-tl-none border-none flex items-center gap-3">
               <Loader2 className="h-4 w-4 animate-spin text-primary" />
-              <span className="text-xs font-bold text-muted-foreground animate-pulse">Spendwise is thinking...</span>
+              <span className="text-xs font-black text-muted-foreground animate-pulse uppercase tracking-widest">Processing...</span>
             </div>
           </div>
         )}
       </main>
 
-      <div className="p-6 bg-background/80 backdrop-blur-lg border-t fixed bottom-20 left-0 right-0 max-w-4xl mx-auto">
+      <div className="p-6 bg-background/50 backdrop-blur-xl border-t fixed bottom-24 left-0 right-0 max-w-4xl mx-auto z-40">
         <div className="relative flex items-center">
           <Input 
-            placeholder="Ask anything about your spending..." 
-            className="pr-12 h-14 rounded-2xl bg-muted/50 border-none shadow-inner text-base"
+            placeholder="How can I save $500 this month?" 
+            className="pr-14 h-14 rounded-3xl glass border-none shadow-inner text-base font-medium"
             value={input}
             onChange={(e) => setInput(e.target.value)}
             onKeyDown={(e) => e.key === 'Enter' && handleSend()}
           />
           <Button 
             size="icon" 
-            className="absolute right-2 h-10 w-10 rounded-xl shadow-lg"
+            className="absolute right-2 h-10 w-10 rounded-2xl bg-primary shadow-lg"
             onClick={handleSend}
             disabled={isTyping}
           >
