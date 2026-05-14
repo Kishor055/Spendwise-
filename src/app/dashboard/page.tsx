@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useMemo, useState } from 'react';
@@ -19,7 +18,8 @@ import {
   Target,
   ChevronRight,
   Flame,
-  Rocket
+  Rocket,
+  Zap
 } from 'lucide-react';
 import { format } from 'date-fns';
 import { cn } from '@/lib/utils';
@@ -130,7 +130,7 @@ export default function DashboardPage() {
       <main className="px-6 space-y-8 max-w-4xl mx-auto">
         <section className="relative">
           <div className="absolute -top-10 -right-10 w-40 h-40 bg-primary/10 rounded-full blur-[80px]" />
-          <Card className="glass-dark border-none overflow-hidden rounded-[3rem] relative z-10">
+          <Card className="glass-dark border-none overflow-hidden rounded-[3rem] relative z-10 shadow-2xl">
             <CardHeader className="pb-2">
               <div className="flex justify-between items-center">
                 <CardTitle className="text-[10px] font-black text-muted-foreground uppercase tracking-[0.3em]">Available Balance</CardTitle>
@@ -165,7 +165,7 @@ export default function DashboardPage() {
                 </div>
               </div>
 
-              <div className="bg-muted/50 rounded-[2.5rem] p-6 space-y-4">
+              <div className="bg-muted/50 rounded-[2.5rem] p-6 space-y-4 border border-white/20">
                 <div className="flex justify-between items-center">
                   <div className="space-y-1">
                     <p className="text-[10px] font-black text-muted-foreground uppercase tracking-widest">Monthly Limit</p>
@@ -190,22 +190,46 @@ export default function DashboardPage() {
           </Card>
         </section>
 
-        <Link href="/ai-assistant">
-          <div className="glass rounded-[2rem] p-5 border-none flex items-center gap-4 group cursor-pointer hover:shadow-xl transition-all hover:-translate-y-1">
-            <div className="h-12 w-12 rounded-2xl bg-primary/10 flex items-center justify-center text-primary group-hover:rotate-12 transition-transform">
-              <Sparkles className="h-6 w-6" />
+        <div className="grid grid-cols-2 gap-4">
+          <Link href="/ai-assistant" className="col-span-2">
+            <div className="glass rounded-[2rem] p-5 border-none flex items-center gap-4 group cursor-pointer hover:shadow-xl transition-all hover:-translate-y-1">
+              <div className="h-12 w-12 rounded-2xl bg-primary/10 flex items-center justify-center text-primary group-hover:rotate-12 transition-transform">
+                <Sparkles className="h-6 w-6" />
+              </div>
+              <div className="flex-1">
+                <p className="text-[10px] font-black text-primary uppercase tracking-widest">AI Advisor</p>
+                <p className="text-sm font-bold text-muted-foreground line-clamp-1">
+                  Ask how to save $500 this month.
+                </p>
+              </div>
+              <ChevronRight className="h-5 w-5 text-muted-foreground/30" />
             </div>
-            <div className="flex-1">
-              <p className="text-[10px] font-black text-primary uppercase tracking-widest">AI Financial Advisor</p>
-              <p className="text-sm font-bold text-muted-foreground line-clamp-1">
-                {summary.expense > summary.budget * 0.8 
-                  ? "Spending high in 'Food'. Ask how to optimize." 
-                  : "On track to save $450 this month. Keep it up!"}
-              </p>
+          </Link>
+          
+          <Link href="/wrapped">
+            <div className="glass rounded-[2rem] p-5 border-none flex flex-col gap-3 group cursor-pointer hover:shadow-xl transition-all hover:-translate-y-1">
+              <div className="h-10 w-10 rounded-xl bg-orange-500/10 flex items-center justify-center text-orange-500 group-hover:scale-110 transition-transform">
+                <Zap className="h-5 w-5" />
+              </div>
+              <div>
+                <p className="text-[10px] font-black text-orange-500 uppercase tracking-widest">Wrapped</p>
+                <p className="text-xs font-bold text-muted-foreground">AI Personality Recap</p>
+              </div>
             </div>
-            <ChevronRight className="h-5 w-5 text-muted-foreground/30" />
-          </div>
-        </Link>
+          </Link>
+
+          <Link href="/subscriptions">
+            <div className="glass rounded-[2rem] p-5 border-none flex flex-col gap-3 group cursor-pointer hover:shadow-xl transition-all hover:-translate-y-1">
+              <div className="h-10 w-10 rounded-xl bg-accent/10 flex items-center justify-center text-accent group-hover:scale-110 transition-transform">
+                <CreditCard className="h-5 w-5" />
+              </div>
+              <div>
+                <p className="text-[10px] font-black text-accent uppercase tracking-widest">Subs</p>
+                <p className="text-xs font-bold text-muted-foreground">Manage Recurring</p>
+              </div>
+            </div>
+          </Link>
+        </div>
 
         <section className="space-y-4">
           <div className="flex items-center justify-between">

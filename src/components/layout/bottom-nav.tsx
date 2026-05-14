@@ -1,9 +1,8 @@
-
 "use client";
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { LayoutDashboard, ReceiptText, PieChart, Sparkles, UserCircle, Plus, Target, CreditCard } from 'lucide-react';
+import { LayoutDashboard, ReceiptText, UserCircle, Plus, Target, CreditCard, Sparkles } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import {
@@ -29,7 +28,7 @@ export function BottomNav() {
   const [isAddOpen, setIsAddOpen] = useState(false);
 
   return (
-    <nav className="fixed bottom-6 left-6 right-6 z-50 glass rounded-[2.5rem] py-3 px-6 flex items-center justify-between shadow-[0_20px_50px_rgba(0,0,0,0.1)] md:hidden">
+    <nav className="fixed bottom-6 left-6 right-6 z-50 glass rounded-[2.5rem] py-3 px-6 flex items-center justify-between shadow-[0_20px_50px_rgba(0,0,0,0.1)] md:max-w-md md:mx-auto">
       {navItems.slice(0, 2).map((item) => (
         <Link key={item.href} href={item.href} className="flex flex-col items-center gap-1 group">
           <item.icon className={cn(
@@ -57,7 +56,7 @@ export function BottomNav() {
         </DialogContent>
       </Dialog>
 
-      {navItems.slice(2).map((item) => (
+      {navItems.slice(2, 4).map((item) => (
         <Link key={item.href} href={item.href} className="flex flex-col items-center gap-1 group">
           <item.icon className={cn(
             "h-5 w-5 transition-all duration-300",
@@ -69,6 +68,17 @@ export function BottomNav() {
           )}>{item.label}</span>
         </Link>
       ))}
+      
+      <Link href="/profile" className="flex flex-col items-center gap-1 group">
+        <UserCircle className={cn(
+          "h-5 w-5 transition-all duration-300",
+          pathname === '/profile' ? "text-primary scale-110" : "text-muted-foreground group-hover:text-primary"
+        )} />
+        <span className={cn(
+          "text-[8px] font-black uppercase tracking-widest transition-colors",
+          pathname === '/profile' ? "text-primary" : "text-muted-foreground"
+        )}>Profile</span>
+      </Link>
     </nav>
   );
 }
