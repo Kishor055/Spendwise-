@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useState, useMemo } from 'react';
@@ -9,6 +8,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { PieChart as ChartIcon, TrendingUp, ChevronLeft, BarChart3, Filter } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
+import { cn } from '@/lib/utils';
 import { 
   PieChart, 
   Pie, 
@@ -57,9 +57,12 @@ export default function AnalyticsPage() {
     return Object.entries(data).map(([name, value]) => ({ name, value }));
   }, [transactions, activeTab]);
 
+  const totalForTab = useMemo(() => {
+    return pieData.reduce((sum, item) => sum + (item.value as number), 0);
+  }, [pieData]);
+
   const barData = useMemo(() => {
     if (!transactions) return [];
-    // Last 7 days or group by month
     const groups: Record<string, { income: number, expense: number }> = {};
     
     transactions.slice(0, 30).forEach(tx => {
@@ -198,7 +201,7 @@ export default function AnalyticsPage() {
                 <div className="text-right">
                   <span className="font-black text-base block">${(item.value as number).toLocaleString()}</span>
                   <span className="text-[10px] text-muted-foreground font-bold uppercase tracking-widest">
-                    {Math.round((item.value / summary.expense) * 100 || 0)}% of total
+                    {Math.round(((item.value as number) / totalForTab) * 100 || 0)}% of total
                   </span>
                 </div>
               </div>

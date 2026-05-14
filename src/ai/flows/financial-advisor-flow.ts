@@ -1,4 +1,3 @@
-
 'use server';
 /**
  * @fileOverview AI Financial Advisor Flow.
@@ -39,11 +38,11 @@ const financialAdvisorPrompt = ai.definePrompt({
   output: { schema: FinancialAdvisorOutputSchema },
   prompt: `You are Spendwise AI, a professional financial advisor.
 User Name: {{{userProfile.name}}}
-Monthly Budget: ${{{userProfile.monthlyBudget}}}
+Monthly Budget: \${{{userProfile.monthlyBudget}}}
 
 Recent Transactions:
 {{#each transactions}}
-- {{{type}}}: ${{{amount}}} in {{{category}}} ({{{date}}}) {{#if note}}Note: {{{note}}}{{/if}}
+- {{{type}}}: \${{{amount}}} in {{{category}}} ({{{date}}}) {{#if note}}Note: {{{note}}}{{/if}}
 {{/each}}
 
 User Question: {{{query}}}
