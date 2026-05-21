@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useState, useMemo } from 'react';
@@ -65,15 +64,18 @@ export default function TransactionsPage() {
   };
 
   const handleExportCSV = () => {
-    if (!filteredTransactions.length) return;
+    if (!filteredTransactions.length) {
+      toast({ variant: 'destructive', title: 'No data', description: 'No records to export.' });
+      return;
+    }
     
     const headers = ['Date', 'Category', 'Type', 'Amount', 'Note'];
     const rows = filteredTransactions.map(tx => [
       tx.date?.seconds ? format(new Date(tx.date.seconds * 1000), 'yyyy-MM-dd') : '',
-      tx.category,
+      `"${tx.category}"`,
       tx.type,
       tx.amount,
-      tx.note || ''
+      `"${tx.note || ''}"`
     ]);
 
     const csvContent = [headers, ...rows].map(e => e.join(",")).join("\n");
@@ -97,14 +99,14 @@ export default function TransactionsPage() {
             <Button variant="ghost" size="icon" className="rounded-2xl glass h-10 w-10" asChild>
               <Link href="/dashboard"><ChevronLeft className="h-5 w-5" /></Link>
             </Button>
-            <h1 className="text-xl font-black tracking-tight">History</h1>
+            <h1 className="text-xl font-black tracking-tight">Financial History</h1>
           </div>
           <Button variant="ghost" size="icon" className="rounded-2xl glass h-10 w-10 text-primary" onClick={handleExportCSV}>
             <Download className="h-5 w-5" />
           </Button>
         </div>
 
-        <div className="space-y-4">
+        <div className="space-y-4 max-w-4xl mx-auto">
           <div className="relative">
             <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
             <Input 
@@ -169,14 +171,14 @@ export default function TransactionsPage() {
                 </AlertDialogTrigger>
                 <AlertDialogContent className="glass-dark rounded-[3rem] border-none shadow-2xl">
                   <AlertDialogHeader>
-                    <AlertDialogTitle className="text-2xl font-black">Remove entry?</AlertDialogTitle>
+                    <AlertDialogTitle className="text-2xl font-black">Remove Record?</AlertDialogTitle>
                     <AlertDialogDescription className="font-bold opacity-70">
-                      This will permanently delete this transaction from your history.
+                      This will permanently delete this transaction from your history. This action cannot be undone.
                     </AlertDialogDescription>
                   </AlertDialogHeader>
                   <AlertDialogFooter className="gap-2">
                     <AlertDialogCancel className="rounded-2xl h-12 font-black">Cancel</AlertDialogCancel>
-                    <AlertDialogAction onClick={() => handleDelete(tx.id)} className="bg-destructive rounded-2xl h-12 font-black">Delete</AlertDialogAction>
+                    <AlertDialogAction onClick={() => handleDelete(tx.id)} className="bg-destructive rounded-2xl h-12 font-black text-white hover:bg-destructive/90">Delete Forever</AlertDialogAction>
                   </AlertDialogFooter>
                 </AlertDialogContent>
               </AlertDialog>
@@ -187,7 +189,7 @@ export default function TransactionsPage() {
         {filteredTransactions.length === 0 && (
           <div className="text-center py-32 opacity-30 italic font-black uppercase text-xs tracking-[0.2em] flex flex-col items-center gap-4">
             <FileText className="h-12 w-12" />
-            No records match
+            No records found
           </div>
         )}
       </main>
