@@ -1,14 +1,15 @@
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 @layer base {
   :root {
-    --background: 222 47% 4%;
+    --background: 224 71% 4%;
     --foreground: 210 40% 98%;
-    --card: 222 47% 6%;
+    --card: 224 71% 6%;
     --card-foreground: 210 40% 98%;
-    --popover: 222 47% 5%;
+    --popover: 224 71% 5%;
     --popover-foreground: 210 40% 98%;
     --primary: 263 70% 50%;
     --primary-foreground: 210 40% 98%;
@@ -23,7 +24,7 @@
     --border: 217 32% 12%;
     --input: 217 32% 12%;
     --ring: 263 70% 50%;
-    --radius: 1.5rem;
+    --radius: 2rem;
   }
 }
 
@@ -32,28 +33,38 @@
     @apply border-border;
   }
   body {
-    @apply bg-[#020617] text-white font-body tracking-tight antialiased selection:bg-primary/30;
+    @apply bg-[#030616] text-white font-body tracking-tight antialiased selection:bg-primary/30;
     background-image: 
-      radial-gradient(at 0% 0%, hsla(263, 70%, 50%, 0.05) 0px, transparent 50%),
-      radial-gradient(at 100% 100%, hsla(191, 100%, 50%, 0.03) 0px, transparent 50%);
+      radial-gradient(at 0% 0%, hsla(263, 70%, 50%, 0.08) 0px, transparent 40%),
+      radial-gradient(at 100% 100%, hsla(191, 100%, 50%, 0.05) 0px, transparent 40%),
+      radial-gradient(at 50% 50%, hsla(263, 70%, 50%, 0.03) 0px, transparent 60%);
     background-attachment: fixed;
   }
 }
 
 .glass {
-  @apply bg-white/[0.02] backdrop-blur-3xl border border-white/[0.05] shadow-[0_4px_24px_rgba(0,0,0,0.5)];
+  @apply bg-white/[0.03] backdrop-blur-3xl border border-white/10 shadow-[0_8px_32px_rgba(0,0,0,0.6)];
 }
 
 .glass-dark {
-  @apply bg-black/60 backdrop-blur-3xl border border-white/[0.03] shadow-[0_20px_50px_rgba(0,0,0,0.8)];
+  @apply bg-black/40 backdrop-blur-3xl border border-white/5 shadow-2xl;
 }
 
 .glass-card {
-  @apply glass hover:bg-white/[0.04] transition-all duration-300 hover:border-white/[0.1] hover:shadow-[0_0_30px_rgba(0,0,0,0.4)];
+  @apply glass hover:bg-white/[0.06] transition-all duration-500 hover:border-white/20;
 }
 
 .text-glow {
-  text-shadow: 0 0 20px hsla(var(--primary), 0.5);
+  text-shadow: 0 0 15px hsla(var(--primary), 0.6);
+}
+
+.neon-border {
+  @apply relative overflow-hidden;
+}
+
+.neon-border::after {
+  content: '';
+  @apply absolute inset-0 border border-primary/20 rounded-[inherit] pointer-events-none;
 }
 
 .scrollbar-hide::-webkit-scrollbar {
@@ -64,14 +75,10 @@
   scrollbar-width: none;
 }
 
+.chart-gradient {
+  background: linear-gradient(180deg, rgba(139, 92, 246, 0.1) 0%, rgba(139, 92, 246, 0) 100%);
+}
+
 [role="progressbar"] > div {
   @apply rounded-full transition-all duration-1000 ease-in-out;
-}
-
-.heading-premium {
-  @apply font-black tracking-tighter text-white text-glow;
-}
-
-.label-premium {
-  @apply text-[10px] font-black uppercase tracking-[0.2em] text-white/40;
 }

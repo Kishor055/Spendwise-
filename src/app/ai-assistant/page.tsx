@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useState, useRef, useEffect } from 'react';
@@ -7,9 +8,10 @@ import { askFinancialAdvisor } from '@/ai/flows/financial-advisor-flow';
 import { BottomNav } from '@/components/layout/bottom-nav';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Sparkles, Send, Bot, User, Loader2, ChevronLeft, HelpCircle, Zap, Cpu } from 'lucide-react';
+import { Sparkles, Send, Bot, User, Loader2, ChevronLeft, HelpCircle, Cpu, BrainCircuit } from 'lucide-react';
 import Link from 'next/link';
 import { cn } from '@/lib/utils';
+import { motion, AnimatePresence } from 'framer-motion';
 
 interface Message {
   role: 'user' | 'assistant';
@@ -17,10 +19,10 @@ interface Message {
 }
 
 const SUGGESTED_QUESTIONS = [
-  "How can I save ₹5000 this month?",
-  "Analyze my spending vibes",
-  "Biggest cash burn this week?",
-  "Predict next month outflow"
+  "Analyze my spending habits",
+  "How can I save ₹10,000?",
+  "Predict my next month",
+  "Investment tips"
 ];
 
 export default function AIAssistantPage() {
@@ -79,55 +81,76 @@ export default function AIAssistantPage() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col pb-44 bg-[#020617] text-white overflow-hidden">
-      <div className="absolute top-[-10%] left-[-10%] w-[50%] h-[50%] bg-primary/10 blur-[150px] rounded-full animate-pulse" />
-      <div className="absolute bottom-[-10%] right-[-10%] w-[50%] h-[50%] bg-accent/10 blur-[150px] rounded-full" />
+    <div className="min-h-screen flex flex-col pb-44 bg-[#030616] text-white overflow-hidden">
+      {/* Immersive Background */}
+      <div className="fixed inset-0 pointer-events-none">
+        <div className="absolute top-[-10%] left-[-10%] w-[50%] h-[50%] bg-primary/10 blur-[150px] rounded-full animate-pulse" />
+        <div className="absolute bottom-[-10%] right-[-10%] w-[50%] h-[50%] bg-accent/10 blur-[150px] rounded-full" />
+      </div>
 
-      <header className="px-6 py-8 bg-[#020617]/40 backdrop-blur-3xl sticky top-0 z-50 border-b border-white/5 flex items-center justify-between">
+      <header className="px-6 py-6 bg-[#030616]/40 backdrop-blur-3xl sticky top-0 z-50 border-b border-white/5 flex items-center justify-between">
         <div className="flex items-center gap-5">
-          <Button variant="ghost" size="icon" className="rounded-2xl glass h-12 w-12 hover:bg-white/10" asChild>
+          <Button variant="ghost" size="icon" className="rounded-2xl glass h-12 w-12 hover:bg-white/10 border-white/10" asChild>
             <Link href="/dashboard"><ChevronLeft className="h-6 w-6" /></Link>
           </Button>
           <div>
             <h1 className="text-xl font-black flex items-center gap-3 text-glow">
-              <Cpu className="h-6 w-6 text-primary animate-pulse" />
+              <BrainCircuit className="h-6 w-6 text-primary animate-pulse" />
               Nexus Core
             </h1>
             <div className="flex items-center gap-2">
               <span className="w-1.5 h-1.5 rounded-full bg-accent animate-ping" />
-              <p className="text-[10px] text-muted-foreground font-black uppercase tracking-[0.3em]">Quantum Advisory Active</p>
+              <p className="text-[10px] text-white/40 font-black uppercase tracking-[0.3em]">Quantum Advisory Active</p>
             </div>
           </div>
         </div>
       </header>
 
       <main className="flex-1 overflow-y-auto px-6 py-10 space-y-8 scrollbar-hide relative z-10" ref={scrollRef}>
-        {messages.map((msg, i) => (
-          <div key={i} className={cn("flex w-full", msg.role === 'user' ? "justify-end" : "justify-start")}>
-            <div className={cn(
-              "max-w-[88%] p-6 rounded-[2.5rem] shadow-2xl transition-all duration-500 animate-in fade-in slide-in-from-bottom-4",
-              msg.role === 'user' 
-                ? "bg-primary/90 text-white rounded-tr-none border border-white/20 shadow-[0_0_30px_rgba(var(--primary),0.2)]" 
-                : "glass rounded-tl-none border-white/10 text-white/90"
-            )}>
-              <div className="flex items-start gap-4">
-                {msg.role === 'assistant' && <div className="p-2 bg-primary/20 rounded-xl"><Bot className="h-5 w-5 text-primary" /></div>}
-                <p className="text-sm font-bold leading-relaxed tracking-tight">{msg.content}</p>
-                {msg.role === 'user' && <div className="p-2 bg-white/10 rounded-xl"><User className="h-5 w-5 opacity-60" /></div>}
+        <div className="flex flex-col items-center justify-center py-10 text-center space-y-4">
+           <div className="w-24 h-24 rounded-full bg-primary/10 flex items-center justify-center p-4 border border-primary/20 shadow-2xl">
+              <Bot className="w-full h-full text-primary" />
+           </div>
+           <div>
+              <h2 className="text-xl font-black italic">I'm Nexus</h2>
+              <p className="text-xs text-white/40 font-bold uppercase tracking-widest mt-1">AI Financial Assistant</p>
+           </div>
+        </div>
+
+        <AnimatePresence>
+          {messages.map((msg, i) => (
+            <motion.div 
+              key={i} 
+              initial={{ opacity: 0, y: 10, scale: 0.95 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              className={cn("flex w-full", msg.role === 'user' ? "justify-end" : "justify-start")}
+            >
+              <div className={cn(
+                "max-w-[85%] p-6 rounded-[2rem] shadow-2xl relative group",
+                msg.role === 'user' 
+                  ? "bg-primary text-white rounded-tr-none border border-white/20" 
+                  : "glass rounded-tl-none border-white/10"
+              )}>
+                <div className="flex items-start gap-4">
+                  {msg.role === 'assistant' && <div className="p-2 bg-primary/20 rounded-xl shrink-0"><Bot className="h-5 w-5 text-primary" /></div>}
+                  <p className="text-sm font-bold leading-relaxed tracking-tight">{msg.content}</p>
+                  {msg.role === 'user' && <div className="p-2 bg-white/10 rounded-xl shrink-0"><User className="h-5 w-5 opacity-60" /></div>}
+                </div>
               </div>
-            </div>
-          </div>
-        ))}
+            </motion.div>
+          ))}
+        </AnimatePresence>
+        
         {isTyping && (
-          <div className="flex justify-start">
-            <div className="glass p-6 rounded-[2.5rem] rounded-tl-none border-white/10 flex items-center gap-4">
+          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex justify-start">
+            <div className="glass p-6 rounded-[2rem] rounded-tl-none border-white/10 flex items-center gap-4">
               <div className="relative">
                 <Loader2 className="h-5 w-5 animate-spin text-accent" />
                 <div className="absolute inset-0 blur-md bg-accent/30 animate-pulse" />
               </div>
               <span className="text-[10px] font-black text-accent animate-pulse uppercase tracking-[0.3em]">Synthesizing Data...</span>
             </div>
-          </div>
+          </motion.div>
         )}
       </main>
 
