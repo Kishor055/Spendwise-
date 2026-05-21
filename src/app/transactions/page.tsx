@@ -1,10 +1,11 @@
+
 "use client";
 
 import { useState, useMemo } from 'react';
 import { useUser, useFirestore, useCollection, useMemoFirebase, deleteDocumentNonBlocking } from '@/firebase';
 import { collection, query, orderBy, doc } from 'firebase/firestore';
 import { BottomNav } from '@/components/layout/bottom-nav';
-import { ArrowUpRight, ArrowDownRight, Search, Trash2, ChevronLeft, Download } from 'lucide-react';
+import { ArrowUpRight, ArrowDownRight, Search, Trash2, ChevronLeft, Download, ReceiptText } from 'lucide-react';
 import { format } from 'date-fns';
 import { cn } from '@/lib/utils';
 import { Input } from '@/components/ui/input';

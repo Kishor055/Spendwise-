@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useMemo, useState } from 'react';
@@ -22,7 +23,8 @@ import {
   Bell,
   Search,
   Zap,
-  LayoutGrid
+  LayoutGrid,
+  Trophy
 } from 'lucide-react';
 import { format } from 'date-fns';
 import { cn } from '@/lib/utils';
