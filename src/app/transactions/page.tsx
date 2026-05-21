@@ -1,10 +1,11 @@
+
 "use client";
 
 import { useState, useMemo } from 'react';
 import { useUser, useFirestore, useCollection, useMemoFirebase, deleteDocumentNonBlocking } from '@/firebase';
 import { collection, query, orderBy, doc } from 'firebase/firestore';
 import { BottomNav } from '@/components/layout/bottom-nav';
-import { ArrowUpRight, ArrowDownRight, Search, Trash2, Filter, ChevronLeft } from 'lucide-react';
+import { ArrowUpRight, ArrowDownRight, Search, Trash2, Filter, ChevronLeft, Download, FileText } from 'lucide-react';
 import { format } from 'date-fns';
 import { cn } from '@/lib/utils';
 import { Input } from '@/components/ui/input';
@@ -46,13 +47,6 @@ export default function TransactionsPage() {
 
   const { data: transactions } = useCollection<Transaction>(transactionsQuery);
 
-  const handleDelete = (transactionId: string) => {
-    if (!user || !firestore) return;
-    const docRef = doc(firestore, 'users', user.uid, 'transactions', transactionId);
-    deleteDocumentNonBlocking(docRef);
-    toast({ title: 'Deleted', description: 'Transaction removed successfully' });
-  };
-
   const filteredTransactions = useMemo(() => {
     if (!transactions) return [];
     return transactions.filter(tx => {
@@ -63,89 +57,126 @@ export default function TransactionsPage() {
     });
   }, [transactions, search, filter]);
 
+  const handleDelete = (transactionId: string) => {
+    if (!user || !firestore) return;
+    const docRef = doc(firestore, 'users', user.uid, 'transactions', transactionId);
+    deleteDocumentNonBlocking(docRef);
+    toast({ title: 'Deleted', description: 'Transaction removed from history' });
+  };
+
+  const handleExportCSV = () => {
+    if (!filteredTransactions.length) return;
+    
+    const headers = ['Date', 'Category', 'Type', 'Amount', 'Note'];
+    const rows = filteredTransactions.map(tx => [
+      tx.date?.seconds ? format(new Date(tx.date.seconds * 1000), 'yyyy-MM-dd') : '',
+      tx.category,
+      tx.type,
+      tx.amount,
+      tx.note || ''
+    ]);
+
+    const csvContent = [headers, ...rows].map(e => e.join(",")).join("\n");
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.setAttribute("href", url);
+    link.setAttribute("download", `SpendWise_Export_${format(new Date(), 'yyyy-MM-dd')}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    
+    toast({ title: 'Export Successful', description: 'Your transaction history is ready.' });
+  };
+
   return (
-    <div className="min-h-screen bg-background pb-24">
-      <header className="px-6 pt-10 pb-6 sticky top-0 bg-background/80 backdrop-blur-lg z-30">
-        <div className="flex items-center gap-4 mb-6">
-          <Button variant="ghost" size="icon" asChild>
-            <Link href="/dashboard"><ChevronLeft className="h-6 w-6" /></Link>
+    <div className="min-h-screen bg-background pb-32">
+      <header className="px-6 pt-12 pb-6 sticky top-0 bg-background/50 backdrop-blur-xl z-50 border-b">
+        <div className="flex items-center justify-between mb-8">
+          <div className="flex items-center gap-4">
+            <Button variant="ghost" size="icon" className="rounded-2xl glass h-10 w-10" asChild>
+              <Link href="/dashboard"><ChevronLeft className="h-5 w-5" /></Link>
+            </Button>
+            <h1 className="text-xl font-black tracking-tight">History</h1>
+          </div>
+          <Button variant="ghost" size="icon" className="rounded-2xl glass h-10 w-10 text-primary" onClick={handleExportCSV}>
+            <Download className="h-5 w-5" />
           </Button>
-          <h1 className="text-2xl font-bold">Transaction History</h1>
         </div>
 
-        <div className="flex gap-2">
-          <div className="relative flex-1">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+        <div className="space-y-4">
+          <div className="relative">
+            <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
             <Input 
-              placeholder="Search category or note..." 
-              className="pl-10 h-11"
+              placeholder="Search history..." 
+              className="pl-12 h-12 rounded-2xl glass border-none shadow-inner"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
             />
           </div>
-          <Button variant="outline" size="icon" className="h-11 w-11">
-            <Filter className="h-4 w-4" />
-          </Button>
-        </div>
 
-        <div className="flex gap-2 mt-4 overflow-x-auto pb-2 scrollbar-hide">
-          {['all', 'income', 'expense'].map((f) => (
-            <Button 
-              key={f}
-              variant={filter === f ? 'default' : 'secondary'}
-              size="sm"
-              className="rounded-full capitalize px-6"
-              onClick={() => setFilter(f as any)}
-            >
-              {f}
-            </Button>
-          ))}
+          <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide">
+            {['all', 'income', 'expense'].map((f) => (
+              <Button 
+                key={f}
+                variant={filter === f ? 'default' : 'ghost'}
+                size="sm"
+                className={cn(
+                  "rounded-full capitalize px-6 font-black text-[10px] tracking-widest",
+                  filter === f ? "bg-primary shadow-lg" : "glass"
+                )}
+                onClick={() => setFilter(f as any)}
+              >
+                {f}
+              </Button>
+            ))}
+          </div>
         </div>
       </header>
 
-      <main className="px-6 space-y-4 max-w-4xl mx-auto">
+      <main className="px-6 pt-8 space-y-4 max-w-4xl mx-auto">
         {filteredTransactions.map((tx) => (
-          <div key={tx.id} className="flex items-center justify-between p-4 glass-card rounded-2xl group relative">
+          <div key={tx.id} className="flex items-center justify-between p-6 glass rounded-[2.5rem] border-none shadow-sm group relative animate-in fade-in slide-in-from-bottom-4">
             <div className="flex items-center gap-4">
               <div className={cn(
                 "w-12 h-12 rounded-2xl flex items-center justify-center",
-                tx.type === 'income' ? "bg-[#43A047]/10 text-[#43A047]" : "bg-[#E53935]/10 text-[#E53935]"
+                tx.type === 'income' ? "bg-green-500/10 text-green-600" : "bg-red-500/10 text-red-600"
               )}>
                 {tx.type === 'income' ? <ArrowUpRight className="h-6 w-6" /> : <ArrowDownRight className="h-6 w-6" />}
               </div>
               <div>
-                <p className="font-bold">{tx.category}</p>
-                <p className="text-xs text-muted-foreground">
+                <p className="font-black text-sm">{tx.category}</p>
+                <p className="text-[10px] text-muted-foreground font-bold uppercase tracking-widest">
                   {tx.date?.seconds ? format(new Date(tx.date.seconds * 1000), 'MMM dd, yyyy') : ''}
                 </p>
-                {tx.note && <p className="text-xs mt-1 text-muted-foreground line-clamp-1 italic">"{tx.note}"</p>}
+                {tx.note && <p className="text-[10px] mt-1 text-muted-foreground italic line-clamp-1 opacity-60">"{tx.note}"</p>}
               </div>
             </div>
             
             <div className="flex items-center gap-4">
               <div className={cn(
-                "font-bold text-lg",
-                tx.type === 'income' ? "text-[#43A047]" : "text-[#E53935]"
+                "font-black text-base tabular-nums",
+                tx.type === 'income' ? "text-green-600" : "text-red-600"
               )}>
                 {tx.type === 'income' ? '+' : '-'}${tx.amount.toLocaleString()}
               </div>
 
               <AlertDialog>
                 <AlertDialogTrigger asChild>
-                  <Button variant="ghost" size="icon" className="opacity-0 group-hover:opacity-100 transition-opacity text-muted-foreground hover:text-destructive">
+                  <Button variant="ghost" size="icon" className="h-10 w-10 text-muted-foreground/30 hover:text-destructive">
                     <Trash2 className="h-4 w-4" />
                   </Button>
                 </AlertDialogTrigger>
-                <AlertDialogContent>
+                <AlertDialogContent className="glass-dark rounded-[3rem] border-none shadow-2xl">
                   <AlertDialogHeader>
-                    <AlertDialogTitle>Delete Transaction?</AlertDialogTitle>
-                    <AlertDialogDescription>
-                      This action cannot be undone. This will permanently remove the transaction from your history.
+                    <AlertDialogTitle className="text-2xl font-black">Remove entry?</AlertDialogTitle>
+                    <AlertDialogDescription className="font-bold opacity-70">
+                      This will permanently delete this transaction from your history.
                     </AlertDialogDescription>
                   </AlertDialogHeader>
-                  <AlertDialogFooter>
-                    <AlertDialogCancel>Cancel</AlertDialogCancel>
-                    <AlertDialogAction onClick={() => handleDelete(tx.id)} className="bg-destructive text-destructive-foreground">Delete</AlertDialogAction>
+                  <AlertDialogFooter className="gap-2">
+                    <AlertDialogCancel className="rounded-2xl h-12 font-black">Cancel</AlertDialogCancel>
+                    <AlertDialogAction onClick={() => handleDelete(tx.id)} className="bg-destructive rounded-2xl h-12 font-black">Delete</AlertDialogAction>
                   </AlertDialogFooter>
                 </AlertDialogContent>
               </AlertDialog>
@@ -154,8 +185,9 @@ export default function TransactionsPage() {
         ))}
 
         {filteredTransactions.length === 0 && (
-          <div className="text-center py-20 text-muted-foreground">
-            No transactions found for your search/filter.
+          <div className="text-center py-32 opacity-30 italic font-black uppercase text-xs tracking-[0.2em] flex flex-col items-center gap-4">
+            <FileText className="h-12 w-12" />
+            No records match
           </div>
         )}
       </main>
