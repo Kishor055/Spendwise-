@@ -93,7 +93,7 @@ export default function DashboardPage() {
     return (
       <div className="h-screen w-full flex items-center justify-center bg-[#020617]">
         <div className="relative">
-          <Loader2 className="h-12 w-12 animate-spin text-primary" />
+          <Loader2 className="h-10 w-10 animate-spin text-primary" />
           <div className="absolute inset-0 blur-xl bg-primary/20 animate-pulse" />
         </div>
       </div>
@@ -101,40 +101,39 @@ export default function DashboardPage() {
   }
 
   return (
-    <div className="min-h-screen pb-44 text-white selection:bg-primary/30">
-      <header className="px-6 pt-12 pb-6 flex justify-between items-center sticky top-0 z-50 bg-[#020617]/70 backdrop-blur-3xl border-b border-white/10">
+    <div className="min-h-screen pb-44 text-white bg-[#020617]">
+      <header className="px-6 pt-10 pb-6 flex justify-between items-center sticky top-0 z-50 bg-[#020617]/80 backdrop-blur-2xl border-b border-white/5">
         <div className="flex items-center gap-4">
-          <div className="relative group">
-            <div className="absolute -inset-1 bg-gradient-to-r from-primary to-accent rounded-2xl blur opacity-30 group-hover:opacity-60 transition duration-1000"></div>
-            <div className="relative w-12 h-12 rounded-2xl glass flex items-center justify-center shadow-2xl">
-               <Crown className="w-6 h-6 text-primary" />
+          <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-primary to-accent p-[1px]">
+            <div className="w-full h-full bg-[#020617] rounded-xl flex items-center justify-center">
+              <Crown className="w-5 h-5 text-white" />
             </div>
           </div>
-          <div className="flex flex-col">
-            <h1 className="text-xl font-black tracking-tight leading-none text-glow">
-              Welcome, {user?.displayName?.split(' ')[0] || 'Explorer'}
+          <div>
+            <h1 className="text-lg font-black tracking-tight leading-none text-white">
+              {user?.displayName?.split(' ')[0] || 'Explorer'}
             </h1>
-            <div className="flex items-center gap-2 mt-1.5">
-              <span className="w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse" />
-              <span className="text-[10px] font-black text-white/60 uppercase tracking-[0.2em]">SpendWise Elite Status</span>
+            <div className="flex items-center gap-1.5 mt-1">
+              <span className="w-1 h-1 rounded-full bg-green-400 animate-pulse" />
+              <span className="text-[9px] font-black text-white/40 uppercase tracking-widest">Premium Status</span>
             </div>
           </div>
         </div>
-        <div className="flex gap-3">
-          <Button variant="ghost" size="icon" className="rounded-2xl glass h-12 w-12 hover:bg-white/10" asChild>
+        <div className="flex gap-2.5">
+          <Button variant="ghost" size="icon" className="rounded-xl glass h-10 w-10" asChild>
             <Link href="/ai-assistant">
-              <Sparkles className="h-6 w-6 text-accent animate-pulse" />
+              <Sparkles className="h-5 w-5 text-accent" />
             </Link>
           </Button>
           <Dialog open={isAddOpen} onOpenChange={setIsAddOpen}>
             <DialogTrigger asChild>
-              <Button size="icon" className="rounded-2xl h-12 w-12 bg-primary shadow-[0_0_25px_rgba(var(--primary),0.4)] hover:scale-110 transition-all duration-300">
-                <Plus className="h-7 w-7 text-white" />
+              <Button size="icon" className="rounded-xl h-10 w-10 bg-primary shadow-lg shadow-primary/20 hover:scale-105 transition-all">
+                <Plus className="h-6 w-6 text-white" />
               </Button>
             </DialogTrigger>
-            <DialogContent className="sm:max-w-[425px] glass-dark rounded-[3rem] border-white/20">
+            <DialogContent className="sm:max-w-[425px] glass-dark rounded-[2rem] border-white/10">
               <DialogHeader>
-                <DialogTitle className="text-2xl font-black text-glow">New Entry</DialogTitle>
+                <DialogTitle className="text-xl font-black italic">Log Entry</DialogTitle>
               </DialogHeader>
               <TransactionForm onSuccess={() => setIsAddOpen(false)} />
             </DialogContent>
@@ -142,76 +141,56 @@ export default function DashboardPage() {
         </div>
       </header>
 
-      <main className="px-6 space-y-10 max-w-4xl mx-auto pt-8">
-        {/* Main Wealth Card */}
+      <main className="px-6 space-y-8 max-w-4xl mx-auto pt-6">
+        {/* Hero Wealth Card */}
         <section className="relative">
-          <div className="absolute -top-10 -right-10 w-64 h-64 bg-primary/20 rounded-full blur-[100px]" />
-          <div className="absolute -bottom-10 -left-10 w-64 h-64 bg-accent/20 rounded-full blur-[100px]" />
+          <div className="absolute -top-10 -right-10 w-48 h-48 bg-primary/20 rounded-full blur-[80px] pointer-events-none" />
           
-          <Card className="glass-dark border-white/20 overflow-hidden rounded-[3.5rem] relative z-10 shadow-2xl transition-all duration-700 hover:border-white/30">
-            <div className="absolute top-0 right-0 p-8">
-               <Activity className="h-24 w-24 text-white/[0.05] absolute -top-4 -right-4" />
-            </div>
-            
-            <CardHeader className="pb-4 pt-10 px-10">
-              <div className="flex justify-between items-center mb-4">
-                <CardTitle className="text-[10px] font-black text-white/60 uppercase tracking-[0.4em]">Current Liquidity</CardTitle>
-                <div className={cn(
-                  "px-4 py-1.5 rounded-full glass border-white/20 flex items-center gap-2 text-[10px] font-black uppercase tracking-widest transition-all",
-                  stats.healthScore > 70 ? "text-green-400 shadow-[0_0_20px_rgba(74,222,128,0.2)]" : "text-orange-400"
-                )}>
-                  <Zap className="h-3.5 w-3.5 fill-current" />
-                  Health Score: {stats.healthScore}
+          <Card className="glass-dark border-white/10 overflow-hidden rounded-[2.5rem] relative z-10 shadow-2xl">
+            <CardHeader className="pb-2 pt-8 px-8 flex-row items-start justify-between">
+              <div>
+                <p className="text-[10px] font-black text-white/50 uppercase tracking-[0.3em] mb-1">Total Liquidity</p>
+                <div className="text-4xl md:text-5xl font-black tracking-tighter tabular-nums text-white">
+                  ₹{stats.balance.toLocaleString('en-IN', { minimumFractionDigits: 2 })}
                 </div>
               </div>
-              <div className="text-5xl md:text-6xl font-black tracking-tighter tabular-nums text-white">
-                ₹{stats.balance.toLocaleString('en-IN', { minimumFractionDigits: 2 })}
+              <div className={cn(
+                "px-3 py-1 rounded-full glass border-white/10 flex items-center gap-2 text-[9px] font-black uppercase tracking-widest",
+                stats.healthScore > 70 ? "text-green-400" : "text-orange-400"
+              )}>
+                <Activity className="h-3 w-3" />
+                Score: {stats.healthScore}
               </div>
             </CardHeader>
             
-            <CardContent className="pt-6 pb-10 px-10 space-y-10">
-              <div className="grid grid-cols-2 gap-6">
-                <div className="glass rounded-[2.5rem] p-6 flex flex-col gap-3 border-white/10 hover:bg-white/[0.08] transition-all">
-                  <div className="w-12 h-12 rounded-2xl bg-green-500/20 flex items-center justify-center text-green-400 shadow-inner">
-                    <ArrowUpRight className="h-7 w-7" />
-                  </div>
-                  <div>
-                    <p className="text-[10px] font-black text-white/50 uppercase tracking-widest">Inflow</p>
-                    <p className="text-xl font-black text-green-400">₹{stats.income.toLocaleString('en-IN')}</p>
-                  </div>
+            <CardContent className="pt-6 pb-8 px-8 space-y-8">
+              <div className="grid grid-cols-2 gap-4">
+                <div className="glass rounded-2xl p-5 border-white/5 bg-white/[0.02]">
+                  <p className="text-[9px] font-black text-white/40 uppercase tracking-widest mb-1.5 flex items-center gap-1.5">
+                    <ArrowUpRight className="h-2.5 w-2.5 text-green-400" /> Inflow
+                  </p>
+                  <p className="text-lg font-black text-white">₹{stats.income.toLocaleString('en-IN')}</p>
                 </div>
-                <div className="glass rounded-[2.5rem] p-6 flex flex-col gap-3 border-white/10 hover:bg-white/[0.08] transition-all">
-                  <div className="w-12 h-12 rounded-2xl bg-red-500/20 flex items-center justify-center text-red-400 shadow-inner">
-                    <ArrowDownRight className="h-7 w-7" />
-                  </div>
-                  <div>
-                    <p className="text-[10px] font-black text-white/50 uppercase tracking-widest">Outflow</p>
-                    <p className="text-xl font-black text-red-400">₹{stats.expense.toLocaleString('en-IN')}</p>
-                  </div>
+                <div className="glass rounded-2xl p-5 border-white/5 bg-white/[0.02]">
+                  <p className="text-[9px] font-black text-white/40 uppercase tracking-widest mb-1.5 flex items-center gap-1.5">
+                    <ArrowDownRight className="h-2.5 w-2.5 text-red-400" /> Outflow
+                  </p>
+                  <p className="text-lg font-black text-white">₹{stats.expense.toLocaleString('en-IN')}</p>
                 </div>
               </div>
 
-              <div className="glass rounded-[2.5rem] p-8 space-y-5 border-white/10 relative overflow-hidden group">
-                <div className="absolute inset-0 bg-gradient-to-r from-primary/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
-                <div className="flex justify-between items-end relative z-10">
-                  <div className="space-y-1">
-                    <p className="text-[10px] font-black text-white/50 uppercase tracking-[0.3em]">Spending Capacity</p>
-                    <p className="text-lg font-black text-white italic">
-                      ₹{stats.expense.toLocaleString('en-IN')} <span className="text-white/40 font-medium text-xs">/ ₹{stats.budget.toLocaleString('en-IN')}</span>
-                    </p>
-                  </div>
-                  <div className="text-right">
-                    <span className="text-xs font-black px-4 py-1 rounded-full bg-white/20 text-white text-glow">
-                      {Math.round(budgetProgress)}%
-                    </span>
-                  </div>
+              <div className="space-y-3">
+                <div className="flex justify-between items-end">
+                  <p className="text-[9px] font-black text-white/40 uppercase tracking-widest">Monthly Cap</p>
+                  <p className="text-[10px] font-bold text-white/80">
+                    ₹{stats.expense.toLocaleString('en-IN')} / <span className="text-white/40">₹{stats.budget.toLocaleString('en-IN')}</span>
+                  </p>
                 </div>
                 <Progress 
                   value={budgetProgress} 
-                  className="h-3 bg-black/60 rounded-full" 
+                  className="h-2 bg-white/[0.05]" 
                   indicatorClassName={cn(
-                    "rounded-full",
-                    budgetProgress > 85 ? "bg-red-500" : budgetProgress > 65 ? "bg-orange-500" : "bg-primary"
+                    budgetProgress > 85 ? "bg-destructive shadow-[0_0_15px_rgba(239,68,68,0.3)]" : "bg-primary shadow-[0_0_15px_rgba(var(--primary),0.3)]"
                   )} 
                 />
               </div>
@@ -220,129 +199,78 @@ export default function DashboardPage() {
         </section>
 
         {/* Action Grid */}
-        <div className="grid grid-cols-2 gap-6">
+        <div className="grid grid-cols-2 gap-4">
           <Link href="/ai-assistant" className="col-span-2">
-            <div className="glass-card rounded-[2.5rem] p-7 flex items-center gap-6 relative overflow-hidden group">
-              <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:scale-150 transition-transform duration-700">
-                <Sparkles className="h-20 w-20 text-accent" />
+            <div className="glass rounded-[2rem] p-6 flex items-center gap-5 border-white/10 hover:bg-white/[0.05] transition-all group">
+              <div className="h-12 w-12 rounded-xl bg-accent/10 flex items-center justify-center text-accent group-hover:scale-110 transition-transform">
+                <Sparkles className="h-6 w-6" />
               </div>
-              <div className="h-14 w-14 rounded-2xl bg-accent/20 flex items-center justify-center text-accent group-hover:rotate-12 transition-transform shadow-lg">
-                <Sparkles className="h-7 w-7" />
+              <div className="flex-1">
+                <p className="text-[9px] font-black text-accent uppercase tracking-widest">Neural Advisor</p>
+                <p className="text-sm font-bold text-white/90">Optimize my spending patterns</p>
               </div>
-              <div className="flex-1 relative z-10">
-                <p className="text-[10px] font-black text-accent uppercase tracking-[0.3em]">Neural Advisor</p>
-                <p className="text-sm font-bold text-white mt-0.5">
-                  Analyze my patterns for efficiency...
-                </p>
-              </div>
-              <ChevronRight className="h-5 w-5 text-white/30 group-hover:translate-x-1 transition-transform" />
+              <ChevronRight className="h-4 w-4 text-white/20 group-hover:translate-x-1 transition-transform" />
             </div>
           </Link>
           
           <Link href="/wrapped">
-            <div className="glass-card rounded-[2.5rem] p-7 flex flex-col gap-4 group border-white/20">
-              <div className="h-12 w-12 rounded-xl bg-orange-500/20 flex items-center justify-center text-orange-400 group-hover:scale-110 transition-transform shadow-inner">
-                <Flame className="h-6 w-6" />
+            <div className="glass rounded-[2rem] p-5 flex flex-col gap-3 border-white/10 hover:bg-white/[0.05] transition-all group">
+              <div className="h-10 w-10 rounded-xl bg-orange-400/10 flex items-center justify-center text-orange-400">
+                <Flame className="h-5 w-5" />
               </div>
               <div>
-                <p className="text-[10px] font-black text-orange-400 uppercase tracking-[0.2em]">Wrapped</p>
-                <p className="text-xs font-bold text-white/70 mt-1 italic">Annual Report</p>
+                <p className="text-[9px] font-black text-orange-400 uppercase tracking-widest">Wrapped</p>
+                <p className="text-xs font-bold text-white/80 mt-0.5">Annual Pulse</p>
               </div>
             </div>
           </Link>
 
           <Link href="/analytics">
-            <div className="glass-card rounded-[2.5rem] p-7 flex flex-col gap-4 group border-white/20">
-              <div className="h-12 w-12 rounded-xl bg-primary/20 flex items-center justify-center text-primary group-hover:scale-110 transition-transform shadow-inner">
-                <TrendingUp className="h-6 w-6" />
+            <div className="glass rounded-[2rem] p-5 flex flex-col gap-3 border-white/10 hover:bg-white/[0.05] transition-all group">
+              <div className="h-10 w-10 rounded-xl bg-primary/10 flex items-center justify-center text-primary">
+                <TrendingUp className="h-5 w-5" />
               </div>
               <div>
-                <p className="text-[10px] font-black text-primary uppercase tracking-[0.2em]">Insights</p>
-                <p className="text-xs font-bold text-white/70 mt-1 italic">Visual Trends</p>
+                <p className="text-[9px] font-black text-primary uppercase tracking-widest">Insights</p>
+                <p className="text-xs font-bold text-white/80 mt-0.5">Visual Trends</p>
               </div>
             </div>
           </Link>
         </div>
 
-        {/* Goals Section */}
-        <section className="space-y-6">
+        {/* Dynamic Activity Feed */}
+        <section className="space-y-4">
           <div className="flex items-center justify-between">
-            <h2 className="text-xl font-black tracking-tight flex items-center gap-3 text-glow">
-              <Target className="h-6 w-6 text-primary" />
-              Strategic Goals
-            </h2>
-            <Button variant="ghost" size="sm" className="font-bold text-primary hover:bg-white/10 rounded-full" asChild>
-              <Link href="/goals" className="flex items-center gap-1 uppercase text-[10px] tracking-widest">
-                Manifest All <ChevronRight className="h-3 w-3" />
-              </Link>
-            </Button>
-          </div>
-          <div className="flex gap-6 overflow-x-auto pb-6 scrollbar-hide px-1">
-            {!goals || goals.length === 0 ? (
-              <Link href="/goals" className="w-full">
-                <div className="glass p-12 rounded-[3rem] border-dashed border-white/20 flex flex-col items-center justify-center text-white/40 hover:bg-white/10 transition-all">
-                  <Rocket className="h-10 w-10 mb-4 opacity-30" />
-                  <p className="text-[10px] font-black uppercase tracking-[0.3em]">Initialize Target</p>
-                </div>
-              </Link>
-            ) : (
-              goals.map((goal: any) => (
-                <div key={goal.id} className="min-w-[280px] glass-card p-8 rounded-[3rem] flex flex-col gap-6 relative overflow-hidden border-white/20">
-                  <div className="absolute -bottom-4 -right-4 opacity-5 rotate-12">
-                    <Trophy className="h-24 w-24" />
-                  </div>
-                  <div className="flex justify-between items-start">
-                    <div className="w-12 h-12 rounded-2xl bg-white/10 flex items-center justify-center text-accent border border-white/10">
-                      <Trophy className="h-6 w-6" />
-                    </div>
-                    <span className="text-[10px] font-black text-accent bg-accent/20 px-3 py-1 rounded-full uppercase tracking-widest">
-                      {Math.round((goal.currentAmount / goal.targetAmount) * 100)}%
-                    </span>
-                  </div>
-                  <div>
-                    <p className="text-[10px] font-black text-white/50 uppercase tracking-widest">{goal.title}</p>
-                    <p className="text-xl font-black mt-1 italic">₹{goal.currentAmount.toLocaleString('en-IN')}</p>
-                  </div>
-                  <Progress value={(goal.currentAmount/goal.targetAmount)*100} className="h-2 bg-black/40" indicatorClassName="bg-accent shadow-[0_0_15px_rgba(var(--accent),0.5)]" />
-                </div>
-              ))
-            )}
-          </div>
-        </section>
-
-        {/* Activity Section */}
-        <section className="space-y-6">
-          <div className="flex items-center justify-between">
-            <h2 className="text-xl font-black tracking-tight text-glow">Live Feed</h2>
-            <Link href="/transactions" className="text-[10px] font-black text-primary uppercase tracking-[0.2em] hover:text-glow transition-all">Universal History</Link>
+            <h2 className="text-sm font-black uppercase tracking-[0.2em] text-white/40">Recent Activity</h2>
+            <Link href="/transactions" className="text-[9px] font-black text-primary uppercase tracking-widest hover:text-white transition-colors">View All</Link>
           </div>
 
-          <div className="space-y-4">
+          <div className="space-y-3">
             {!transactions || transactions.length === 0 ? (
-              <div className="text-center py-24 glass rounded-[3rem] flex flex-col items-center opacity-40">
-                <CreditCard className="h-16 w-16 mb-4" />
-                <p className="font-black uppercase tracking-widest text-xs italic">No activity detected</p>
+              <div className="py-12 glass rounded-[2rem] flex flex-col items-center opacity-30 border-dashed border-white/10">
+                <Activity className="h-10 w-10 mb-2" />
+                <p className="text-[9px] font-black uppercase tracking-widest">No signals detected</p>
               </div>
             ) : (
-              transactions.slice(0, 5).map((tx) => (
-                <div key={tx.id} className="flex items-center justify-between p-7 glass rounded-[3rem] hover:bg-white/[0.1] border-white/10 transition-all group">
-                  <div className="flex items-center gap-6">
+              transactions.slice(0, 4).map((tx) => (
+                <div key={tx.id} className="flex items-center justify-between p-5 glass rounded-[2rem] border-white/5 hover:bg-white/[0.04] transition-all group">
+                  <div className="flex items-center gap-4">
                     <div className={cn(
-                      "w-14 h-14 rounded-2xl flex items-center justify-center shadow-lg transition-transform group-hover:rotate-6",
-                      tx.type === 'income' ? "bg-green-500/20 text-green-400" : "bg-red-500/20 text-red-400"
+                      "w-11 h-11 rounded-xl flex items-center justify-center transition-transform group-hover:scale-105",
+                      tx.type === 'income' ? "bg-green-400/10 text-green-400" : "bg-red-400/10 text-red-400"
                     )}>
-                      {tx.type === 'income' ? <ArrowUpRight className="h-7 w-7" /> : <ArrowDownRight className="h-7 w-7" />}
+                      {tx.type === 'income' ? <ArrowUpRight className="h-5 w-5" /> : <ArrowDownRight className="h-5 w-5" />}
                     </div>
                     <div>
-                      <p className="font-black text-base text-white tracking-tight">{tx.category}</p>
-                      <p className="text-[10px] text-white/50 font-black uppercase tracking-[0.2em] mt-1">
+                      <p className="font-bold text-sm text-white/90">{tx.category}</p>
+                      <p className="text-[9px] text-white/40 font-black uppercase tracking-widest mt-0.5">
                         {tx.date?.seconds ? format(new Date(tx.date.seconds * 1000), 'MMM dd') : 'Current'}
                       </p>
                     </div>
                   </div>
                   <div className={cn(
-                    "font-black text-lg tabular-nums italic",
-                    tx.type === 'income' ? "text-green-400" : "text-red-400"
+                    "font-black text-sm tabular-nums",
+                    tx.type === 'income' ? "text-green-400" : "text-white"
                   )}>
                     {tx.type === 'income' ? '+' : '-'}₹{tx.amount.toLocaleString('en-IN')}
                   </div>
