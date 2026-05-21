@@ -4,24 +4,24 @@
 
 @layer base {
   :root {
-    --background: 222 47% 11%;
+    --background: 222 47% 4%;
     --foreground: 210 40% 98%;
-    --card: 222 47% 11%;
+    --card: 222 47% 6%;
     --card-foreground: 210 40% 98%;
-    --popover: 222 47% 11%;
+    --popover: 222 47% 5%;
     --popover-foreground: 210 40% 98%;
     --primary: 263 70% 50%;
     --primary-foreground: 210 40% 98%;
-    --secondary: 222 47% 15%;
+    --secondary: 222 47% 10%;
     --secondary-foreground: 210 40% 98%;
-    --muted: 222 47% 15%;
+    --muted: 222 47% 10%;
     --muted-foreground: 215 20% 65%;
     --accent: 191 100% 50%;
     --accent-foreground: 222 47% 11%;
     --destructive: 0 84% 60%;
     --destructive-foreground: 210 40% 98%;
-    --border: 217 32% 17%;
-    --input: 217 32% 17%;
+    --border: 217 32% 12%;
+    --input: 217 32% 12%;
     --ring: 263 70% 50%;
     --radius: 1.5rem;
   }
@@ -34,23 +34,22 @@
   body {
     @apply bg-[#020617] text-white font-body tracking-tight antialiased selection:bg-primary/30;
     background-image: 
-      radial-gradient(at 0% 0%, hsla(263, 70%, 50%, 0.1) 0px, transparent 50%),
-      radial-gradient(at 100% 100%, hsla(191, 100%, 50%, 0.05) 0px, transparent 50%);
+      radial-gradient(at 0% 0%, hsla(263, 70%, 50%, 0.05) 0px, transparent 50%),
+      radial-gradient(at 100% 100%, hsla(191, 100%, 50%, 0.03) 0px, transparent 50%);
     background-attachment: fixed;
   }
 }
 
-/* Professional Glassmorphism 2.0 Classes */
 .glass {
-  @apply bg-white/[0.03] backdrop-blur-2xl border border-white/[0.08] shadow-[0_8px_32px_0_rgba(0,0,0,0.8)];
+  @apply bg-white/[0.02] backdrop-blur-3xl border border-white/[0.05] shadow-[0_4px_24px_rgba(0,0,0,0.5)];
 }
 
 .glass-dark {
-  @apply bg-black/40 backdrop-blur-3xl border border-white/[0.05] shadow-[20px_20px_50px_rgba(0,0,0,0.5)];
+  @apply bg-black/60 backdrop-blur-3xl border border-white/[0.03] shadow-[0_20px_50px_rgba(0,0,0,0.8)];
 }
 
 .glass-card {
-  @apply glass hover:bg-white/[0.06] transition-all duration-300 hover:border-white/[0.15] hover:shadow-[0_0_40px_rgba(var(--primary),0.1)];
+  @apply glass hover:bg-white/[0.04] transition-all duration-300 hover:border-white/[0.1] hover:shadow-[0_0_30px_rgba(0,0,0,0.4)];
 }
 
 .text-glow {
@@ -65,16 +64,14 @@
   scrollbar-width: none;
 }
 
-/* Custom Progress Indicator for Precision Look */
 [role="progressbar"] > div {
-  @apply rounded-full transition-all duration-700 ease-in-out;
+  @apply rounded-full transition-all duration-1000 ease-in-out;
 }
 
-/* Luxury Typography Utilities */
 .heading-premium {
-  @apply font-black tracking-tighter uppercase italic text-white text-glow;
+  @apply font-black tracking-tighter text-white text-glow;
 }
 
 .label-premium {
-  @apply text-[10px] font-black uppercase tracking-[0.3em] text-white/50;
+  @apply text-[10px] font-black uppercase tracking-[0.2em] text-white/40;
 }

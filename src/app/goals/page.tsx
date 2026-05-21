@@ -1,4 +1,3 @@
-
 'use client';
 
 import { useState } from 'react';
@@ -69,90 +68,92 @@ export default function GoalsPage() {
   };
 
   return (
-    <div className="min-h-screen pb-32">
-      <header className="px-6 pt-12 pb-6 flex items-center justify-between sticky top-0 z-50 bg-background/50 backdrop-blur-xl border-b">
-        <div className="flex items-center gap-4">
-          <Button variant="ghost" size="icon" className="rounded-2xl glass h-10 w-10" asChild>
-            <Link href="/dashboard"><ChevronLeft className="h-5 w-5" /></Link>
+    <div className="min-h-screen bg-[#020617] text-white pb-44">
+      <header className="px-6 py-10 bg-[#020617]/90 backdrop-blur-3xl sticky top-0 z-50">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-4">
+            <Button variant="ghost" size="icon" className="rounded-xl bg-white/[0.03] h-10 w-10" asChild>
+              <Link href="/dashboard"><ChevronLeft className="h-5 w-5" /></Link>
+            </Button>
+            <h1 className="text-xl font-black tracking-tight">Strategic Targets</h1>
+          </div>
+          <Button 
+            size="icon" 
+            className="rounded-xl h-10 w-10 bg-primary"
+            onClick={() => setIsAdding(!isAdding)}
+          >
+            <Plus className="h-5 w-5" />
           </Button>
-          <h1 className="text-xl font-black tracking-tight">Wealth Goals</h1>
         </div>
-        <Button 
-          size="icon" 
-          className="rounded-2xl h-10 w-10 bg-primary shadow-xl"
-          onClick={() => setIsAdding(!isAdding)}
-        >
-          <Plus className="h-5 w-5" />
-        </Button>
       </header>
 
-      <main className="px-6 space-y-8 max-w-4xl mx-auto pt-6">
-        <section className="bg-gradient-to-tr from-accent to-primary text-white p-10 rounded-[3rem] shadow-2xl relative overflow-hidden">
+      <main className="px-6 space-y-6 max-w-4xl mx-auto pt-4">
+        <section className="bg-[#0a0a16] border border-white/[0.03] p-10 rounded-[2.5rem] shadow-2xl relative overflow-hidden">
           <div className="relative z-10">
-            <Trophy className="h-10 w-10 mb-4 text-yellow-300" />
-            <h2 className="text-4xl font-black tracking-tighter">Dream Big.</h2>
-            <p className="font-bold opacity-80 mt-2">Track your progress to financial freedom.</p>
+            <Trophy className="h-8 w-8 mb-4 text-accent" />
+            <h2 className="text-4xl font-black tracking-tighter">Manifest All.</h2>
+            <p className="font-bold opacity-40 mt-2 text-sm uppercase tracking-widest">Financial Milestones</p>
           </div>
-          <Rocket className="absolute -bottom-10 -right-10 h-48 w-48 text-white/10 -rotate-12" />
+          <Rocket className="absolute -bottom-10 -right-10 h-48 w-48 text-white/5 -rotate-12" />
         </section>
 
         {isAdding && (
-          <div className="glass p-8 rounded-[3rem] space-y-4 animate-in fade-in zoom-in-95">
-            <h3 className="text-lg font-black">Set New Target</h3>
+          <div className="bg-[#0a0a16] p-8 rounded-[2.5rem] border border-white/[0.05] space-y-4 animate-in fade-in slide-in-from-bottom-4">
+            <h3 className="text-sm font-black uppercase tracking-widest text-accent">Initialize Target</h3>
             <div className="grid gap-4">
-              <Input placeholder="Goal Title (e.g. New Macbook)" value={title} onChange={(e) => setTitle(e.target.value)} className="h-12 rounded-2xl" />
+              <Input placeholder="Goal Title" value={title} onChange={(e) => setTitle(e.target.value)} className="h-12 rounded-2xl bg-white/[0.02] border-white/5" />
               <div className="relative">
-                <span className="absolute left-3 top-1/2 -translate-y-1/2 font-bold text-muted-foreground">₹</span>
-                <Input type="number" placeholder="Target Amount" value={target} onChange={(e) => setTarget(e.target.value)} className="h-12 rounded-2xl pl-10" />
+                <span className="absolute left-4 top-1/2 -translate-y-1/2 font-bold text-white/20">₹</span>
+                <Input type="number" placeholder="Target Amount" value={target} onChange={(e) => setTarget(e.target.value)} className="h-12 rounded-2xl bg-white/[0.02] border-white/5 pl-10" />
               </div>
-              <Button className="w-full h-12 rounded-2xl font-black" onClick={handleAdd}>Launch Goal</Button>
+              <Button className="w-full h-12 rounded-2xl font-black" onClick={handleAdd}>Confirm Launch</Button>
             </div>
           </div>
         )}
 
-        <div className="space-y-6">
+        <div className="space-y-4">
           {!goals || goals.length === 0 ? (
-            <div className="text-center py-20 opacity-30 italic font-black uppercase text-xs tracking-widest flex flex-col items-center gap-4">
+            <div className="text-center py-20 opacity-10 font-black uppercase text-[8px] tracking-[0.4em] flex flex-col items-center gap-4">
                <Target className="h-12 w-12" />
-               No active goals
+               No active missions
             </div>
           ) : (
             goals.map((goal) => {
               const progress = Math.min((goal.currentAmount / goal.targetAmount) * 100, 100);
               return (
-                <div key={goal.id} className="glass p-8 rounded-[3rem] border-none shadow-sm space-y-6 group">
+                <div key={goal.id} className="bg-[#0a0a16] p-8 rounded-[2.5rem] border border-white/[0.02] shadow-sm space-y-6 group transition-all hover:bg-white/[0.02]">
                   <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-4">
-                      <div className="w-14 h-14 rounded-2xl bg-accent/10 flex items-center justify-center text-accent group-hover:rotate-6 transition-transform">
+                    <div className="flex items-center gap-5">
+                      <div className="w-14 h-14 rounded-2xl bg-accent/5 flex items-center justify-center text-accent group-hover:scale-110 transition-transform">
                         <Trophy className="h-7 w-7" />
                       </div>
                       <div>
                         <h3 className="text-xl font-black tracking-tight">{goal.title}</h3>
-                        <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">
-                          ₹{goal.currentAmount.toLocaleString('en-IN')} of ₹{goal.targetAmount.toLocaleString('en-IN')}
+                        <p className="text-[8px] font-black uppercase tracking-widest text-white/20 mt-1">
+                          ₹{goal.currentAmount.toLocaleString('en-IN')} / ₹{goal.targetAmount.toLocaleString('en-IN')}
                         </p>
                       </div>
                     </div>
-                    <Button variant="ghost" size="icon" className="h-10 w-10 text-muted-foreground/30 hover:text-destructive" onClick={() => handleDelete(goal.id)}>
+                    <Button variant="ghost" size="icon" className="h-10 w-10 text-white/10 hover:text-red-500" onClick={() => handleDelete(goal.id)}>
                       <Trash2 className="h-4 w-4" />
                     </Button>
                   </div>
 
                   <div className="space-y-3">
-                    <div className="flex justify-between items-center text-[10px] font-black uppercase tracking-widest">
-                      <span className="text-primary">{Math.round(progress)}% Complete</span>
-                      <span className="text-muted-foreground">₹{(goal.targetAmount - goal.currentAmount).toLocaleString('en-IN')} left</span>
+                    <div className="flex justify-between items-center text-[8px] font-black uppercase tracking-widest">
+                      <span className="text-accent">{Math.round(progress)}% Optimized</span>
+                      <span className="text-white/20">₹{(goal.targetAmount - goal.currentAmount).toLocaleString('en-IN')} Remaining</span>
                     </div>
-                    <Progress value={progress} className="h-3 bg-muted" indicatorClassName="bg-accent" />
+                    <Progress value={progress} className="h-2 bg-white/[0.03]" indicatorClassName="bg-accent" />
                   </div>
 
                   <div className="flex gap-2">
-                    {[500, 1000, 5000].map((amount) => (
+                    {[1000, 5000, 10000].map((amount) => (
                       <Button 
                         key={amount} 
-                        variant="secondary" 
+                        variant="ghost" 
                         size="sm" 
-                        className="flex-1 rounded-full font-black text-[10px] h-10"
+                        className="flex-1 rounded-xl font-black text-[9px] h-10 bg-white/[0.03] hover:bg-white/[0.08]"
                         onClick={() => handleAddMoney(goal.id, goal.currentAmount, amount)}
                       >
                         +₹{amount.toLocaleString('en-IN')}
