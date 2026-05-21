@@ -81,8 +81,6 @@ export default function DashboardPage() {
       return acc;
     }, { balance: 0, income: 0, expense: 0, budget: 2500 });
 
-    // Calculate Financial Health Score (0-100)
-    // Based on Savings Rate: (Income - Expense) / Income
     const savingsRate = totals.income > 0 ? (totals.income - totals.expense) / totals.income : 0;
     const healthScore = Math.max(0, Math.min(100, Math.round(savingsRate * 100 + 50)));
 

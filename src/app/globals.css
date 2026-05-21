@@ -92,8 +92,8 @@
   animation: float 6s ease-in-out infinite;
 }
 
-/* Custom progress transition */
+/* Custom progress transition - fixed cubic-bezier syntax for tailwind parser */
 [role="progressbar"] > div {
-  @apply rounded-full;
-  transition: all 1s cubic-bezier(0.4, 0, 0.2, 1);
+  @apply rounded-full transition-all duration-1000;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
 }
