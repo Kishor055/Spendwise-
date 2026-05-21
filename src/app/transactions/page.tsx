@@ -1,10 +1,11 @@
+
 "use client";
 
 import { useState, useMemo } from 'react';
 import { useUser, useFirestore, useCollection, useMemoFirebase, deleteDocumentNonBlocking } from '@/firebase';
 import { collection, query, orderBy, doc } from 'firebase/firestore';
 import { BottomNav } from '@/components/layout/bottom-nav';
-import { ArrowUpRight, ArrowDownRight, Search, Trash2, Filter, ChevronLeft, Download, FileText } from 'lucide-react';
+import { ArrowUpRight, ArrowDownRight, Search, Trash2, ChevronLeft, Download, FileText } from 'lucide-react';
 import { format } from 'date-fns';
 import { cn } from '@/lib/utils';
 import { Input } from '@/components/ui/input';
@@ -160,7 +161,7 @@ export default function TransactionsPage() {
                 "font-black text-base tabular-nums",
                 tx.type === 'income' ? "text-green-600" : "text-red-600"
               )}>
-                {tx.type === 'income' ? '+' : '-'}${tx.amount.toLocaleString()}
+                {tx.type === 'income' ? '+' : '-'}₹{tx.amount.toLocaleString('en-IN')}
               </div>
 
               <AlertDialog>

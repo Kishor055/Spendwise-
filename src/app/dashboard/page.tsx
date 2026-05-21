@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useMemo, useState } from 'react';
@@ -20,8 +21,7 @@ import {
   Flame,
   Rocket,
   Zap,
-  Activity,
-  ShieldCheck
+  Activity
 } from 'lucide-react';
 import { format } from 'date-fns';
 import { cn } from '@/lib/utils';
@@ -69,7 +69,7 @@ export default function DashboardPage() {
   const { data: goals } = useCollection(goalsQuery);
 
   const stats = useMemo(() => {
-    if (!transactions) return { balance: 0, income: 0, expense: 0, budget: 2500, healthScore: 0 };
+    if (!transactions) return { balance: 0, income: 0, expense: 0, budget: 50000, healthScore: 0 };
     const totals = transactions.reduce((acc, tx) => {
       if (tx.type === 'income') {
         acc.income += tx.amount;
@@ -79,7 +79,7 @@ export default function DashboardPage() {
         acc.balance -= tx.amount;
       }
       return acc;
-    }, { balance: 0, income: 0, expense: 0, budget: 2500 });
+    }, { balance: 0, income: 0, expense: 0, budget: 50000 });
 
     const savingsRate = totals.income > 0 ? (totals.income - totals.expense) / totals.income : 0;
     const healthScore = Math.max(0, Math.min(100, Math.round(savingsRate * 100 + 50)));
@@ -146,7 +146,7 @@ export default function DashboardPage() {
                 </div>
               </div>
               <div className="text-5xl font-black mt-2 tracking-tighter tabular-nums text-foreground">
-                ${stats.balance.toLocaleString(undefined, { minimumFractionDigits: 2 })}
+                ₹{stats.balance.toLocaleString('en-IN', { minimumFractionDigits: 2 })}
               </div>
             </CardHeader>
             
@@ -158,7 +158,7 @@ export default function DashboardPage() {
                   </div>
                   <div>
                     <p className="text-[10px] font-black text-muted-foreground uppercase">Income</p>
-                    <p className="text-lg font-black text-green-600">${stats.income.toLocaleString()}</p>
+                    <p className="text-lg font-black text-green-600">₹{stats.income.toLocaleString('en-IN')}</p>
                   </div>
                 </div>
                 <div className="glass rounded-[2rem] p-5 flex flex-col gap-2 border-none">
@@ -167,7 +167,7 @@ export default function DashboardPage() {
                   </div>
                   <div>
                     <p className="text-[10px] font-black text-muted-foreground uppercase">Expense</p>
-                    <p className="text-lg font-black text-red-600">${stats.expense.toLocaleString()}</p>
+                    <p className="text-lg font-black text-red-600">₹{stats.expense.toLocaleString('en-IN')}</p>
                   </div>
                 </div>
               </div>
@@ -176,7 +176,7 @@ export default function DashboardPage() {
                 <div className="flex justify-between items-center">
                   <div className="space-y-1">
                     <p className="text-[10px] font-black text-muted-foreground uppercase tracking-widest">Monthly Limit</p>
-                    <p className="text-sm font-black">${stats.expense.toLocaleString()} / ${stats.budget.toLocaleString()}</p>
+                    <p className="text-sm font-black">₹{stats.expense.toLocaleString('en-IN')} / ₹{stats.budget.toLocaleString('en-IN')}</p>
                   </div>
                   <div className="text-right">
                     <span className="text-[10px] font-black bg-white shadow-sm px-3 py-1 rounded-full text-primary">
@@ -268,7 +268,7 @@ export default function DashboardPage() {
                   </div>
                   <div>
                     <p className="text-[10px] font-black text-muted-foreground uppercase">{goal.title}</p>
-                    <p className="text-base font-black">${goal.currentAmount.toLocaleString()}</p>
+                    <p className="text-base font-black">₹{goal.currentAmount.toLocaleString('en-IN')}</p>
                   </div>
                   <Progress value={(goal.currentAmount/goal.targetAmount)*100} className="h-1.5 bg-background" indicatorClassName="bg-accent" />
                 </div>
@@ -310,7 +310,7 @@ export default function DashboardPage() {
                     "font-black text-base tabular-nums",
                     tx.type === 'income' ? "text-green-600" : "text-red-600"
                   )}>
-                    {tx.type === 'income' ? '+' : '-'}${tx.amount.toLocaleString()}
+                    {tx.type === 'income' ? '+' : '-'}₹{tx.amount.toLocaleString('en-IN')}
                   </div>
                 </div>
               ))

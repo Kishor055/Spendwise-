@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState, useMemo } from 'react';
@@ -197,7 +198,7 @@ export default function AnalyticsPage() {
                   <span className="font-black text-sm">{item.name}</span>
                 </div>
                 <div className="text-right">
-                  <span className="font-black text-base block tabular-nums">${(item.value as number).toLocaleString()}</span>
+                  <span className="font-black text-base block tabular-nums">₹{(item.value as number).toLocaleString('en-IN')}</span>
                   <span className="text-[10px] text-muted-foreground font-black uppercase tracking-widest">
                     {Math.round(((item.value as number) / totalForTab) * 100 || 0)}%
                   </span>

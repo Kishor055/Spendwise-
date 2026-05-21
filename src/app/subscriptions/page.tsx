@@ -12,7 +12,6 @@ import {
   Plus, 
   Trash2, 
   ChevronLeft, 
-  Bell,
   CheckCircle2,
   CalendarDays,
   Clock
@@ -20,7 +19,6 @@ import {
 import Link from 'next/link';
 import { addDocumentNonBlocking, deleteDocumentNonBlocking } from '@/firebase';
 import { useToast } from '@/hooks/use-toast';
-import { format, differenceInDays, addMonths, addYears } from 'date-fns';
 import { cn } from '@/lib/utils';
 
 export default function SubscriptionsPage() {
@@ -91,7 +89,7 @@ export default function SubscriptionsPage() {
         <section className="bg-gradient-to-tr from-primary to-accent text-white p-10 rounded-[3rem] shadow-2xl relative overflow-hidden">
           <div className="relative z-10">
             <h2 className="text-[10px] font-black uppercase tracking-[0.4em] opacity-80 mb-2">Monthly Recurring</h2>
-            <p className="text-5xl font-black tracking-tighter">${monthlyBurn.toFixed(2)}</p>
+            <p className="text-5xl font-black tracking-tighter">₹{monthlyBurn.toLocaleString('en-IN', { minimumFractionDigits: 2 })}</p>
             <div className="mt-8 flex items-center gap-2 bg-white/10 w-fit px-5 py-2 rounded-full border border-white/10 backdrop-blur-md">
               <Clock className="h-4 w-4 text-yellow-300" />
               <span className="text-[10px] font-black uppercase tracking-widest">{subscriptions?.length || 0} active commitments</span>
@@ -106,7 +104,10 @@ export default function SubscriptionsPage() {
             <div className="grid gap-4">
               <Input placeholder="Service Name (e.g. Spotify)" value={name} onChange={(e) => setName(e.target.value)} className="h-14 rounded-2xl glass border-none px-6" />
               <div className="flex gap-2">
-                <Input type="number" placeholder="0.00" value={amount} onChange={(e) => setAmount(e.target.value)} className="h-14 rounded-2xl glass border-none flex-1 px-6" />
+                <div className="relative flex-1">
+                  <span className="absolute left-4 top-1/2 -translate-y-1/2 font-bold">₹</span>
+                  <Input type="number" placeholder="0.00" value={amount} onChange={(e) => setAmount(e.target.value)} className="h-14 rounded-2xl glass border-none pl-10 px-6" />
+                </div>
                 <select 
                   className="h-14 rounded-2xl glass border-none px-6 font-black text-[10px] uppercase tracking-widest outline-none"
                   value={cycle}
@@ -148,7 +149,7 @@ export default function SubscriptionsPage() {
                   </div>
                   <div className="flex items-center gap-6">
                     <div className="text-right">
-                      <span className="font-black text-xl block tabular-nums">${sub.amount.toFixed(2)}</span>
+                      <span className="font-black text-xl block tabular-nums">₹{sub.amount.toLocaleString('en-IN', { minimumFractionDigits: 2 })}</span>
                       <span className="text-[10px] text-primary font-black uppercase tracking-widest">Active</span>
                     </div>
                     <Button variant="ghost" size="icon" className="h-10 w-10 text-muted-foreground/20 hover:text-destructive transition-colors" onClick={() => handleDelete(sub.id)}>

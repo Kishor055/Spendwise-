@@ -9,8 +9,8 @@
         "id": { "type": "string" },
         "name": { "type": "string" },
         "email": { "type": "string", "format": "email" },
-        "currency": { "type": "string", "default": "USD" },
-        "monthlyBudget": { "type": "number", "default": 2000 },
+        "currency": { "type": "string", "default": "INR" },
+        "monthlyBudget": { "type": "number", "default": 50000 },
         "createdAt": { "type": "string", "format": "date-time" }
       },
       "required": ["id", "name", "email", "createdAt"]

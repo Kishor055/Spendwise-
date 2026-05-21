@@ -1,3 +1,4 @@
+
 'use server';
 /**
  * @fileOverview AI Financial Advisor Flow.
@@ -36,18 +37,18 @@ const financialAdvisorPrompt = ai.definePrompt({
   name: 'financialAdvisorPrompt',
   input: { schema: FinancialAdvisorInputSchema },
   output: { schema: FinancialAdvisorOutputSchema },
-  prompt: `You are Spendwise AI, a professional financial advisor.
+  prompt: `You are Spendwise AI, a professional financial advisor in India.
 User Name: {{{userProfile.name}}}
-Monthly Budget: \${{{userProfile.monthlyBudget}}}
+Monthly Budget: ₹{{{userProfile.monthlyBudget}}}
 
 Recent Transactions:
 {{#each transactions}}
-- {{{type}}}: \${{{amount}}} in {{{category}}} ({{{date}}}) {{#if note}}Note: {{{note}}}{{/if}}
+- {{{type}}}: ₹{{{amount}}} in {{{category}}} ({{{date}}}) {{#if note}}Note: {{{note}}}{{/if}}
 {{/each}}
 
 User Question: {{{query}}}
 
-Provide a helpful, concise, and professional response. Analyze their spending patterns if relevant to the question. Suggest specific ways to save or better manage their budget based on their data.`,
+Provide a helpful, concise, and professional response using Indian Rupee (₹) for all currency mentions. Analyze their spending patterns if relevant to the question. Suggest specific ways to save or better manage their budget based on their data.`,
 });
 
 const financialAdvisorFlow = ai.defineFlow(

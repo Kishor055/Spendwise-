@@ -14,8 +14,6 @@ import {
   Plus, 
   Trash2, 
   ChevronLeft, 
-  TrendingUp,
-  DollarSign,
   Rocket
 } from 'lucide-react';
 import Link from 'next/link';
@@ -104,7 +102,7 @@ export default function GoalsPage() {
             <div className="grid gap-4">
               <Input placeholder="Goal Title (e.g. New Macbook)" value={title} onChange={(e) => setTitle(e.target.value)} className="h-12 rounded-2xl" />
               <div className="relative">
-                <DollarSign className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                <span className="absolute left-3 top-1/2 -translate-y-1/2 font-bold text-muted-foreground">₹</span>
                 <Input type="number" placeholder="Target Amount" value={target} onChange={(e) => setTarget(e.target.value)} className="h-12 rounded-2xl pl-10" />
               </div>
               <Button className="w-full h-12 rounded-2xl font-black" onClick={handleAdd}>Launch Goal</Button>
@@ -131,7 +129,7 @@ export default function GoalsPage() {
                       <div>
                         <h3 className="text-xl font-black tracking-tight">{goal.title}</h3>
                         <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">
-                          ${goal.currentAmount.toLocaleString()} of ${goal.targetAmount.toLocaleString()}
+                          ₹{goal.currentAmount.toLocaleString('en-IN')} of ₹{goal.targetAmount.toLocaleString('en-IN')}
                         </p>
                       </div>
                     </div>
@@ -143,13 +141,13 @@ export default function GoalsPage() {
                   <div className="space-y-3">
                     <div className="flex justify-between items-center text-[10px] font-black uppercase tracking-widest">
                       <span className="text-primary">{Math.round(progress)}% Complete</span>
-                      <span className="text-muted-foreground">${(goal.targetAmount - goal.currentAmount).toLocaleString()} left</span>
+                      <span className="text-muted-foreground">₹{(goal.targetAmount - goal.currentAmount).toLocaleString('en-IN')} left</span>
                     </div>
                     <Progress value={progress} className="h-3 bg-muted" indicatorClassName="bg-accent" />
                   </div>
 
                   <div className="flex gap-2">
-                    {[50, 100, 500].map((amount) => (
+                    {[500, 1000, 5000].map((amount) => (
                       <Button 
                         key={amount} 
                         variant="secondary" 
@@ -157,7 +155,7 @@ export default function GoalsPage() {
                         className="flex-1 rounded-full font-black text-[10px] h-10"
                         onClick={() => handleAddMoney(goal.id, goal.currentAmount, amount)}
                       >
-                        +${amount}
+                        +₹{amount.toLocaleString('en-IN')}
                       </Button>
                     ))}
                   </div>

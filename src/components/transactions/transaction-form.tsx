@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState } from 'react';
@@ -76,7 +77,7 @@ export function TransactionForm({ onSuccess }: { onSuccess?: () => void }) {
       const colRef = collection(firestore, 'users', user.uid, 'transactions');
       addDocumentNonBlocking(colRef, {
         ...values,
-        userId: user.uid, // Explicit userId as per schema/rules
+        userId: user.uid,
         date: Timestamp.fromDate(values.date),
         createdAt: serverTimestamp(),
       });
@@ -85,7 +86,6 @@ export function TransactionForm({ onSuccess }: { onSuccess?: () => void }) {
       form.reset();
       onSuccess?.();
     } catch (error) {
-      // Errors handled by non-blocking emitter but we catch local issues
       toast({ variant: 'destructive', title: 'Error', description: 'Failed to initiate transaction' });
     } finally {
       setLoading(false);
@@ -149,7 +149,7 @@ export function TransactionForm({ onSuccess }: { onSuccess?: () => void }) {
               <FormLabel>Amount</FormLabel>
               <FormControl>
                 <div className="relative">
-                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground">$</span>
+                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground">₹</span>
                   <Input 
                     type="number" 
                     placeholder="0.00" 

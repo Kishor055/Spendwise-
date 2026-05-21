@@ -39,10 +39,10 @@ const wrappedPrompt = ai.definePrompt({
 
 Recent Transactions:
 {{#each transactions}}
-- {{{type}}}: \${{{amount}}} in {{{category}}} on {{{date}}}
+- {{{type}}}: ₹{{{amount}}} in {{{category}}} on {{{date}}}
 {{/each}}
 
-Make it feel like a viral social media recap. Be encouraging but honest about their spending habits. Use humor if they spend a lot on "Food" or "Entertainment".`,
+Make it feel like a viral social media recap. Be encouraging but honest about their spending habits using Indian Rupee (₹) symbols. Be witty and use humor if they spend a lot on "Food" or "Entertainment".`,
 });
 
 const moneyWrappedFlow = ai.defineFlow(
