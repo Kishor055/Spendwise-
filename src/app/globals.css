@@ -70,10 +70,6 @@
   @apply bg-white/60 backdrop-blur-2xl border border-white/60 shadow-[0_20px_50px_-12px_rgba(0,0,0,0.1)];
 }
 
-.glass-nav {
-  @apply bg-white/60 backdrop-blur-2xl border border-white/40;
-}
-
 .glass-card {
   @apply bg-white/60 backdrop-blur-2xl border border-white/60 shadow-[0_20px_50px_-12px_rgba(0,0,0,0.1)];
 }
@@ -98,6 +94,6 @@
 
 /* Custom progress transition */
 [role="progressbar"] > div {
-  @apply rounded-full transition-all duration-1000;
-  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  @apply rounded-full;
+  transition: all 1s cubic-bezier(0.4, 0, 0.2, 1);
 }
