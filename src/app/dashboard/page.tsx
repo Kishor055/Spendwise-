@@ -101,11 +101,11 @@ export default function DashboardPage() {
   }
 
   return (
-    <div className="min-h-screen pb-40 text-white selection:bg-primary/30">
-      <header className="px-6 pt-12 pb-6 flex justify-between items-center sticky top-0 z-50 bg-[#020617]/40 backdrop-blur-3xl border-b border-white/5">
+    <div className="min-h-screen pb-44 text-white selection:bg-primary/30">
+      <header className="px-6 pt-12 pb-6 flex justify-between items-center sticky top-0 z-50 bg-[#020617]/70 backdrop-blur-3xl border-b border-white/10">
         <div className="flex items-center gap-4">
           <div className="relative group">
-            <div className="absolute -inset-1 bg-gradient-to-r from-primary to-accent rounded-2xl blur opacity-25 group-hover:opacity-50 transition duration-1000 group-hover:duration-200"></div>
+            <div className="absolute -inset-1 bg-gradient-to-r from-primary to-accent rounded-2xl blur opacity-30 group-hover:opacity-60 transition duration-1000"></div>
             <div className="relative w-12 h-12 rounded-2xl glass flex items-center justify-center shadow-2xl">
                <Crown className="w-6 h-6 text-primary" />
             </div>
@@ -115,8 +115,8 @@ export default function DashboardPage() {
               Welcome, {user?.displayName?.split(' ')[0] || 'Explorer'}
             </h1>
             <div className="flex items-center gap-2 mt-1.5">
-              <span className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse" />
-              <span className="text-[10px] font-black text-muted-foreground uppercase tracking-[0.2em]">SpendWise Elite Status</span>
+              <span className="w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse" />
+              <span className="text-[10px] font-black text-white/60 uppercase tracking-[0.2em]">SpendWise Elite Status</span>
             </div>
           </div>
         </div>
@@ -128,11 +128,11 @@ export default function DashboardPage() {
           </Button>
           <Dialog open={isAddOpen} onOpenChange={setIsAddOpen}>
             <DialogTrigger asChild>
-              <Button size="icon" className="rounded-2xl h-12 w-12 bg-primary shadow-[0_0_20px_rgba(var(--primary),0.3)] hover:scale-110 transition-all duration-300">
-                <Plus className="h-6 w-6 text-white" />
+              <Button size="icon" className="rounded-2xl h-12 w-12 bg-primary shadow-[0_0_25px_rgba(var(--primary),0.4)] hover:scale-110 transition-all duration-300">
+                <Plus className="h-7 w-7 text-white" />
               </Button>
             </DialogTrigger>
-            <DialogContent className="sm:max-w-[425px] glass-dark rounded-[3rem] border-white/10">
+            <DialogContent className="sm:max-w-[425px] glass-dark rounded-[3rem] border-white/20">
               <DialogHeader>
                 <DialogTitle className="text-2xl font-black text-glow">New Entry</DialogTitle>
               </DialogHeader>
@@ -145,26 +145,26 @@ export default function DashboardPage() {
       <main className="px-6 space-y-10 max-w-4xl mx-auto pt-8">
         {/* Main Wealth Card */}
         <section className="relative">
-          <div className="absolute -top-10 -right-10 w-64 h-64 bg-primary/10 rounded-full blur-[100px]" />
-          <div className="absolute -bottom-10 -left-10 w-64 h-64 bg-accent/10 rounded-full blur-[100px]" />
+          <div className="absolute -top-10 -right-10 w-64 h-64 bg-primary/20 rounded-full blur-[100px]" />
+          <div className="absolute -bottom-10 -left-10 w-64 h-64 bg-accent/20 rounded-full blur-[100px]" />
           
-          <Card className="glass-dark border-white/10 overflow-hidden rounded-[3.5rem] relative z-10 shadow-2xl transition-all duration-700 hover:border-white/20">
+          <Card className="glass-dark border-white/20 overflow-hidden rounded-[3.5rem] relative z-10 shadow-2xl transition-all duration-700 hover:border-white/30">
             <div className="absolute top-0 right-0 p-8">
-               <Activity className="h-24 w-24 text-white/[0.03] absolute -top-4 -right-4" />
+               <Activity className="h-24 w-24 text-white/[0.05] absolute -top-4 -right-4" />
             </div>
             
             <CardHeader className="pb-4 pt-10 px-10">
               <div className="flex justify-between items-center mb-4">
-                <CardTitle className="text-[10px] font-black text-muted-foreground uppercase tracking-[0.4em]">Current Liquidity</CardTitle>
+                <CardTitle className="text-[10px] font-black text-white/60 uppercase tracking-[0.4em]">Current Liquidity</CardTitle>
                 <div className={cn(
-                  "px-4 py-1.5 rounded-full glass border-white/10 flex items-center gap-2 text-[10px] font-black uppercase tracking-widest transition-all",
-                  stats.healthScore > 70 ? "text-green-400 shadow-[0_0_15px_rgba(34,197,94,0.2)]" : "text-orange-400"
+                  "px-4 py-1.5 rounded-full glass border-white/20 flex items-center gap-2 text-[10px] font-black uppercase tracking-widest transition-all",
+                  stats.healthScore > 70 ? "text-green-400 shadow-[0_0_20px_rgba(74,222,128,0.2)]" : "text-orange-400"
                 )}>
                   <Zap className="h-3.5 w-3.5 fill-current" />
                   Health Score: {stats.healthScore}
                 </div>
               </div>
-              <div className="text-6xl font-black tracking-tighter tabular-nums text-white bg-clip-text">
+              <div className="text-5xl md:text-6xl font-black tracking-tighter tabular-nums text-white">
                 ₹{stats.balance.toLocaleString('en-IN', { minimumFractionDigits: 2 })}
               </div>
             </CardHeader>
@@ -172,43 +172,43 @@ export default function DashboardPage() {
             <CardContent className="pt-6 pb-10 px-10 space-y-10">
               <div className="grid grid-cols-2 gap-6">
                 <div className="glass rounded-[2.5rem] p-6 flex flex-col gap-3 border-white/10 hover:bg-white/[0.08] transition-all">
-                  <div className="w-12 h-12 rounded-2xl bg-green-500/10 flex items-center justify-center text-green-400 shadow-inner">
+                  <div className="w-12 h-12 rounded-2xl bg-green-500/20 flex items-center justify-center text-green-400 shadow-inner">
                     <ArrowUpRight className="h-7 w-7" />
                   </div>
                   <div>
-                    <p className="text-[10px] font-black text-muted-foreground uppercase tracking-widest">Inflow</p>
+                    <p className="text-[10px] font-black text-white/50 uppercase tracking-widest">Inflow</p>
                     <p className="text-xl font-black text-green-400">₹{stats.income.toLocaleString('en-IN')}</p>
                   </div>
                 </div>
                 <div className="glass rounded-[2.5rem] p-6 flex flex-col gap-3 border-white/10 hover:bg-white/[0.08] transition-all">
-                  <div className="w-12 h-12 rounded-2xl bg-red-500/10 flex items-center justify-center text-red-400 shadow-inner">
+                  <div className="w-12 h-12 rounded-2xl bg-red-500/20 flex items-center justify-center text-red-400 shadow-inner">
                     <ArrowDownRight className="h-7 w-7" />
                   </div>
                   <div>
-                    <p className="text-[10px] font-black text-muted-foreground uppercase tracking-widest">Outflow</p>
+                    <p className="text-[10px] font-black text-white/50 uppercase tracking-widest">Outflow</p>
                     <p className="text-xl font-black text-red-400">₹{stats.expense.toLocaleString('en-IN')}</p>
                   </div>
                 </div>
               </div>
 
-              <div className="glass rounded-[2.5rem] p-8 space-y-5 border-white/5 relative overflow-hidden group">
-                <div className="absolute inset-0 bg-gradient-to-r from-primary/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+              <div className="glass rounded-[2.5rem] p-8 space-y-5 border-white/10 relative overflow-hidden group">
+                <div className="absolute inset-0 bg-gradient-to-r from-primary/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
                 <div className="flex justify-between items-end relative z-10">
                   <div className="space-y-1">
-                    <p className="text-[10px] font-black text-muted-foreground uppercase tracking-[0.3em]">Spending Capacity</p>
-                    <p className="text-lg font-black text-white/90 italic">
-                      ₹{stats.expense.toLocaleString('en-IN')} <span className="text-muted-foreground font-medium text-xs">/ ₹{stats.budget.toLocaleString('en-IN')}</span>
+                    <p className="text-[10px] font-black text-white/50 uppercase tracking-[0.3em]">Spending Capacity</p>
+                    <p className="text-lg font-black text-white italic">
+                      ₹{stats.expense.toLocaleString('en-IN')} <span className="text-white/40 font-medium text-xs">/ ₹{stats.budget.toLocaleString('en-IN')}</span>
                     </p>
                   </div>
                   <div className="text-right">
-                    <span className="text-xs font-black px-4 py-1 rounded-full bg-white/10 text-glow">
+                    <span className="text-xs font-black px-4 py-1 rounded-full bg-white/20 text-white text-glow">
                       {Math.round(budgetProgress)}%
                     </span>
                   </div>
                 </div>
                 <Progress 
                   value={budgetProgress} 
-                  className="h-3 bg-black/40 rounded-full" 
+                  className="h-3 bg-black/60 rounded-full" 
                   indicatorClassName={cn(
                     "rounded-full",
                     budgetProgress > 85 ? "bg-red-500" : budgetProgress > 65 ? "bg-orange-500" : "bg-primary"
@@ -222,43 +222,43 @@ export default function DashboardPage() {
         {/* Action Grid */}
         <div className="grid grid-cols-2 gap-6">
           <Link href="/ai-assistant" className="col-span-2">
-            <div className="glass-card rounded-[2.5rem] p-6 flex items-center gap-5 relative overflow-hidden group">
+            <div className="glass-card rounded-[2.5rem] p-7 flex items-center gap-6 relative overflow-hidden group">
               <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:scale-150 transition-transform duration-700">
                 <Sparkles className="h-20 w-20 text-accent" />
               </div>
-              <div className="h-14 w-14 rounded-2xl bg-accent/10 flex items-center justify-center text-accent group-hover:rotate-12 transition-transform shadow-lg">
+              <div className="h-14 w-14 rounded-2xl bg-accent/20 flex items-center justify-center text-accent group-hover:rotate-12 transition-transform shadow-lg">
                 <Sparkles className="h-7 w-7" />
               </div>
               <div className="flex-1 relative z-10">
                 <p className="text-[10px] font-black text-accent uppercase tracking-[0.3em]">Neural Advisor</p>
-                <p className="text-sm font-bold text-white/70 line-clamp-1 mt-0.5">
+                <p className="text-sm font-bold text-white mt-0.5">
                   Analyze my patterns for efficiency...
                 </p>
               </div>
-              <ChevronRight className="h-5 w-5 text-muted-foreground/30 group-hover:translate-x-1 transition-transform" />
+              <ChevronRight className="h-5 w-5 text-white/30 group-hover:translate-x-1 transition-transform" />
             </div>
           </Link>
           
           <Link href="/wrapped">
-            <div className="glass-card rounded-[2.5rem] p-6 flex flex-col gap-4 group">
-              <div className="h-12 w-12 rounded-xl bg-orange-500/10 flex items-center justify-center text-orange-400 group-hover:scale-110 transition-transform shadow-inner">
+            <div className="glass-card rounded-[2.5rem] p-7 flex flex-col gap-4 group border-white/20">
+              <div className="h-12 w-12 rounded-xl bg-orange-500/20 flex items-center justify-center text-orange-400 group-hover:scale-110 transition-transform shadow-inner">
                 <Flame className="h-6 w-6" />
               </div>
               <div>
                 <p className="text-[10px] font-black text-orange-400 uppercase tracking-[0.2em]">Wrapped</p>
-                <p className="text-xs font-bold text-muted-foreground mt-1 italic">Annual Report</p>
+                <p className="text-xs font-bold text-white/70 mt-1 italic">Annual Report</p>
               </div>
             </div>
           </Link>
 
           <Link href="/analytics">
-            <div className="glass-card rounded-[2.5rem] p-6 flex flex-col gap-4 group">
-              <div className="h-12 w-12 rounded-xl bg-primary/10 flex items-center justify-center text-primary group-hover:scale-110 transition-transform shadow-inner">
+            <div className="glass-card rounded-[2.5rem] p-7 flex flex-col gap-4 group border-white/20">
+              <div className="h-12 w-12 rounded-xl bg-primary/20 flex items-center justify-center text-primary group-hover:scale-110 transition-transform shadow-inner">
                 <TrendingUp className="h-6 w-6" />
               </div>
               <div>
                 <p className="text-[10px] font-black text-primary uppercase tracking-[0.2em]">Insights</p>
-                <p className="text-xs font-bold text-muted-foreground mt-1 italic">Visual Trends</p>
+                <p className="text-xs font-bold text-white/70 mt-1 italic">Visual Trends</p>
               </div>
             </div>
           </Link>
@@ -271,7 +271,7 @@ export default function DashboardPage() {
               <Target className="h-6 w-6 text-primary" />
               Strategic Goals
             </h2>
-            <Button variant="ghost" size="sm" className="font-bold text-primary hover:bg-white/5 rounded-full" asChild>
+            <Button variant="ghost" size="sm" className="font-bold text-primary hover:bg-white/10 rounded-full" asChild>
               <Link href="/goals" className="flex items-center gap-1 uppercase text-[10px] tracking-widest">
                 Manifest All <ChevronRight className="h-3 w-3" />
               </Link>
@@ -280,30 +280,30 @@ export default function DashboardPage() {
           <div className="flex gap-6 overflow-x-auto pb-6 scrollbar-hide px-1">
             {!goals || goals.length === 0 ? (
               <Link href="/goals" className="w-full">
-                <div className="glass p-10 rounded-[3rem] border-dashed border-white/10 flex flex-col items-center justify-center text-muted-foreground hover:bg-white/5 transition-all">
-                  <Rocket className="h-10 w-10 mb-3 opacity-20" />
+                <div className="glass p-12 rounded-[3rem] border-dashed border-white/20 flex flex-col items-center justify-center text-white/40 hover:bg-white/10 transition-all">
+                  <Rocket className="h-10 w-10 mb-4 opacity-30" />
                   <p className="text-[10px] font-black uppercase tracking-[0.3em]">Initialize Target</p>
                 </div>
               </Link>
             ) : (
               goals.map((goal: any) => (
-                <div key={goal.id} className="min-w-[280px] glass-card p-8 rounded-[3rem] flex flex-col gap-5 relative overflow-hidden">
+                <div key={goal.id} className="min-w-[280px] glass-card p-8 rounded-[3rem] flex flex-col gap-6 relative overflow-hidden border-white/20">
                   <div className="absolute -bottom-4 -right-4 opacity-5 rotate-12">
                     <Trophy className="h-24 w-24" />
                   </div>
                   <div className="flex justify-between items-start">
-                    <div className="w-12 h-12 rounded-2xl bg-white/5 flex items-center justify-center text-accent border border-white/10">
+                    <div className="w-12 h-12 rounded-2xl bg-white/10 flex items-center justify-center text-accent border border-white/10">
                       <Trophy className="h-6 w-6" />
                     </div>
-                    <span className="text-[10px] font-black text-accent bg-accent/10 px-3 py-1 rounded-full uppercase tracking-widest">
+                    <span className="text-[10px] font-black text-accent bg-accent/20 px-3 py-1 rounded-full uppercase tracking-widest">
                       {Math.round((goal.currentAmount / goal.targetAmount) * 100)}%
                     </span>
                   </div>
                   <div>
-                    <p className="text-[10px] font-black text-muted-foreground uppercase tracking-widest">{goal.title}</p>
+                    <p className="text-[10px] font-black text-white/50 uppercase tracking-widest">{goal.title}</p>
                     <p className="text-xl font-black mt-1 italic">₹{goal.currentAmount.toLocaleString('en-IN')}</p>
                   </div>
-                  <Progress value={(goal.currentAmount/goal.targetAmount)*100} className="h-2 bg-black/30" indicatorClassName="bg-accent shadow-[0_0_10px_rgba(var(--accent),0.3)]" />
+                  <Progress value={(goal.currentAmount/goal.targetAmount)*100} className="h-2 bg-black/40" indicatorClassName="bg-accent shadow-[0_0_15px_rgba(var(--accent),0.5)]" />
                 </div>
               ))
             )}
@@ -319,23 +319,23 @@ export default function DashboardPage() {
 
           <div className="space-y-4">
             {!transactions || transactions.length === 0 ? (
-              <div className="text-center py-20 glass rounded-[3rem] flex flex-col items-center opacity-30">
+              <div className="text-center py-24 glass rounded-[3rem] flex flex-col items-center opacity-40">
                 <CreditCard className="h-16 w-16 mb-4" />
                 <p className="font-black uppercase tracking-widest text-xs italic">No activity detected</p>
               </div>
             ) : (
               transactions.slice(0, 5).map((tx) => (
-                <div key={tx.id} className="flex items-center justify-between p-6 glass rounded-[3rem] hover:bg-white/[0.08] transition-all group">
-                  <div className="flex items-center gap-5">
+                <div key={tx.id} className="flex items-center justify-between p-7 glass rounded-[3rem] hover:bg-white/[0.1] border-white/10 transition-all group">
+                  <div className="flex items-center gap-6">
                     <div className={cn(
                       "w-14 h-14 rounded-2xl flex items-center justify-center shadow-lg transition-transform group-hover:rotate-6",
-                      tx.type === 'income' ? "bg-green-500/10 text-green-400" : "bg-red-500/10 text-red-400"
+                      tx.type === 'income' ? "bg-green-500/20 text-green-400" : "bg-red-500/20 text-red-400"
                     )}>
                       {tx.type === 'income' ? <ArrowUpRight className="h-7 w-7" /> : <ArrowDownRight className="h-7 w-7" />}
                     </div>
                     <div>
-                      <p className="font-black text-base text-white/90 tracking-tight">{tx.category}</p>
-                      <p className="text-[10px] text-muted-foreground font-black uppercase tracking-[0.2em] mt-0.5">
+                      <p className="font-black text-base text-white tracking-tight">{tx.category}</p>
+                      <p className="text-[10px] text-white/50 font-black uppercase tracking-[0.2em] mt-1">
                         {tx.date?.seconds ? format(new Date(tx.date.seconds * 1000), 'MMM dd') : 'Current'}
                       </p>
                     </div>
