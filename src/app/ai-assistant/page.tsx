@@ -1,4 +1,3 @@
-
 'use client';
 
 import { useState, useRef, useEffect } from 'react';
@@ -81,39 +80,38 @@ export default function AIAssistantPage() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col pb-44 bg-[#030616] text-white overflow-hidden">
-      {/* Immersive Background */}
+    <div className="min-h-screen flex flex-col pb-44 bg-[#020617] text-white overflow-hidden">
       <div className="fixed inset-0 pointer-events-none">
         <div className="absolute top-[-10%] left-[-10%] w-[50%] h-[50%] bg-primary/10 blur-[150px] rounded-full animate-pulse" />
         <div className="absolute bottom-[-10%] right-[-10%] w-[50%] h-[50%] bg-accent/10 blur-[150px] rounded-full" />
       </div>
 
-      <header className="px-6 py-6 bg-[#030616]/40 backdrop-blur-3xl sticky top-0 z-50 border-b border-white/5 flex items-center justify-between">
-        <div className="flex items-center gap-5">
-          <Button variant="ghost" size="icon" className="rounded-2xl glass h-12 w-12 hover:bg-white/10 border-white/10" asChild>
-            <Link href="/dashboard"><ChevronLeft className="h-6 w-6" /></Link>
+      <header className="px-8 py-8 bg-[#020617]/60 backdrop-blur-3xl sticky top-0 z-50 border-b border-white/10 flex items-center justify-between">
+        <div className="flex items-center gap-6">
+          <Button variant="ghost" size="icon" className="rounded-2xl glass h-14 w-14 hover:bg-white/10 border-white/10" asChild>
+            <Link href="/dashboard"><ChevronLeft className="h-7 w-7" /></Link>
           </Button>
           <div>
-            <h1 className="text-xl font-black flex items-center gap-3 text-glow">
-              <BrainCircuit className="h-6 w-6 text-primary animate-pulse" />
-              Nexus Core
+            <h1 className="text-2xl font-black flex items-center gap-4 text-glow italic">
+              <BrainCircuit className="h-8 w-8 text-primary animate-pulse" />
+              Nexus AI
             </h1>
-            <div className="flex items-center gap-2">
-              <span className="w-1.5 h-1.5 rounded-full bg-accent animate-ping" />
-              <p className="text-[10px] text-white/40 font-black uppercase tracking-[0.3em]">Quantum Advisory Active</p>
+            <div className="flex items-center gap-3">
+              <span className="w-2 h-2 rounded-full bg-accent animate-ping" />
+              <p className="text-[10px] text-white/40 font-black uppercase tracking-[0.4em]">Quantum Advisory Active</p>
             </div>
           </div>
         </div>
       </header>
 
-      <main className="flex-1 overflow-y-auto px-6 py-10 space-y-8 scrollbar-hide relative z-10" ref={scrollRef}>
-        <div className="flex flex-col items-center justify-center py-10 text-center space-y-4">
-           <div className="w-24 h-24 rounded-full bg-primary/10 flex items-center justify-center p-4 border border-primary/20 shadow-2xl">
+      <main className="flex-1 overflow-y-auto px-8 py-12 space-y-10 scrollbar-hide relative z-10" ref={scrollRef}>
+        <div className="flex flex-col items-center justify-center py-10 text-center space-y-6">
+           <div className="w-28 h-28 rounded-[2.5rem] bg-primary/10 flex items-center justify-center p-6 border border-primary/20 shadow-3xl">
               <Bot className="w-full h-full text-primary" />
            </div>
            <div>
-              <h2 className="text-xl font-black italic">I'm Nexus</h2>
-              <p className="text-xs text-white/40 font-bold uppercase tracking-widest mt-1">AI Financial Assistant</p>
+              <h2 className="text-2xl font-black italic tracking-tighter">Nexus Core Interface</h2>
+              <p className="text-[10px] text-white/30 font-black uppercase tracking-[0.5em] mt-2">Neural Financial Intelligence</p>
            </div>
         </div>
 
@@ -121,20 +119,20 @@ export default function AIAssistantPage() {
           {messages.map((msg, i) => (
             <motion.div 
               key={i} 
-              initial={{ opacity: 0, y: 10, scale: 0.95 }}
+              initial={{ opacity: 0, y: 20, scale: 0.98 }}
               animate={{ opacity: 1, y: 0, scale: 1 }}
               className={cn("flex w-full", msg.role === 'user' ? "justify-end" : "justify-start")}
             >
               <div className={cn(
-                "max-w-[85%] p-6 rounded-[2rem] shadow-2xl relative group",
+                "max-w-[85%] p-8 rounded-[3rem] shadow-3xl relative",
                 msg.role === 'user' 
                   ? "bg-primary text-white rounded-tr-none border border-white/20" 
                   : "glass rounded-tl-none border-white/10"
               )}>
-                <div className="flex items-start gap-4">
-                  {msg.role === 'assistant' && <div className="p-2 bg-primary/20 rounded-xl shrink-0"><Bot className="h-5 w-5 text-primary" /></div>}
-                  <p className="text-sm font-bold leading-relaxed tracking-tight">{msg.content}</p>
-                  {msg.role === 'user' && <div className="p-2 bg-white/10 rounded-xl shrink-0"><User className="h-5 w-5 opacity-60" /></div>}
+                <div className="flex items-start gap-5">
+                  {msg.role === 'assistant' && <div className="p-3 bg-primary/20 rounded-2xl shrink-0"><Bot className="h-6 w-6 text-primary" /></div>}
+                  <p className="text-base font-bold leading-relaxed tracking-tight text-white/90">{msg.content}</p>
+                  {msg.role === 'user' && <div className="p-3 bg-white/10 rounded-2xl shrink-0"><User className="h-6 w-6 opacity-60" /></div>}
                 </div>
               </div>
             </motion.div>
@@ -143,48 +141,48 @@ export default function AIAssistantPage() {
         
         {isTyping && (
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex justify-start">
-            <div className="glass p-6 rounded-[2rem] rounded-tl-none border-white/10 flex items-center gap-4">
+            <div className="glass p-8 rounded-[3rem] rounded-tl-none border-white/10 flex items-center gap-5">
               <div className="relative">
-                <Loader2 className="h-5 w-5 animate-spin text-accent" />
+                <Loader2 className="h-6 w-6 animate-spin text-accent" />
                 <div className="absolute inset-0 blur-md bg-accent/30 animate-pulse" />
               </div>
-              <span className="text-[10px] font-black text-accent animate-pulse uppercase tracking-[0.3em]">Synthesizing Data...</span>
+              <span className="text-[10px] font-black text-accent animate-pulse uppercase tracking-[0.4em]">Synthesizing Matrix...</span>
             </div>
           </motion.div>
         )}
       </main>
 
-      <div className="fixed bottom-28 left-0 right-0 p-6 z-40">
-        <div className="max-w-3xl mx-auto space-y-6">
-          <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide">
+      <div className="fixed bottom-32 left-0 right-0 p-8 z-40">
+        <div className="max-w-3xl mx-auto space-y-8">
+          <div className="flex gap-4 overflow-x-auto pb-4 scrollbar-hide">
             {SUGGESTED_QUESTIONS.map((q) => (
               <Button 
                 key={q} 
                 variant="outline" 
-                className="whitespace-nowrap rounded-full glass border-white/10 text-[10px] font-black uppercase tracking-widest h-10 px-6 hover:bg-white/10 hover:border-accent/50 transition-all"
+                className="whitespace-nowrap rounded-full glass border-white/10 text-[10px] font-black uppercase tracking-[0.2em] h-12 px-8 hover:bg-white/10 hover:border-accent/50 transition-all"
                 onClick={() => handleSend(q)}
               >
-                <HelpCircle className="h-3.5 w-3.5 mr-2 text-accent" />
+                <HelpCircle className="h-4 w-4 mr-3 text-accent" />
                 {q}
               </Button>
             ))}
           </div>
           <div className="relative flex items-center group">
-            <div className="absolute -inset-1 bg-gradient-to-r from-primary to-accent rounded-3xl blur opacity-20 group-hover:opacity-40 transition duration-500"></div>
+            <div className="absolute -inset-2 bg-gradient-to-r from-primary to-accent rounded-[3rem] blur opacity-20 group-hover:opacity-40 transition duration-700"></div>
             <Input 
               placeholder="Query the Nexus..." 
-              className="relative pr-16 h-16 rounded-3xl glass border-white/10 shadow-2xl text-base font-medium placeholder:text-white/20"
+              className="relative pr-20 h-20 rounded-[2.5rem] glass border-white/10 shadow-3xl text-lg font-bold placeholder:text-white/20 px-8"
               value={input}
               onChange={(e) => setInput(e.target.value)}
               onKeyDown={(e) => e.key === 'Enter' && handleSend()}
             />
             <Button 
               size="icon" 
-              className="absolute right-3 h-11 w-11 rounded-2xl bg-primary hover:bg-primary/80 shadow-xl transition-all active:scale-90"
+              className="absolute right-4 h-14 w-14 rounded-3xl bg-primary hover:bg-primary/80 shadow-2xl transition-all active:scale-90"
               onClick={() => handleSend()}
               disabled={isTyping || !input.trim()}
             >
-              <Send className="h-5 w-5" />
+              <Send className="h-6 w-6" />
             </Button>
           </div>
         </div>
