@@ -1,12 +1,12 @@
 
 "use client";
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { useUser, useFirestore, useCollection, useMemoFirebase } from '@/firebase';
 import { collection, query, orderBy } from 'firebase/firestore';
 import { BottomNav } from '@/components/layout/bottom-nav';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { PieChart as ChartIcon, TrendingUp, ChevronLeft, BarChart3, Filter } from 'lucide-react';
+import { PieChart as ChartIcon, TrendingUp, ChevronLeft, BarChart3, Filter, Activity, PieChart as PieIcon, LineChart } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
 import { cn } from '@/lib/utils';
@@ -21,7 +21,9 @@ import {
   Bar, 
   XAxis, 
   YAxis, 
-  CartesianGrid 
+  CartesianGrid,
+  AreaChart,
+  Area
 } from 'recharts';
 
 interface Transaction {
@@ -32,12 +34,17 @@ interface Transaction {
   date: any;
 }
 
-const COLORS = ['#523399', '#69A9ED', '#10B981', '#F59E0B', '#EF4444', '#EC4899', '#8B5CF6'];
+const COLORS = ['#8B5CF6', '#EC4899', '#06B6D4', '#10B981', '#F59E0B', '#EF4444', '#6366F1'];
 
 export default function AnalyticsPage() {
   const { user } = useUser();
   const firestore = useFirestore();
   const [activeTab, setActiveTab] = useState<'expense' | 'income'>('expense');
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   const transactionsQuery = useMemoFirebase(() => {
     if (!firestore || !user) return null;
@@ -69,7 +76,7 @@ export default function AnalyticsPage() {
     transactions.slice(0, 30).forEach(tx => {
       const dateKey = tx.date?.seconds 
         ? new Date(tx.date.seconds * 1000).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
-        : 'Today';
+        : 'Live';
       
       if (!groups[dateKey]) groups[dateKey] = { income: 0, expense: 0 };
       if (tx.type === 'income') groups[dateKey].income += tx.amount;
@@ -79,47 +86,52 @@ export default function AnalyticsPage() {
     return Object.entries(groups).map(([name, vals]) => ({ name, ...vals })).reverse();
   }, [transactions]);
 
+  if (!mounted) return null;
+
   return (
-    <div className="min-h-screen pb-32">
-      <header className="px-6 pt-12 pb-6 flex items-center justify-between sticky top-0 z-50 bg-background/50 backdrop-blur-xl">
-        <div className="flex items-center gap-4">
-          <Button variant="ghost" size="icon" className="rounded-2xl glass h-10 w-10" asChild>
-            <Link href="/dashboard"><ChevronLeft className="h-5 w-5" /></Link>
+    <div className="min-h-screen pb-44 bg-[#020617] text-white">
+      <header className="px-8 pt-12 pb-8 flex items-center justify-between sticky top-0 z-50 bg-[#020617]/80 backdrop-blur-3xl border-b border-white/[0.05]">
+        <div className="flex items-center gap-6">
+          <Button variant="ghost" size="icon" className="rounded-2xl glass h-12 w-12" asChild>
+            <Link href="/dashboard"><ChevronLeft className="h-6 w-6" /></Link>
           </Button>
-          <h1 className="text-xl font-black tracking-tight">Insights</h1>
+          <div>
+            <h1 className="text-2xl font-black tracking-tight italic">Visual Insights</h1>
+            <p className="text-[9px] font-black uppercase tracking-[0.4em] text-white/20 mt-1">Matrix Pattern Analysis</p>
+          </div>
         </div>
-        <Button variant="ghost" size="icon" className="rounded-2xl glass h-10 w-10">
-          <Filter className="h-4 w-4" />
+        <Button variant="ghost" size="icon" className="rounded-2xl glass h-12 w-12">
+          <Filter className="h-5 w-5" />
         </Button>
       </header>
 
-      <main className="px-6 space-y-6 max-w-4xl mx-auto">
-        <div className="flex glass rounded-[2rem] p-1.5 shadow-inner">
+      <main className="px-8 space-y-10 max-w-7xl mx-auto py-10">
+        <div className="flex glass rounded-[2.5rem] p-2 shadow-2xl max-w-md mx-auto">
           <Button 
             variant={activeTab === 'expense' ? 'default' : 'ghost'} 
-            className={cn("flex-1 rounded-3xl font-black uppercase text-[10px] tracking-widest", activeTab === 'expense' && "shadow-xl bg-primary")}
+            className={cn("flex-1 rounded-[1.8rem] font-black uppercase text-[10px] tracking-[0.2em] h-12 transition-all", activeTab === 'expense' && "shadow-2xl bg-primary")}
             onClick={() => setActiveTab('expense')}
           >
-            Expenses
+            Outflow
           </Button>
           <Button 
             variant={activeTab === 'income' ? 'default' : 'ghost'} 
-            className={cn("flex-1 rounded-3xl font-black uppercase text-[10px] tracking-widest", activeTab === 'income' && "shadow-xl bg-primary")}
+            className={cn("flex-1 rounded-[1.8rem] font-black uppercase text-[10px] tracking-[0.2em] h-12 transition-all", activeTab === 'income' && "shadow-2xl bg-primary")}
             onClick={() => setActiveTab('income')}
           >
-            Income
+            Inflow
           </Button>
         </div>
 
-        <Card className="rounded-[3rem] border-none glass-dark">
-          <CardHeader>
-            <CardTitle className="text-xs font-black flex items-center gap-2 uppercase tracking-widest text-muted-foreground">
-              <ChartIcon className="h-4 w-4 text-primary" />
-              Category Breakdown
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="h-[280px] w-full">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+          <Card className="rounded-[3rem] border-none glass-dark p-8">
+            <CardHeader className="p-0 mb-8">
+              <CardTitle className="text-[10px] font-black flex items-center gap-3 uppercase tracking-[0.3em] text-white/30">
+                <PieIcon className="h-5 w-5 text-primary" />
+                Category Distribution
+              </CardTitle>
+            </CardHeader>
+            <div className="h-[320px] w-full">
               {pieData.length > 0 ? (
                 <ResponsiveContainer width="100%" height="100%">
                   <PieChart>
@@ -127,8 +139,8 @@ export default function AnalyticsPage() {
                       data={pieData}
                       cx="50%"
                       cy="45%"
-                      innerRadius={70}
-                      outerRadius={95}
+                      innerRadius={80}
+                      outerRadius={110}
                       paddingAngle={10}
                       dataKey="value"
                       stroke="none"
@@ -138,69 +150,80 @@ export default function AnalyticsPage() {
                       ))}
                     </Pie>
                     <Tooltip 
-                      contentStyle={{ borderRadius: '24px', border: 'none', boxShadow: '0 20px 40px rgba(0,0,0,0.1)', fontWeight: '900' }}
+                      contentStyle={{ borderRadius: '24px', border: 'none', background: '#0a0a16', boxShadow: '0 20px 40px rgba(0,0,0,0.5)', fontWeight: '900', color: '#fff' }}
+                      itemStyle={{ color: '#fff' }}
                     />
                     <Legend iconType="circle" />
                   </PieChart>
                 </ResponsiveContainer>
               ) : (
-                <div className="h-full flex flex-col items-center justify-center text-muted-foreground text-center opacity-40">
-                  <TrendingUp className="h-12 w-12 mb-4" />
-                  <p className="font-black uppercase tracking-widest text-[10px]">No data yet</p>
+                <div className="h-full flex flex-col items-center justify-center text-white/10 text-center">
+                  <Activity className="h-16 w-16 mb-4 opacity-10" />
+                  <p className="font-black uppercase tracking-[0.4em] text-[10px]">Insufficient temporal data</p>
                 </div>
               )}
             </div>
-          </CardContent>
-        </Card>
+          </Card>
 
-        <Card className="rounded-[3rem] border-none glass-dark">
-          <CardHeader>
-            <CardTitle className="text-xs font-black flex items-center gap-2 uppercase tracking-widest text-muted-foreground">
-              <BarChart3 className="h-4 w-4 text-accent" />
-              Spending Trends
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="h-[250px] w-full">
+          <Card className="rounded-[3rem] border-none glass-dark p-8">
+            <CardHeader className="p-0 mb-8">
+              <CardTitle className="text-[10px] font-black flex items-center gap-3 uppercase tracking-[0.3em] text-white/30">
+                <LineChart className="h-5 w-5 text-accent" />
+                Evolution Trend
+              </CardTitle>
+            </CardHeader>
+            <div className="h-[320px] w-full">
               {barData.length > 0 ? (
                 <ResponsiveContainer width="100%" height="100%">
-                  <BarChart data={barData}>
-                    <CartesianGrid strokeDasharray="3 3" vertical={false} strokeOpacity={0.05} />
-                    <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fontSize: 9, fontWeight: 900 }} />
+                  <AreaChart data={barData}>
+                    <defs>
+                      <linearGradient id="colorInc" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="5%" stopColor="#10B981" stopOpacity={0.3}/>
+                        <stop offset="95%" stopColor="#10B981" stopOpacity={0}/>
+                      </linearGradient>
+                      <linearGradient id="colorExp" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="5%" stopColor="#8B5CF6" stopOpacity={0.3}/>
+                        <stop offset="95%" stopColor="#8B5CF6" stopOpacity={0}/>
+                      </linearGradient>
+                    </defs>
+                    <CartesianGrid strokeDasharray="3 3" vertical={false} strokeOpacity={0.03} />
+                    <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fontSize: 9, fontWeight: 900, fill: 'rgba(255,255,255,0.2)' }} />
                     <YAxis hide />
                     <Tooltip 
-                      cursor={{ fill: 'transparent' }}
-                      contentStyle={{ borderRadius: '20px', border: 'none', boxShadow: '0 10px 30px rgba(0,0,0,0.05)' }}
+                      contentStyle={{ borderRadius: '20px', border: 'none', background: '#0a0a16', boxShadow: '0 10px 30px rgba(0,0,0,0.5)', fontWeight: '900' }}
                     />
-                    <Bar dataKey="expense" fill="#EF4444" radius={[6, 6, 0, 0]} barSize={10} />
-                    <Bar dataKey="income" fill="#10B981" radius={[6, 6, 0, 0]} barSize={10} />
-                  </BarChart>
+                    <Area type="monotone" dataKey="expense" stroke="#8B5CF6" strokeWidth={4} fillOpacity={1} fill="url(#colorExp)" />
+                    <Area type="monotone" dataKey="income" stroke="#10B981" strokeWidth={4} fillOpacity={1} fill="url(#colorInc)" />
+                  </AreaChart>
                 </ResponsiveContainer>
               ) : (
-                <div className="h-full flex items-center justify-center opacity-20 italic font-black uppercase text-[10px]">No trend history</div>
+                <div className="h-full flex items-center justify-center text-white/10 font-black uppercase text-[10px] tracking-[0.4em]">No trend history detected</div>
               )}
             </div>
-          </CardContent>
-        </Card>
+          </Card>
+        </div>
 
-        <section className="space-y-4">
-          <h3 className="text-lg font-black tracking-tight">Top Categories</h3>
-          <div className="space-y-3">
+        <section className="space-y-6">
+          <h3 className="text-xl font-black tracking-tight italic">Top Sectors</h3>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {pieData.sort((a: any, b: any) => b.value - a.value).map((item, index) => (
-              <div key={item.name} className="flex items-center justify-between p-5 glass rounded-[2rem] border-none shadow-sm transition-transform active:scale-95">
-                <div className="flex items-center gap-4">
+              <div key={item.name} className="flex items-center justify-between p-6 glass-dark rounded-[2.5rem] border border-white/[0.03] transition-all hover:bg-white/[0.06] group">
+                <div className="flex items-center gap-5">
                   <div 
-                    className="w-12 h-12 rounded-2xl flex items-center justify-center shadow-inner" 
+                    className="w-14 h-14 rounded-2xl flex items-center justify-center border border-white/5" 
                     style={{ backgroundColor: `${COLORS[index % COLORS.length]}15`, color: COLORS[index % COLORS.length] }} 
                   >
-                    <ChartIcon className="h-6 w-6" />
+                    <PieIcon className="h-7 w-7" />
                   </div>
-                  <span className="font-black text-sm">{item.name}</span>
+                  <div>
+                    <span className="font-black text-base">{item.name}</span>
+                    <p className="text-[9px] font-black uppercase tracking-widest text-white/20 mt-1">Sector Efficiency: High</p>
+                  </div>
                 </div>
                 <div className="text-right">
-                  <span className="font-black text-base block tabular-nums">₹{(item.value as number).toLocaleString('en-IN')}</span>
-                  <span className="text-[10px] text-muted-foreground font-black uppercase tracking-widest">
-                    {Math.round(((item.value as number) / totalForTab) * 100 || 0)}%
+                  <span className="font-black text-xl block tabular-nums italic">₹{(item.value as number).toLocaleString('en-IN')}</span>
+                  <span className="text-[10px] text-accent font-black uppercase tracking-widest mt-1 block">
+                    {Math.round(((item.value as number) / totalForTab) * 100 || 0)}% of total
                   </span>
                 </div>
               </div>

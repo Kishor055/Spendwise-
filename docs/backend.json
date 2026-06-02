@@ -11,7 +11,8 @@
         "email": { "type": "string", "format": "email" },
         "currency": { "type": "string", "default": "INR" },
         "monthlyBudget": { "type": "number", "default": 50000 },
-        "createdAt": { "type": "string", "format": "date-time" }
+        "createdAt": { "type": "string", "format": "date-time" },
+        "onboarded": { "type": "boolean", "default": false }
       },
       "required": ["id", "name", "email", "createdAt"]
     },
@@ -24,10 +25,11 @@
         "userId": { "type": "string" },
         "type": { "type": "string", "enum": ["income", "expense"] },
         "amount": { "type": "number" },
-        "category": { "type": "string" },
+        "category": { "type": "string", "enum": ["Food", "Shopping", "Travel", "Recharge", "Electricity", "Fuel", "Rent", "EMI", "Entertainment", "Healthcare", "Salary", "Freelance", "Gift", "Investment", "Other"] },
         "note": { "type": "string" },
         "date": { "type": "string", "format": "date-time" },
-        "createdAt": { "type": "string", "format": "date-time" }
+        "createdAt": { "type": "string", "format": "date-time" },
+        "receiptUrl": { "type": "string" }
       },
       "required": ["id", "userId", "type", "amount", "category", "date", "createdAt"]
     },
@@ -64,7 +66,7 @@
     }
   },
   "auth": {
-    "providers": ["password", "google"]
+    "providers": ["password", "google", "phone"]
   },
   "firestore": {
     "/users/{userId}": {
