@@ -1,510 +1,111 @@
-# 💰 SpendWise — AI Powered Personal Finance & Expense Management Platform
+# 💰 SpendWise 2.0 — AI-Powered Fintech Ecosystem
 
-## 🚀 Overview
-
-SpendWise is a modern AI-powered personal finance and expense tracking platform designed to help users manage income, expenses, savings, subscriptions, and financial goals efficiently.
-
-The application provides smart analytics, real-time budgeting insights, AI-driven recommendations, visual dashboards, and secure transaction management.
-
-SpendWise aims to transform traditional expense tracking into an intelligent financial ecosystem.
+SpendWise is a production-grade, AI-driven personal finance and expense management platform. Designed with a futuristic "Fintech Noir" aesthetic, it leverages advanced AI to provide deep financial insights, automated tracking, and strategic wealth planning.
 
 ---
 
-# 🌟 Key Features
-
-## 📊 Expense Tracking
-
-* Add daily income and expenses
-* Categorize transactions
-* Real-time balance calculation
-* Monthly and yearly financial summaries
-
-## 🤖 AI Financial Insights
-
-* Smart spending analysis
-* Budget recommendations
-* Expense prediction
-* AI-powered savings suggestions
-
-## 📈 Analytics Dashboard
-
-* Interactive charts
-* Spending trends
-* Category-based analytics
-* Financial health reports
-
-## 🔔 Smart Notifications
-
-* Bill reminders
-* Budget alerts
-* Subscription renewal notifications
-* EMI tracking
-
-## 🌙 Modern UI/UX
-
-* Responsive design
-* Dark/Light mode
-* Professional dashboard
-* Smooth animations
-
-## 🔐 Security Features
-
-* User authentication
-* Secure API handling
-* Encrypted financial data
-* Session management
+## 🚀 Vision
+SpendWise transforms traditional expense tracking into a **Neural Financial Terminal**. It doesn't just record transactions; it analyzes patterns, predicts trends, and coaches users toward financial freedom using the power of Generative AI.
 
 ---
 
-# 🏗️ System Architecture
+## 🌟 Key Features
 
-```text
-                    ┌──────────────────────┐
-                    │      Frontend        │
-                    │  React / Next.js UI  │
-                    └──────────┬───────────┘
-                               │
-                               ▼
-                    ┌──────────────────────┐
-                    │      Backend API     │
-                    │  Node.js / Express   │
-                    └──────────┬───────────┘
-                               │
-          ┌────────────────────┼────────────────────┐
-          ▼                    ▼                    ▼
- ┌────────────────┐  ┌────────────────┐  ┌────────────────┐
- │ Authentication │  │ Expense Engine │  │ Analytics AI   │
- │ JWT / Firebase │  │ Transactions   │  │ Smart Insights │
- └────────────────┘  └────────────────┘  └────────────────┘
-                               │
-                               ▼
-                    ┌──────────────────────┐
-                    │      Database        │
-                    │ MongoDB / PostgreSQL │
-                    └──────────────────────┘
-```
+### 🧠 Neural Command Center (Dashboard)
+- **Quantum Analytics**: Real-time visualization of Liquidity, Inflow, Outflow, and Burn Rate.
+- **Financial Vitality Index**: A sophisticated health gauge that calculates saving efficiency.
+- **Temporal Pulse**: Interactive Area charts for 7-day spending trends.
+
+### 🤖 Nexus AI Assistant
+- **AI Financial Advisor**: A specialized Genkit-powered agent for personalized wealth advice based on local spending habits.
+- **Money Wrapped**: Viral-style social recaps of your monthly and yearly financial journey.
+- **Strategic Prompting**: Pre-built commands for instant budget analysis and savings tips.
+
+### 💳 Universal Transaction Engine
+- **Multi-Sector Tracking**: Comprehensive categorization (Food, Shopping, Travel, EMI, etc.).
+- **Evidence Logging**: Receipt upload capability and encrypted notes.
+- **Universal History**: Searchable, filterable ledger with one-click CSV export.
+
+### 🎯 Strategic Control (Budgets & Goals)
+- **Sector Limits**: Category-wise budget enforcement with real-time overspending alerts.
+- **Manifest Goals**: Target-based savings tracking for high-value acquisitions.
+- **Recursive Bills**: A dedicated reminder system for Rent, EMI, and Utilities.
+
+### 🔐 Security & Authority
+- **Nexus Terminal (Admin)**: Global oversight for system entities and security status.
+- **Encryption Protocol**: Secure Firebase-backed authentication (Google, Email, OTP).
+- **Matrix Permissions**: Robust Firestore security rules ensuring total data privacy.
 
 ---
 
-# 📂 Project Structure
+## 🎨 Design Philosophy: "Fintech Noir"
+SpendWise uses **Glassmorphism 2.0/3.0** principles:
+- **Depth & Translucency**: Layered interfaces with 20px+ blur.
+- **High-Contrast Legibility**: Deep `#020617` backgrounds with vibrant neon accents.
+- **Physics-Based UI**: Smooth, hardware-accelerated transitions via `framer-motion`.
+
+---
+
+## 🛠️ Tech Stack
+
+| Layer | Technology |
+| :--- | :--- |
+| **Frontend** | Next.js 15 (App Router), React 19, TypeScript |
+| **Styling** | Tailwind CSS, ShadCN UI, Lucide Icons |
+| **Animation** | Framer Motion, Tailwind Animate |
+| **Backend** | Firebase (Auth, Firestore) |
+| **AI Engine** | Genkit, Google Gemini 2.5 Flash |
+| **Charts** | Recharts |
+
+---
+
+## 📂 Project Structure
 
 ```bash
-SpendWise/
-│
-├── frontend/
-│   ├── public/
-│   ├── src/
-│   │   ├── components/
-│   │   ├── pages/
-│   │   ├── hooks/
-│   │   ├── services/
-│   │   ├── charts/
-│   │   ├── animations/
-│   │   ├── utils/
-│   │   └── styles/
-│   └── package.json
-│
-├── backend/
-│   ├── api/
-│   ├── controllers/
-│   ├── routes/
-│   ├── middleware/
-│   ├── models/
-│   ├── services/
-│   ├── ai/
-│   ├── analytics/
-│   ├── database/
-│   └── server.js
-│
-├── docs/
-│   ├── architecture/
-│   ├── screenshots/
-│   └── api-docs/
-│
-├── tests/
-│   ├── frontend/
-│   ├── backend/
-│   └── integration/
-│
-├── docker/
-├── .env
-├── README.md
-└── package.json
+src/
+├── ai/                  # Genkit flows and AI prompt logic
+├── app/                 # Next.js App Router (Pages & Layouts)
+│   ├── (auth)/          # Authentication routes (Login, Register)
+│   ├── dashboard/       # Main Command Center
+│   ├── analytics/       # Data visualization hub
+│   ├── budget/          # Sector limit management
+│   └── ai-assistant/    # Nexus AI Terminal
+├── components/          # Reusable UI & Complex Widgets
+│   ├── ui/              # ShadCN base components
+│   └── layout/          # Global navigation (Pill-nav)
+├── firebase/            # Firebase SDK config & Non-blocking hooks
+└── lib/                 # Shared utilities and types
 ```
 
 ---
 
-# 🧠 Workflow / Job Structure
+## ⚡ Quick Start
 
-## 1️⃣ User Authentication
-
-* User signs up or logs in
-* Authentication token generated
-* Secure session established
-
-## 2️⃣ Expense Management
-
-* User adds transactions
-* Data stored in database
-* Categories assigned automatically
-
-## 3️⃣ Analytics Processing
-
-* Backend calculates trends
-* Expense reports generated
-* AI insights prepared
-
-## 4️⃣ Dashboard Visualization
-
-* Charts rendered dynamically
-* Financial summaries displayed
-* Real-time updates shown
-
-## 5️⃣ Notification Engine
-
-* Budget alerts generated
-* Reminder notifications triggered
-* Subscription tracking enabled
-
----
-
-# 🖥️ Website Pages
-
-## 🏠 Home Page
-
-Features:
-
-* Hero section
-* Financial statistics
-* Feature showcase
-* Call-to-action buttons
-* Modern animations
-
----
-
-## 📊 Dashboard Page
-
-Features:
-
-* Expense summary cards
-* Analytics charts
-* Income vs expense comparison
-* Savings tracker
-* AI financial recommendations
-
----
-
-## 💳 Transactions Page
-
-Features:
-
-* Add/edit/delete transactions
-* Filter expenses
-* Search functionality
-* Category management
-
----
-
-## 📈 Analytics Page
-
-Features:
-
-* Monthly spending charts
-* Pie chart analytics
-* Trend predictions
-* Smart reports
-
----
-
-## 🎯 Goals & Budget Page
-
-Features:
-
-* Savings goals
-* Budget planning
-* Progress indicators
-* Smart suggestions
-
----
-
-## ⚙️ Settings Page
-
-Features:
-
-* Profile management
-* Theme customization
-* Security settings
-* Notification preferences
-
----
-
-# 📸 Website Output Preview
-
-## 🏠 Home Page Output
-
-```text
----------------------------------------------------
-| SpendWise                                        |
-| AI Powered Finance Management Platform           |
-|                                                   |
-| [Get Started]   [View Dashboard]                 |
----------------------------------------------------
-```
-
----
-
-## 📊 Dashboard Output
-
-```text
----------------------------------------------------
-| Total Balance      ₹45,000                       |
-| Monthly Expense    ₹12,500                       |
-| Savings            ₹8,200                        |
----------------------------------------------------
-| Expense Analytics Chart                           |
----------------------------------------------------
-```
-
----
-
-## 📈 Analytics Output
-
-```text
----------------------------------------------------
-| Food           ███████ 35%                       |
-| Shopping       ████ 20%                          |
-| Bills          ███ 15%                           |
-| Travel         ██ 10%                            |
----------------------------------------------------
-```
-
----
-
-# 🛠️ Tech Stack
-
-| Layer           | Technology                 |
-| --------------- | -------------------------- |
-| Frontend        | React.js / Next.js         |
-| Backend         | Node.js / Express.js       |
-| Database        | MongoDB / PostgreSQL       |
-| Styling         | Tailwind CSS               |
-| Charts          | Chart.js / Recharts        |
-| Authentication  | Firebase / JWT             |
-| AI Integration  | Gemini API / OpenAI        |
-| Deployment      | Vercel / Netlify / Railway |
-| Version Control | Git & GitHub               |
-
----
-
-# ⚡ Installation Guide
-
-## Clone Repository
-
+### 1. Initialize Project
 ```bash
-git clone https://github.com/Kishor055/Spendwise-.git
-```
-
-## Navigate to Project
-
-```bash
-cd Spendwise-
-```
-
-## Install Dependencies
-
-### Frontend
-
-```bash
-cd frontend
 npm install
 ```
 
-### Backend
-
-```bash
-cd backend
-npm install
+### 2. Set Up Environment
+Create a `.env.local` file with your Firebase and Google AI credentials:
+```env
+NEXT_PUBLIC_FIREBASE_API_KEY=your_key
+NEXT_PUBLIC_FIREBASE_PROJECT_ID=your_id
+GOOGLE_GENAI_API_KEY=your_gemini_key
 ```
 
----
-
-# ▶️ Run Application
-
-## Start Frontend
-
+### 3. Launch Nexus
 ```bash
 npm run dev
 ```
 
-## Start Backend
+---
 
-```bash
-npm start
-```
+## 👨‍💻 Author
+**SpendWise Core Team**
+*Specializing in AI-Driven Fintech Solutions.*
 
 ---
 
-# 🌐 Deployment
-
-## Frontend Deployment
-
-* Vercel
-* Netlify
-
-## Backend Deployment
-
-* Railway
-* Render
-* AWS
-
-## Database Hosting
-
-* MongoDB Atlas
-* Supabase
-* PostgreSQL Cloud
-
----
-
-# 🔥 Future Enhancements
-
-* AI financial assistant
-* OCR receipt scanner
-* Voice expense entry
-* Multi-user family budgeting
-* Real-time bank integration
-* Investment tracking
-* Mobile application
-* Offline mode
-* PWA support
-* Smart tax estimation
-
----
-
-# 🧪 Testing
-
-## Frontend Testing
-
-* Jest
-* React Testing Library
-
-## Backend Testing
-
-* Mocha
-* Chai
-* Postman API Testing
-
----
-
-# 📊 Performance Optimization
-
-* Lazy loading
-* Code splitting
-* API caching
-* Database indexing
-* Optimized assets
-* Responsive rendering
-
----
-
-# 🔐 Security Best Practices
-
-* Secure API routes
-* Password encryption
-* Environment variable protection
-* Rate limiting
-* Token authentication
-* HTTPS deployment
-
----
-
-# 📚 API Endpoints
-
-## Authentication APIs
-
-```bash
-POST /api/auth/register
-POST /api/auth/login
-GET  /api/auth/profile
-```
-
-## Expense APIs
-
-```bash
-GET    /api/expenses
-POST   /api/expenses
-PUT    /api/expenses/:id
-DELETE /api/expenses/:id
-```
-
-## Analytics APIs
-
-```bash
-GET /api/analytics/monthly
-GET /api/analytics/yearly
-GET /api/analytics/categories
-```
-
----
-
-# 📦 DevOps & CI/CD
-
-## Integrated Tools
-
-* GitHub Actions
-* Docker
-* CI/CD Pipelines
-* Automated Testing
-* Auto Deployment
-
----
-
-# 🤝 Contribution Guidelines
-
-1. Fork the repository
-2. Create a new branch
-3. Commit changes
-4. Push changes
-5. Create Pull Request
-
----
-
-# 📜 License
-
-This project is licensed under the MIT License.
-
----
-
-# 👨‍💻 Author
-
-## Kishor Kakde Patil
-
-Passionate Full Stack Developer focused on:
-
-* AI Applications
-* FinTech Platforms
-* Cloud Solutions
-* Smart Analytics Systems
-
----
-
-# ⭐ Support
-
-If you like this project:
-
-* Star the repository
-* Fork the project
-* Contribute improvements
-* Share with developers
-
----
-
-# 📞 Contact
-
-GitHub Repository:
-[https://github.com/Kishor055/Spendwise-](https://github.com/Kishor055/Spendwise-)
-
----
-
-# 🚀 Final Vision
-
-SpendWise is designed to evolve from a simple expense tracker into a complete AI-powered personal finance ecosystem capable of helping users manage, optimize, and grow their financial health intelligently.
+## 📜 License
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
