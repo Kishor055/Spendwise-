@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useMemo, useState, useEffect } from 'react';
@@ -19,15 +18,16 @@ import {
   CreditCard,
   BrainCircuit,
   Bell,
-  Search,
   Zap,
   Target,
   Trophy,
   Wallet2,
   TrendingDown,
   ChevronRight,
-  MoreHorizontal,
-  CircleDollarSign
+  CircleDollarSign,
+  Flame,
+  ShieldCheck,
+  LayoutGrid
 } from 'lucide-react';
 import { format } from 'date-fns';
 import { cn } from '@/lib/utils';
@@ -163,32 +163,60 @@ export default function DashboardPage() {
               </div>
             </div>
             <div>
-              <h1 className="text-2xl font-black tracking-tight leading-none italic">Welcome, {user?.displayName?.split(' ')[0] || 'Elite'}</h1>
-              <p className="text-[10px] text-white/40 font-black uppercase tracking-[0.4em] mt-2">SpendWise Elite Status</p>
+              <h1 className="text-2xl font-black tracking-tight leading-none italic">Elite Matrix</h1>
+              <p className="text-[10px] text-white/40 font-black uppercase tracking-[0.4em] mt-2">SpendWise Premium Active</p>
             </div>
           </div>
           <div className="flex items-center gap-4">
-             <Button variant="ghost" size="icon" className="rounded-2xl glass h-12 w-12">
-                <Bell className="h-6 w-6 text-white/60" />
+             <div className="flex items-center gap-2 bg-primary/10 px-4 py-2 rounded-full border border-primary/20">
+                <Flame className="h-4 w-4 text-primary animate-pulse" />
+                <span className="text-[10px] font-black uppercase tracking-widest">Streak: 12d</span>
+             </div>
+             <Button variant="ghost" size="icon" className="rounded-2xl glass h-12 w-12" asChild>
+                <Link href="/profile"><ShieldCheck className="h-6 w-6 text-emerald-400" /></Link>
              </Button>
           </div>
         </div>
       </header>
 
       <main className="px-8 py-12 space-y-10 max-w-7xl mx-auto relative z-10">
+        {/* Quick Access Grid */}
+        <section className="grid grid-cols-2 md:grid-cols-4 gap-6">
+           {[
+             { label: 'Sector Control', icon: LayoutGrid, href: '/budget', color: 'text-primary' },
+             { label: 'Time Alerts', icon: Bell, href: '/reminders', color: 'text-accent' },
+             { label: 'Strategic Goals', icon: Target, href: '/goals', color: 'text-emerald-400' },
+             { label: 'Wrapped Hub', icon: Trophy, href: '/wrapped', color: 'text-yellow-400' }
+           ].map((item, i) => (
+             <Link key={item.label} href={item.href}>
+                <motion.div 
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: i * 0.1 }}
+                  className="glass-dark p-6 rounded-[2.5rem] border border-white/5 flex flex-col items-center justify-center text-center space-y-4 group hover:bg-white/[0.05] transition-all"
+                >
+                   <div className={cn("p-4 rounded-2xl bg-white/[0.03] border border-white/5 group-hover:scale-110 transition-transform", item.color)}>
+                      <item.icon className="h-7 w-7" />
+                   </div>
+                   <p className="text-[10px] font-black uppercase tracking-[0.2em] text-white/40">{item.label}</p>
+                </motion.div>
+             </Link>
+           ))}
+        </section>
+
         {/* Top Summary Row */}
         <section className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
           {[
-            { label: 'Current Liquidity', value: stats.balance, icon: Wallet2, color: 'text-primary' },
-            { label: 'Inflow', value: stats.income, icon: TrendingUp, color: 'text-emerald-400' },
-            { label: 'Outflow', value: stats.expense, icon: TrendingDown, color: 'text-rose-400' },
-            { label: 'Spending Capacity', value: stats.budget - stats.expense, icon: CircleDollarSign, color: 'text-accent' },
+            { label: 'Available Capital', value: stats.balance, icon: Wallet2, color: 'text-primary' },
+            { label: 'Monthly Inflow', value: stats.income, icon: TrendingUp, color: 'text-emerald-400' },
+            { label: 'Current Burn', value: stats.expense, icon: TrendingDown, color: 'text-rose-400' },
+            { label: 'Reserve Power', value: stats.budget - stats.expense, icon: CircleDollarSign, color: 'text-accent' },
           ].map((item, i) => (
             <motion.div 
               key={item.label} 
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: i * 0.1 }}
+              transition={{ delay: 0.2 + (i * 0.1) }}
             >
               <Card className="rounded-[3rem] border-none glass-dark p-8 group hover:bg-white/[0.05] transition-all">
                 <div className="flex justify-between items-start mb-6">
@@ -198,9 +226,6 @@ export default function DashboardPage() {
                   </div>
                 </div>
                 <h3 className="text-3xl font-black tabular-nums tracking-tighter italic">₹{item.value.toLocaleString('en-IN')}</h3>
-                <div className="mt-6 h-1 w-full bg-white/[0.03] rounded-full overflow-hidden">
-                   <div className={cn("h-full transition-all duration-1000", item.color === 'text-primary' ? 'bg-primary w-2/3' : 'bg-current w-1/2')} />
-                </div>
               </Card>
             </motion.div>
           ))}
@@ -210,8 +235,11 @@ export default function DashboardPage() {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Budget Progress Donut */}
           <Card className="rounded-[3rem] border-none glass-dark lg:col-span-1 p-8">
-            <CardHeader className="p-0 mb-8">
-              <CardTitle className="text-[10px] font-black uppercase tracking-[0.3em] text-white/30">Budget Neural Status</CardTitle>
+            <CardHeader className="p-0 mb-8 flex justify-between items-center">
+              <CardTitle className="text-[10px] font-black uppercase tracking-[0.3em] text-white/30">Temporal Budget</CardTitle>
+              <Button variant="ghost" size="sm" asChild>
+                 <Link href="/budget"><Plus className="h-4 w-4" /></Link>
+              </Button>
             </CardHeader>
             <div className="flex flex-col items-center">
               <div className="relative w-full h-[240px]">
@@ -238,23 +266,13 @@ export default function DashboardPage() {
                   <p className="text-[9px] font-black text-white/20 uppercase tracking-[0.3em] mt-2">Consumed</p>
                 </div>
               </div>
-              <div className="w-full space-y-4 mt-8">
-                <div className="flex justify-between items-center p-4 glass rounded-2xl">
-                  <div className="flex items-center gap-3"><span className="w-2.5 h-2.5 rounded-full bg-primary" /> <span className="text-[10px] font-black uppercase tracking-widest text-white/60">Outflow</span></div>
-                  <span className="text-xs font-black">₹{stats.expense.toLocaleString('en-IN')}</span>
-                </div>
-                <div className="flex justify-between items-center p-4 glass rounded-2xl">
-                  <div className="flex items-center gap-3"><span className="w-2.5 h-2.5 rounded-full bg-white/10" /> <span className="text-[10px] font-black uppercase tracking-widest text-white/60">Limit</span></div>
-                  <span className="text-xs font-black">₹{stats.budget.toLocaleString('en-IN')}</span>
-                </div>
-              </div>
             </div>
           </Card>
 
           {/* Sector Breakdown */}
           <Card className="rounded-[3rem] border-none glass-dark lg:col-span-1 p-8">
             <CardHeader className="p-0 mb-8 flex flex-row justify-between items-center">
-              <CardTitle className="text-[10px] font-black uppercase tracking-[0.3em] text-white/30">Sector Analysis</CardTitle>
+              <CardTitle className="text-[10px] font-black uppercase tracking-[0.3em] text-white/30">Sector Power</CardTitle>
               <Button variant="ghost" size="sm" className="h-8 text-[9px] font-black uppercase tracking-widest text-white/20" asChild>
                 <Link href="/analytics">Expand</Link>
               </Button>
@@ -279,24 +297,13 @@ export default function DashboardPage() {
                 </PieChart>
               </ResponsiveContainer>
             </div>
-            <div className="grid grid-cols-1 gap-3">
-              {categoryData.slice(0, 4).map((cat, i) => (
-                <div key={cat.name} className="flex items-center justify-between p-3 glass rounded-2xl">
-                  <div className="flex items-center gap-3">
-                    <span className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: PIE_COLORS[i % PIE_COLORS.length] }} />
-                    <span className="text-[10px] font-black uppercase tracking-widest text-white/70">{cat.name}</span>
-                  </div>
-                  <span className="text-[10px] font-black text-white/40">{cat.percent}%</span>
-                </div>
-              ))}
-            </div>
           </Card>
 
           {/* Health Index */}
           <Card className="rounded-[3rem] border-none glass-dark lg:col-span-1 p-8">
             <CardHeader className="p-0 mb-10">
               <CardTitle className="text-[10px] font-black uppercase tracking-[0.3em] text-white/30 flex justify-between items-center">
-                Financial Health Index
+                Financial Vitality
                 <Activity className="h-5 w-5 text-accent" />
               </CardTitle>
             </CardHeader>
@@ -322,121 +329,60 @@ export default function DashboardPage() {
                     <span className="text-[10px] font-black text-accent uppercase tracking-[0.4em] mt-2">Optimal</span>
                   </div>
                </div>
-               <p className="text-sm font-bold text-white/50 italic leading-relaxed px-6">"Matrix stability high. Wealth generation protocols active."</p>
-               <Button className="mt-10 rounded-2xl glass border-white/10 hover:bg-white/10 w-full font-black text-[10px] uppercase tracking-[0.3em] h-14" asChild>
-                 <Link href="/ai-assistant">Neural Advisor</Link>
-               </Button>
             </div>
           </Card>
         </div>
 
-        {/* Recent Activity & Global Insights */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-          {/* Universal Logs */}
-          <Card className="rounded-[3rem] border-none glass-dark p-8">
-            <CardHeader className="p-0 mb-8 flex flex-row justify-between items-center">
-              <CardTitle className="text-[10px] font-black uppercase tracking-[0.3em] text-white/30">Universal History</CardTitle>
-              <Button variant="ghost" className="text-[9px] font-black uppercase tracking-widest text-white/20 h-8" asChild>
-                <Link href="/transactions">View All</Link>
-              </Button>
-            </CardHeader>
-            <div className="space-y-4">
-              {transactions?.slice(0, 5).map((tx) => (
-                <div key={tx.id} className="flex items-center justify-between group p-4 hover:bg-white/[0.03] rounded-[2rem] transition-all border border-transparent hover:border-white/5">
-                  <div className="flex items-center gap-5">
-                    <div className={cn(
-                      "w-12 h-12 rounded-2xl flex items-center justify-center border border-white/5",
-                      tx.type === 'income' ? "bg-emerald-500/10 text-emerald-500" : "bg-primary/10 text-primary"
-                    )}>
-                      {tx.type === 'income' ? <ArrowUpRight className="h-6 w-6" /> : <ArrowDownRight className="h-6 w-6" />}
-                    </div>
-                    <div>
-                      <p className="font-black text-base">{tx.category}</p>
-                      <p className="text-[9px] font-black uppercase tracking-widest text-white/20 mt-1">
-                        {tx.date?.seconds ? format(new Date(tx.date.seconds * 1000), 'MMM d, h:mm a') : 'Now'}
-                      </p>
-                    </div>
-                  </div>
-                  <div className="text-right">
-                    <p className={cn("font-black text-lg tabular-nums italic", tx.type === 'income' ? "text-emerald-400" : "text-white")}>
-                      {tx.type === 'income' ? '+' : '-'}₹{tx.amount.toLocaleString('en-IN')}
-                    </p>
-                  </div>
-                </div>
-              ))}
-              {(!transactions || transactions.length === 0) && (
-                <div className="h-40 flex flex-col items-center justify-center text-white/10 font-black uppercase tracking-[0.4em] text-[10px]">
-                  No entries detected
-                </div>
-              )}
-            </div>
-          </Card>
-
-          {/* Neural Insights & Actions */}
-          <div className="space-y-8">
+        {/* Neural Insights & Actions */}
+        <section className="grid grid-cols-1 lg:grid-cols-2 gap-8">
             <Card className="rounded-[3rem] border-none glass-dark p-8 overflow-hidden relative">
                <div className="absolute top-0 right-0 w-32 h-32 bg-primary/20 blur-[80px] rounded-full" />
                <CardHeader className="p-0 mb-8 flex flex-row justify-between items-center">
                   <CardTitle className="text-[10px] font-black uppercase tracking-[0.3em] text-white/30 flex items-center gap-3">
-                     Neural Insights <Sparkles className="h-4 w-4 text-accent animate-pulse" />
+                     Quantum Actions <Sparkles className="h-4 w-4 text-accent animate-pulse" />
                   </CardTitle>
-                  <span className="bg-primary text-white px-4 py-1.5 rounded-full text-[8px] font-black uppercase tracking-widest shadow-lg shadow-primary/20">Active</span>
                </CardHeader>
-               <div className="space-y-4">
-                  {[
-                    { text: "System detected high spending in 'Entertainment'. Recommend 12% reduction for protocol optimization.", color: "bg-rose-500/5 border-rose-500/10 text-rose-200" },
-                    { text: "Liquidity up by ₹12,400. Suggest redirecting excess to 'Strategic Goals'.", color: "bg-emerald-500/5 border-emerald-500/10 text-emerald-200" },
-                  ].map((insight, i) => (
-                    <motion.div 
-                      key={i} 
-                      initial={{ x: 20, opacity: 0 }} 
-                      animate={{ x: 0, opacity: 1 }} 
-                      transition={{ delay: i * 0.2 }}
-                      className={cn("p-6 rounded-[2rem] border relative overflow-hidden", insight.color)}
-                    >
-                      <p className="text-xs font-bold leading-relaxed italic">{insight.text}</p>
-                    </motion.div>
-                  ))}
-                  <div className="pt-6 grid grid-cols-2 md:grid-cols-4 gap-4">
-                     <Dialog open={isAddOpen} onOpenChange={setIsAddOpen}>
-                        <DialogTrigger asChild>
-                          <Button className="flex flex-col gap-3 h-28 rounded-[2rem] bg-primary shadow-2xl shadow-primary/20 hover:scale-105 transition-all">
-                             <Plus className="h-7 w-7" />
-                             <span className="text-[8px] font-black uppercase tracking-[0.2em]">Matrix Entry</span>
-                          </Button>
-                        </DialogTrigger>
-                        <DialogContent className="sm:max-w-[500px] glass rounded-[3rem] border-white/10 p-0 overflow-hidden">
-                          <div className="p-10">
-                            <DialogHeader className="mb-8">
-                              <DialogTitle className="text-3xl font-black italic tracking-tighter">New Entry</DialogTitle>
-                              <p className="text-[9px] font-black uppercase tracking-[0.4em] text-white/20">Financial Protocol Initiation</p>
-                            </DialogHeader>
-                            <TransactionForm onSuccess={() => setIsAddOpen(false)} />
-                          </div>
-                        </DialogContent>
-                     </Dialog>
-                     <Button className="flex flex-col gap-3 h-28 rounded-[2rem] bg-emerald-500 shadow-2xl shadow-emerald-500/20 hover:scale-105 transition-all" onClick={() => setIsAddOpen(true)}>
-                        <TrendingUp className="h-7 w-7" />
-                        <span className="text-[8px] font-black uppercase tracking-[0.2em]">Inflow Entry</span>
-                     </Button>
-                     <Button variant="ghost" className="flex flex-col gap-3 h-28 rounded-[2rem] glass border-white/10 hover:bg-white/10 hover:scale-105 transition-all">
-                        <Zap className="h-7 w-7 text-accent" />
-                        <span className="text-[8px] font-black uppercase tracking-[0.2em]">Scan Data</span>
-                     </Button>
-                     <Button variant="ghost" className="flex flex-col gap-3 h-28 rounded-[2rem] glass border-white/10 hover:bg-white/10 hover:scale-105 transition-all" asChild>
-                        <Link href="/ai-assistant">
-                           <Sparkles className="h-7 w-7 text-primary" />
-                           <span className="text-[8px] font-black uppercase tracking-[0.2em]">AI Advisor</span>
-                        </Link>
-                     </Button>
-                  </div>
+               <div className="pt-6 grid grid-cols-2 md:grid-cols-4 gap-4">
+                  <Dialog open={isAddOpen} onOpenChange={setIsAddOpen}>
+                    <DialogTrigger asChild>
+                      <Button className="flex flex-col gap-3 h-28 rounded-[2rem] bg-primary shadow-2xl shadow-primary/20 hover:scale-105 transition-all">
+                        <Plus className="h-7 w-7" />
+                        <span className="text-[8px] font-black uppercase tracking-[0.2em]">New Log</span>
+                      </Button>
+                    </DialogTrigger>
+                    <DialogContent className="sm:max-w-[500px] glass rounded-[3rem] border-white/10 p-0 overflow-hidden">
+                      <div className="p-10">
+                        <DialogHeader className="mb-8">
+                          <DialogTitle className="text-3xl font-black italic tracking-tighter">New Entry</DialogTitle>
+                        </DialogHeader>
+                        <TransactionForm onSuccess={() => setIsAddOpen(false)} />
+                      </div>
+                    </DialogContent>
+                  </Dialog>
+                  <Button variant="ghost" className="flex flex-col gap-3 h-28 rounded-[2rem] glass border-white/10 hover:bg-white/10 hover:scale-105 transition-all" asChild>
+                    <Link href="/budget">
+                      <LayoutGrid className="h-7 w-7 text-accent" />
+                      <span className="text-[8px] font-black uppercase tracking-[0.2em]">Budgets</span>
+                    </Link>
+                  </Button>
+                  <Button variant="ghost" className="flex flex-col gap-3 h-28 rounded-[2rem] glass border-white/10 hover:bg-white/10 hover:scale-105 transition-all" asChild>
+                    <Link href="/reminders">
+                      <Bell className="h-7 w-7 text-emerald-400" />
+                      <span className="text-[8px] font-black uppercase tracking-[0.2em]">Alerts</span>
+                    </Link>
+                  </Button>
+                  <Button variant="ghost" className="flex flex-col gap-3 h-28 rounded-[2rem] glass border-white/10 hover:bg-white/10 hover:scale-105 transition-all" asChild>
+                    <Link href="/ai-assistant">
+                      <Sparkles className="h-7 w-7 text-primary" />
+                      <span className="text-[8px] font-black uppercase tracking-[0.2em]">AI Advisor</span>
+                    </Link>
+                  </Button>
                </div>
             </Card>
 
-            {/* Area Trend Visualization */}
             <Card className="rounded-[3rem] border-none glass-dark p-8">
               <CardHeader className="p-0 mb-8">
-                <CardTitle className="text-[10px] font-black uppercase tracking-[0.3em] text-white/30">Temporal Pulse</CardTitle>
+                <CardTitle className="text-[10px] font-black uppercase tracking-[0.3em] text-white/30">Universal Trends</CardTitle>
               </CardHeader>
               <div className="h-[200px] w-full">
                 <ResponsiveContainer width="100%" height="100%">
@@ -461,8 +407,7 @@ export default function DashboardPage() {
                 </ResponsiveContainer>
               </div>
             </Card>
-          </div>
-        </div>
+        </section>
       </main>
 
       <BottomNav />

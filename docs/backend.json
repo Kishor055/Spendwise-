@@ -1,4 +1,3 @@
-
 {
   "entities": {
     "UserProfile": {
@@ -12,7 +11,9 @@
         "currency": { "type": "string", "default": "INR" },
         "monthlyBudget": { "type": "number", "default": 50000 },
         "createdAt": { "type": "string", "format": "date-time" },
-        "onboarded": { "type": "boolean", "default": false }
+        "onboarded": { "type": "boolean", "default": false },
+        "streak": { "type": "number", "default": 0 },
+        "rank": { "type": "string", "default": "Novice" }
       },
       "required": ["id", "name", "email", "createdAt"]
     },
@@ -48,21 +49,33 @@
       },
       "required": ["id", "userId", "title", "targetAmount", "createdAt"]
     },
-    "Subscription": {
-      "title": "Subscription",
+    "Budget": {
+      "title": "Budget",
       "type": "object",
-      "description": "Recurring subscription services.",
+      "description": "Category-wise budget limits.",
       "properties": {
         "id": { "type": "string" },
         "userId": { "type": "string" },
-        "name": { "type": "string" },
-        "amount": { "type": "number" },
-        "billingCycle": { "type": "string", "enum": ["monthly", "yearly"] },
         "category": { "type": "string" },
-        "nextBillingDate": { "type": "string", "format": "date-time" },
-        "active": { "type": "boolean", "default": true }
+        "limit": { "type": "number" },
+        "month": { "type": "string" }
       },
-      "required": ["id", "userId", "name", "amount", "billingCycle"]
+      "required": ["id", "userId", "category", "limit", "month"]
+    },
+    "Reminder": {
+      "title": "Reminder",
+      "type": "object",
+      "description": "Bill and payment reminders.",
+      "properties": {
+        "id": { "type": "string" },
+        "userId": { "type": "string" },
+        "title": { "type": "string" },
+        "amount": { "type": "number" },
+        "dueDate": { "type": "string", "format": "date-time" },
+        "type": { "type": "string", "enum": ["Electricity", "EMI", "Rent", "Credit Card", "Recharge", "Other"] },
+        "notified": { "type": "boolean", "default": false }
+      },
+      "required": ["id", "userId", "title", "amount", "dueDate", "type"]
     }
   },
   "auth": {
@@ -81,9 +94,13 @@
       "schema": { "$ref": "#/entities/Goal" },
       "description": "User financial goals."
     },
-    "/users/{userId}/subscriptions/{subscriptionId}": {
-      "schema": { "$ref": "#/entities/Subscription" },
-      "description": "User recurring subscriptions."
+    "/users/{userId}/budgets/{budgetId}": {
+      "schema": { "$ref": "#/entities/Budget" },
+      "description": "User category budgets."
+    },
+    "/users/{userId}/reminders/{reminderId}": {
+      "schema": { "$ref": "#/entities/Reminder" },
+      "description": "User bill reminders."
     }
   }
 }

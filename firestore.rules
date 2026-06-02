@@ -1,23 +1,28 @@
-
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
     function isSignedIn() { return request.auth != null; }
     function isOwner(userId) { return isSignedIn() && request.auth.uid == userId; }
+    function isAdmin() { return isSignedIn() && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.rank == 'Admin'; }
 
     match /users/{userId} {
-      allow get, list, create, update, delete: if isOwner(userId);
+      allow get, list, create, update: if isOwner(userId);
+      allow delete: if isOwner(userId) || isAdmin();
       
       match /transactions/{transactionId} {
-        allow get, list, create, update, delete: if isOwner(userId);
+        allow get, list, create, update, delete: if isOwner(userId) || isAdmin();
       }
       
       match /goals/{goalId} {
-        allow get, list, create, update, delete: if isOwner(userId);
+        allow get, list, create, update, delete: if isOwner(userId) || isAdmin();
       }
       
-      match /subscriptions/{subscriptionId} {
-        allow get, list, create, update, delete: if isOwner(userId);
+      match /budgets/{budgetId} {
+        allow get, list, create, update, delete: if isOwner(userId) || isAdmin();
+      }
+      
+      match /reminders/{reminderId} {
+        allow get, list, create, update, delete: if isOwner(userId) || isAdmin();
       }
     }
   }
