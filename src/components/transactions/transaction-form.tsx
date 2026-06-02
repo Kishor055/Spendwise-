@@ -6,7 +6,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { format } from 'date-fns';
-import { CalendarIcon, Loader2, Upload, X } from 'lucide-react';
+import { CalendarIcon, Loader2, Upload } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { Calendar } from '@/components/ui/calendar';
@@ -59,7 +59,7 @@ export function TransactionForm({ onSuccess }: { onSuccess?: () => void }) {
   const form = useForm<z.infer<typeof transactionSchema>>({
     resolver: zodResolver(transactionSchema),
     defaultValues: {
-      amount: '' as unknown as number,
+      amount: 0,
       type: 'expense',
       category: '',
       date: new Date(),
@@ -84,7 +84,7 @@ export function TransactionForm({ onSuccess }: { onSuccess?: () => void }) {
       
       toast({ title: 'Success', description: 'Transaction recorded in the matrix.' });
       form.reset({
-        amount: '' as unknown as number,
+        amount: 0,
         type: values.type,
         category: '',
         date: new Date(),
@@ -161,7 +161,8 @@ export function TransactionForm({ onSuccess }: { onSuccess?: () => void }) {
                     placeholder="0.00" 
                     step="0.01" 
                     className="pl-14 h-16 rounded-[2rem] glass border-white/10 text-2xl font-black placeholder:text-white/10"
-                    {...field} 
+                    {...field}
+                    value={field.value || ''}
                   />
                 </div>
               </FormControl>
@@ -248,6 +249,7 @@ export function TransactionForm({ onSuccess }: { onSuccess?: () => void }) {
                   placeholder="Encryption note..." 
                   className="h-16 rounded-[2rem] glass border-white/10 font-bold px-6 placeholder:text-white/10"
                   {...field} 
+                  value={field.value || ''}
                 />
               </FormControl>
               <FormMessage />

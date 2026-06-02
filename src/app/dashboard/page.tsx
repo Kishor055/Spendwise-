@@ -1,29 +1,23 @@
+
 "use client";
 
 import { useMemo, useState, useEffect } from 'react';
 import { useUser, useFirestore, useCollection, useMemoFirebase } from '@/firebase';
 import { collection, query, orderBy, limit } from 'firebase/firestore';
 import { BottomNav } from '@/components/layout/bottom-nav';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardHeader, CardTitle } from '@/components/ui/card';
 import { 
-  ArrowUpRight, 
-  ArrowDownRight, 
   Loader2, 
   Plus, 
   TrendingUp, 
   Sparkles,
   Activity,
-  Wallet,
-  PieChart as PieChartIcon,
-  CreditCard,
   BrainCircuit,
   Bell,
-  Zap,
   Target,
   Trophy,
   Wallet2,
   TrendingDown,
-  ChevronRight,
   CircleDollarSign,
   Flame,
   ShieldCheck,
@@ -53,7 +47,7 @@ import {
   YAxis,
   CartesianGrid
 } from 'recharts';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 
 interface Transaction {
   id: string;
@@ -180,13 +174,12 @@ export default function DashboardPage() {
       </header>
 
       <main className="px-8 py-12 space-y-10 max-w-7xl mx-auto relative z-10">
-        {/* Quick Access Grid */}
         <section className="grid grid-cols-2 md:grid-cols-4 gap-6">
            {[
              { label: 'Sector Control', icon: LayoutGrid, href: '/budget', color: 'text-primary' },
              { label: 'Time Alerts', icon: Bell, href: '/reminders', color: 'text-accent' },
              { label: 'Strategic Goals', icon: Target, href: '/goals', color: 'text-emerald-400' },
-             { label: 'Wrapped Hub', icon: Trophy, href: '/wrapped', color: 'text-yellow-400' }
+             { label: 'Recap Matrix', icon: Trophy, href: '/wrapped', color: 'text-yellow-400' }
            ].map((item, i) => (
              <Link key={item.label} href={item.href}>
                 <motion.div 
@@ -204,7 +197,6 @@ export default function DashboardPage() {
            ))}
         </section>
 
-        {/* Top Summary Row */}
         <section className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
           {[
             { label: 'Available Capital', value: stats.balance, icon: Wallet2, color: 'text-primary' },
@@ -231,9 +223,7 @@ export default function DashboardPage() {
           ))}
         </section>
 
-        {/* Analytics Grid */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          {/* Budget Progress Donut */}
           <Card className="rounded-[3rem] border-none glass-dark lg:col-span-1 p-8">
             <CardHeader className="p-0 mb-8 flex justify-between items-center">
               <CardTitle className="text-[10px] font-black uppercase tracking-[0.3em] text-white/30">Temporal Budget</CardTitle>
@@ -269,7 +259,6 @@ export default function DashboardPage() {
             </div>
           </Card>
 
-          {/* Sector Breakdown */}
           <Card className="rounded-[3rem] border-none glass-dark lg:col-span-1 p-8">
             <CardHeader className="p-0 mb-8 flex flex-row justify-between items-center">
               <CardTitle className="text-[10px] font-black uppercase tracking-[0.3em] text-white/30">Sector Power</CardTitle>
@@ -299,7 +288,6 @@ export default function DashboardPage() {
             </div>
           </Card>
 
-          {/* Health Index */}
           <Card className="rounded-[3rem] border-none glass-dark lg:col-span-1 p-8">
             <CardHeader className="p-0 mb-10">
               <CardTitle className="text-[10px] font-black uppercase tracking-[0.3em] text-white/30 flex justify-between items-center">
@@ -312,7 +300,7 @@ export default function DashboardPage() {
                   <svg className="w-full h-full -rotate-90" viewBox="0 0 100 100">
                      <circle className="text-white/[0.03]" strokeWidth="8" stroke="currentColor" fill="transparent" r="42" cx="50" cy="50" />
                      <circle 
-                        className="text-accent transition-all duration-[2000ms] ease-out shadow-accent" 
+                        className="text-accent transition-all duration-[2000ms] ease-out" 
                         strokeWidth="8" 
                         strokeDasharray={264} 
                         strokeDashoffset={264 - (264 * stats.healthScore) / 100} 
@@ -333,7 +321,6 @@ export default function DashboardPage() {
           </Card>
         </div>
 
-        {/* Neural Insights & Actions */}
         <section className="grid grid-cols-1 lg:grid-cols-2 gap-8">
             <Card className="rounded-[3rem] border-none glass-dark p-8 overflow-hidden relative">
                <div className="absolute top-0 right-0 w-32 h-32 bg-primary/20 blur-[80px] rounded-full" />

@@ -1,12 +1,14 @@
+
 'use client';
 
 import { useUser, useFirestore, useCollection, useMemoFirebase } from '@/firebase';
 import { collection, query, limit } from 'firebase/firestore';
 import { BottomNav } from '@/components/layout/bottom-nav';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
-import { Users, FileText, Activity, ShieldAlert, ChevronLeft, Lock } from 'lucide-react';
+import { Users, Activity, ShieldAlert, ChevronLeft, Lock } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
+import { cn } from '@/lib/utils';
 
 export default function AdminPanelPage() {
   const { user } = useUser();
@@ -18,9 +20,6 @@ export default function AdminPanelPage() {
   }, [firestore, user]);
 
   const { data: users, isLoading } = useCollection(usersQuery);
-
-  // In a real app, you'd check for an 'admin' role or custom claim.
-  // For this prototype, we'll show the UI.
 
   return (
     <div className="min-h-screen bg-[#020617] text-white pb-44">

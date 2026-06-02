@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useState, useEffect } from 'react';
@@ -15,10 +16,10 @@ import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Wallet, Loader2, Mail, Lock, Sparkles, ChevronRight, Phone, ShieldCheck } from 'lucide-react';
+import { Wallet, Loader2, Mail, Lock, ChevronRight, Phone, ShieldCheck } from 'lucide-react';
 import Link from 'next/link';
 import { useToast } from '@/hooks/use-toast';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 
 export default function LoginPage() {
   const [email, setEmail] = useState('');
@@ -38,7 +39,7 @@ export default function LoginPage() {
   }, []);
 
   const setupRecaptcha = () => {
-    if (!(window as any).recaptchaVerifier) {
+    if (typeof window !== 'undefined' && !(window as any).recaptchaVerifier) {
       (window as any).recaptchaVerifier = new RecaptchaVerifier(auth, 'recaptcha-container', {
         'size': 'invisible',
         'callback': () => {}
@@ -144,7 +145,15 @@ export default function LoginPage() {
                     <Label className="text-[10px] font-black uppercase tracking-widest text-white/40 ml-4">Address</Label>
                     <div className="relative">
                       <Mail className="absolute left-5 top-1/2 -translate-y-1/2 h-4 w-4 text-white/20" />
-                      <Input type="email" placeholder="name@nexus.com" value={email} onChange={(e) => setEmail(e.target.value)} required className="h-14 rounded-2xl glass border-white/5 pl-14 text-sm font-bold placeholder:text-white/10" />
+                      <Input 
+                        type="email" 
+                        placeholder="name@nexus.com" 
+                        value={email} 
+                        onChange={(e) => setEmail(e.target.value)} 
+                        required 
+                        className="h-14 rounded-2xl glass border-white/5 pl-14 text-sm font-bold placeholder:text-white/10"
+                        suppressHydrationWarning
+                      />
                     </div>
                   </div>
                   <div className="space-y-2">
@@ -154,7 +163,14 @@ export default function LoginPage() {
                     </div>
                     <div className="relative">
                       <Lock className="absolute left-5 top-1/2 -translate-y-1/2 h-4 w-4 text-white/20" />
-                      <Input type="password" value={password} onChange={(e) => setPassword(e.target.value)} required className="h-14 rounded-2xl glass border-white/5 pl-14 text-sm font-bold" />
+                      <Input 
+                        type="password" 
+                        value={password} 
+                        onChange={(e) => setPassword(e.target.value)} 
+                        required 
+                        className="h-14 rounded-2xl glass border-white/5 pl-14 text-sm font-bold"
+                        suppressHydrationWarning
+                      />
                     </div>
                   </div>
                   <Button type="submit" className="w-full h-16 rounded-2xl text-xs font-black uppercase tracking-[0.3em] bg-primary hover:bg-primary/80 shadow-xl shadow-primary/20 group transition-all" disabled={loading}>
@@ -170,7 +186,15 @@ export default function LoginPage() {
                       <Label className="text-[10px] font-black uppercase tracking-widest text-white/40 ml-4">Phone Matrix</Label>
                       <div className="relative">
                         <Phone className="absolute left-5 top-1/2 -translate-y-1/2 h-4 w-4 text-white/20" />
-                        <Input type="tel" placeholder="9876543210" value={phoneNumber} onChange={(e) => setPhoneNumber(e.target.value)} required className="h-14 rounded-2xl glass border-white/5 pl-14 text-sm font-bold placeholder:text-white/10" />
+                        <Input 
+                          type="tel" 
+                          placeholder="9876543210" 
+                          value={phoneNumber} 
+                          onChange={(e) => setPhoneNumber(e.target.value)} 
+                          required 
+                          className="h-14 rounded-2xl glass border-white/5 pl-14 text-sm font-bold placeholder:text-white/10"
+                          suppressHydrationWarning
+                        />
                       </div>
                     </div>
                     <Button type="submit" className="w-full h-16 rounded-2xl text-xs font-black uppercase tracking-[0.3em] bg-primary hover:bg-primary/80 shadow-xl shadow-primary/20 group transition-all" disabled={loading}>
@@ -183,7 +207,15 @@ export default function LoginPage() {
                       <Label className="text-[10px] font-black uppercase tracking-widest text-white/40 ml-4">Verification Signal</Label>
                       <div className="relative">
                         <ShieldCheck className="absolute left-5 top-1/2 -translate-y-1/2 h-4 w-4 text-white/20" />
-                        <Input type="text" placeholder="Enter OTP" value={otp} onChange={(e) => setOtp(e.target.value)} required className="h-14 rounded-2xl glass border-white/5 pl-14 text-sm font-bold placeholder:text-white/10" />
+                        <Input 
+                          type="text" 
+                          placeholder="Enter OTP" 
+                          value={otp} 
+                          onChange={(e) => setOtp(e.target.value)} 
+                          required 
+                          className="h-14 rounded-2xl glass border-white/5 pl-14 text-sm font-bold placeholder:text-white/10"
+                          suppressHydrationWarning
+                        />
                       </div>
                     </div>
                     <Button type="submit" className="w-full h-16 rounded-2xl text-xs font-black uppercase tracking-[0.3em] bg-emerald-500 hover:bg-emerald-600 shadow-xl shadow-emerald-500/20 group transition-all" disabled={loading}>
