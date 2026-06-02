@@ -28,3 +28,10 @@ ui-debug.log*
 # OS
 .DS_Store
 Thumbs.db
+.env
+*.env
+config.ts
+node_modules/
+.next/
+dist/
+build/
