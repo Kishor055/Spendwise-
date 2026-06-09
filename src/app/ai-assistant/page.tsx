@@ -7,7 +7,7 @@ import { askFinancialAdvisor } from '@/ai/flows/financial-advisor-flow';
 import { BottomNav } from '@/components/layout/bottom-nav';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Sparkles, Send, Bot, User, Loader2, ChevronLeft, HelpCircle, Cpu, BrainCircuit, Wallet, PieChart, ShieldCheck } from 'lucide-react';
+import { Sparkles, Send, Bot, Loader2, ChevronLeft, Wallet, PieChart, Briefcase, Zap, ShieldCheck, Target } from 'lucide-react';
 import Link from 'next/link';
 import { cn } from '@/lib/utils';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -16,12 +16,17 @@ import Image from 'next/image';
 interface Message {
   role: 'user' | 'assistant';
   content: string;
+  strategicInfo?: {
+    action: string;
+    rating: number;
+    marketCorrelation: string;
+  };
 }
 
 const SUGGESTIONS = [
-  { label: "Budget Suggestions", icon: Wallet },
-  { label: "Savings Tips", icon: Sparkles },
-  { label: "Expense Report", icon: PieChart }
+  { label: "Job Market Readiness", icon: Briefcase },
+  { label: "Strategic Reduction", icon: Zap },
+  { label: "Goal Manifestation", icon: Target }
 ];
 
 export default function AIAssistantPage() {
@@ -29,7 +34,7 @@ export default function AIAssistantPage() {
   const firestore = useFirestore();
   const [input, setInput] = useState('');
   const [messages, setMessages] = useState<Message[]>([
-    { role: 'assistant', content: "Hi Aman! I'm your AI Financial Assistant. How can I help you today?" }
+    { role: 'assistant', content: "Welcome to the Nexus Intelligence Hub. I have retrieved your financial matrix. Ready for strategic analysis." }
   ]);
   const [isTyping, setIsTyping] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
@@ -39,7 +44,19 @@ export default function AIAssistantPage() {
     return query(collection(firestore, 'users', user.uid, 'transactions'), orderBy('date', 'desc'), limit(50));
   }, [firestore, user]);
 
+  const budgetsQuery = useMemoFirebase(() => {
+    if (!firestore || !user) return null;
+    return query(collection(firestore, 'users', user.uid, 'budgets'));
+  }, [firestore, user]);
+
+  const goalsQuery = useMemoFirebase(() => {
+    if (!firestore || !user) return null;
+    return query(collection(firestore, 'users', user.uid, 'goals'));
+  }, [firestore, user]);
+
   const { data: transactions } = useCollection(transactionsQuery);
+  const { data: budgets } = useCollection(budgetsQuery);
+  const { data: goals } = useCollection(goalsQuery);
 
   useEffect(() => {
     if (scrollRef.current) {
@@ -65,15 +82,26 @@ export default function AIAssistantPage() {
           date: t.date?.seconds ? new Date(t.date.seconds * 1000).toISOString() : new Date().toISOString(),
           note: t.note
         })),
+        budgets: (budgets || []).map(b => ({ category: b.category, limit: b.limit })),
+        goals: (goals || []).map(g => ({ title: g.title, targetAmount: g.targetAmount, currentAmount: g.currentAmount })),
         userProfile: {
-          name: user.displayName || 'Aman',
-          monthlyBudget: 45000
+          name: user.displayName || 'Entity',
+          monthlyBudget: 50000,
+          rank: 'Elite'
         }
       });
 
-      setMessages(prev => [...prev, { role: 'assistant', content: response.answer }]);
+      setMessages(prev => [...prev, { 
+        role: 'assistant', 
+        content: response.answer,
+        strategicInfo: {
+          action: response.strategicAction,
+          rating: response.efficiencyRating,
+          marketCorrelation: response.marketCorrelation
+        }
+      }]);
     } catch (error) {
-      setMessages(prev => [...prev, { role: 'assistant', content: "Sorry, I lost my connection. Could you try again?" }]);
+      setMessages(prev => [...prev, { role: 'assistant', content: "Neural link interrupted. Re-syncing..." }]);
     } finally {
       setIsTyping(false);
     }
@@ -94,27 +122,27 @@ export default function AIAssistantPage() {
           <div>
             <h1 className="text-2xl font-black flex items-center gap-4 italic text-glow">
               <Bot className="h-8 w-8 text-primary" />
-              AI Assistant
+              Nexus Advisor
             </h1>
             <div className="flex items-center gap-2">
                <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-               <span className="text-[10px] font-black uppercase tracking-widest text-emerald-500">Online</span>
+               <span className="text-[10px] font-black uppercase tracking-widest text-emerald-500">RAG Intelligence Active</span>
             </div>
           </div>
         </div>
       </header>
 
-      <main className="flex-1 overflow-y-auto px-8 py-12 space-y-10 scrollbar-hide relative z-10" ref={scrollRef}>
+      <main className="flex-1 overflow-y-auto px-8 py-12 space-y-12 scrollbar-hide relative z-10" ref={scrollRef}>
         <div className="flex flex-col items-center justify-center py-10 text-center space-y-8">
-           <div className="w-48 h-48 relative animate-pulse">
-              <div className="absolute inset-0 bg-primary/20 blur-3xl rounded-full" />
-              <div className="relative glass rounded-full p-6 border-white/20">
-                 <Image src="https://picsum.photos/seed/bot/200/200" width={160} height={160} alt="AI Assistant" className="rounded-full grayscale brightness-150 contrast-125" />
+           <div className="w-40 h-40 relative">
+              <div className="absolute inset-0 bg-primary/30 blur-3xl rounded-full animate-pulse" />
+              <div className="relative glass rounded-full p-4 border-white/20">
+                 <Image src="https://picsum.photos/seed/cyberbot/200/200" width={160} height={160} alt="AI Assistant" className="rounded-full grayscale contrast-150" />
               </div>
            </div>
            <div>
-              <h2 className="text-2xl font-black italic tracking-tighter">AI Financial Terminal</h2>
-              <p className="text-[10px] text-white/30 font-black uppercase tracking-[0.4em] mt-3">Synthesizing Wealth Insights...</p>
+              <h2 className="text-xl font-black italic tracking-tighter uppercase tracking-[0.2em]">Strategic Wealth Terminal</h2>
+              <p className="text-[10px] text-white/30 font-black uppercase tracking-[0.4em] mt-3">Cross-referencing Jobs & Markets...</p>
            </div>
         </div>
 
@@ -124,7 +152,7 @@ export default function AIAssistantPage() {
               key={i} 
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              className={cn("flex w-full", msg.role === 'user' ? "justify-end" : "justify-start")}
+              className={cn("flex flex-col w-full gap-4", msg.role === 'user' ? "items-end" : "items-start")}
             >
               <div className={cn(
                 "max-w-[85%] p-8 rounded-[2.5rem] shadow-2xl relative",
@@ -133,6 +161,38 @@ export default function AIAssistantPage() {
                   : "glass rounded-tl-none border-white/10"
               )}>
                 <p className="text-base font-bold leading-relaxed tracking-tight text-white/90">{msg.content}</p>
+                
+                {msg.strategicInfo && (
+                  <motion.div 
+                    initial={{ opacity: 0, scale: 0.9 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    className="mt-8 pt-8 border-t border-white/10 space-y-6"
+                  >
+                    <div className="flex items-center gap-4 bg-emerald-500/10 p-4 rounded-2xl border border-emerald-500/20">
+                      <ShieldCheck className="h-5 w-5 text-emerald-500" />
+                      <div>
+                        <p className="text-[8px] font-black uppercase tracking-widest text-emerald-500">Efficiency Rating</p>
+                        <p className="text-lg font-black italic">{msg.strategicInfo.rating}/100</p>
+                      </div>
+                    </div>
+                    
+                    <div className="space-y-4">
+                      <div className="flex items-center gap-3">
+                        <Zap className="h-4 w-4 text-accent" />
+                        <h4 className="text-[10px] font-black uppercase tracking-widest text-accent">Strategic Move</h4>
+                      </div>
+                      <p className="text-xs font-bold text-white/60 leading-relaxed">{msg.strategicInfo.action}</p>
+                    </div>
+
+                    <div className="space-y-4">
+                      <div className="flex items-center gap-3">
+                        <Briefcase className="h-4 w-4 text-primary" />
+                        <h4 className="text-[10px] font-black uppercase tracking-widest text-primary">Market Correlation</h4>
+                      </div>
+                      <p className="text-xs font-bold text-white/60 leading-relaxed">{msg.strategicInfo.marketCorrelation}</p>
+                    </div>
+                  </motion.div>
+                )}
               </div>
             </motion.div>
           ))}
@@ -142,7 +202,7 @@ export default function AIAssistantPage() {
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex justify-start">
             <div className="glass p-6 rounded-[2.5rem] rounded-tl-none border-white/10 flex items-center gap-4">
               <Loader2 className="h-5 w-5 animate-spin text-accent" />
-              <span className="text-[10px] font-black text-accent uppercase tracking-[0.4em]">Thinking...</span>
+              <span className="text-[10px] font-black text-accent uppercase tracking-[0.4em]">Retrieving Matrix Data...</span>
             </div>
           </motion.div>
         )}
@@ -155,17 +215,17 @@ export default function AIAssistantPage() {
               <Button 
                 key={s.label} 
                 variant="outline" 
-                className="whitespace-nowrap rounded-2xl glass border-white/10 text-[10px] font-black uppercase tracking-widest h-12 px-6 hover:bg-white/10"
-                onClick={() => handleSend(s.label)}
+                className="whitespace-nowrap rounded-2xl glass border-white/10 text-[10px] font-black uppercase tracking-widest h-12 px-6 hover:bg-white/10 group"
+                onClick={() => handleSend(`Strategic analysis for: ${s.label}`)}
               >
-                <s.icon className="h-4 w-4 mr-3 text-accent" />
+                <s.icon className="h-4 w-4 mr-3 text-accent group-hover:scale-110 transition-transform" />
                 {s.label}
               </Button>
             ))}
           </div>
           <div className="relative flex items-center">
             <Input 
-              placeholder="Ask anything..." 
+              placeholder="Query the strategic matrix..." 
               className="h-20 rounded-[2.5rem] glass border-white/10 shadow-3xl text-lg font-bold placeholder:text-white/20 px-10 pr-24"
               value={input}
               onChange={(e) => setInput(e.target.value)}

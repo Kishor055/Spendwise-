@@ -1,8 +1,7 @@
-
 'use server';
 /**
- * @fileOverview AI Financial Advisor Flow.
- * Provides personalized financial advice based on user transactions.
+ * @fileOverview Strategic Wealth & RAG Intelligence Flow.
+ * Correlates holistic SpendWise data with commercial job market insights.
  */
 
 import { ai } from '@/ai/genkit';
@@ -17,16 +16,27 @@ const FinancialAdvisorInputSchema = z.object({
     date: z.string(),
     note: z.string().optional()
   })),
+  budgets: z.array(z.object({
+    category: z.string(),
+    limit: z.number()
+  })).optional(),
+  goals: z.array(z.object({
+    title: z.string(),
+    targetAmount: z.number(),
+    currentAmount: z.number()
+  })).optional(),
   userProfile: z.object({
     name: z.string(),
-    monthlyBudget: z.number()
+    monthlyBudget: z.number(),
+    rank: z.string().optional()
   })
 });
 
 const FinancialAdvisorOutputSchema = z.object({
   answer: z.string(),
-  recommendations: z.array(z.string()).optional(),
-  savingTip: z.string().optional()
+  strategicAction: z.string().describe('A high-level commercial or career move based on finances.'),
+  efficiencyRating: z.number().describe('A score from 1-100 on financial stability.'),
+  marketCorrelation: z.string().describe('How these habits affect job market standing or commercial viability.')
 });
 
 export async function askFinancialAdvisor(input: z.infer<typeof FinancialAdvisorInputSchema>) {
@@ -34,21 +44,36 @@ export async function askFinancialAdvisor(input: z.infer<typeof FinancialAdvisor
 }
 
 const financialAdvisorPrompt = ai.definePrompt({
-  name: 'financialAdvisorPrompt',
+  name: 'strategicWealthPrompt',
   input: { schema: FinancialAdvisorInputSchema },
   output: { schema: FinancialAdvisorOutputSchema },
-  prompt: `You are Spendwise AI, a professional financial advisor in India.
-User Name: {{{userProfile.name}}}
-Monthly Budget: ₹{{{userProfile.monthlyBudget}}}
+  prompt: `You are the SpendWise Strategic Oracle. You have retrieved the following entity data for a holistic RAG analysis.
 
-Recent Transactions:
-{{#each transactions}}
-- {{{type}}}: ₹{{{amount}}} in {{{category}}} ({{{date}}}) {{#if note}}Note: {{{note}}}{{/if}}
+User Profile: {{{userProfile.name}}} (Rank: {{{userProfile.rank}}})
+Total Monthly Matrix Budget: ₹{{{userProfile.monthlyBudget}}}
+
+Active Sector Limits (Budgets):
+{{#each budgets}}
+- {{{category}}}: Limit ₹{{{limit}}}
 {{/each}}
 
-User Question: {{{query}}}
+Strategic Manifestation Goals:
+{{#each goals}}
+- {{{title}}}: Target ₹{{{targetAmount}}} (Current: ₹{{{currentAmount}}})
+{{/each}}
 
-Provide a helpful, concise, and professional response using Indian Rupee (₹) for all currency mentions. Analyze their spending patterns if relevant to the question. Suggest specific ways to save or better manage their budget based on their data.`,
+Temporal Transaction History:
+{{#each transactions}}
+- {{{type}}}: ₹{{{amount}}} in {{{category}}} on {{{date}}} {{#if note}}[{{{note}}}]{{/if}}
+{{/each}}
+
+User Query: {{{query}}}
+
+MISSION:
+1. Provide a professional, deep-space analysis using Indian Rupee (₹).
+2. Correlate their spending habits with "Commercial Professionalism". For example, high impulse spending might indicate lower professional stability, whereas high goal-manifestation shows executive-level discipline.
+3. Suggest how reducing specific expenses can increase their "Professional Burn Rate" (how long they can survive without income) to better navigate the Job Market.
+4. Give an efficiency rating (1-100).`,
 });
 
 const financialAdvisorFlow = ai.defineFlow(
