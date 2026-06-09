@@ -34,3 +34,6 @@ src/firebase/config.ts
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+config.ts
+config
+API_KEY
