@@ -8,6 +8,7 @@ import { Loader2, ArrowRight, Wallet, TrendingUp, ShieldCheck, Sparkles, BrainCi
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
+import { cn } from '@/lib/utils';
 
 export default function Home() {
   const { user, isUserLoading: loading } = useUser();
