@@ -4,9 +4,10 @@
 import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useUser } from '@/firebase';
-import { Loader2, ArrowRight, Wallet, TrendingUp, ShieldCheck, Sparkles } from 'lucide-react';
+import { Loader2, ArrowRight, Wallet, TrendingUp, ShieldCheck, Sparkles, BrainCircuit } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
+import { motion } from 'framer-motion';
 
 export default function Home() {
   const { user, isUserLoading: loading } = useUser();
@@ -20,92 +21,113 @@ export default function Home() {
 
   if (loading) {
     return (
-      <div className="h-screen w-full flex items-center justify-center bg-background">
+      <div className="h-screen w-full flex items-center justify-center bg-[#020617]">
         <Loader2 className="h-10 w-10 animate-spin text-primary" />
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen flex flex-col selection:bg-primary/20">
-      <header className="px-6 h-20 flex items-center justify-between border-b bg-white/50 backdrop-blur-md sticky top-0 z-50">
-        <div className="flex items-center gap-2">
-          <div className="w-10 h-10 rounded-xl bg-primary flex items-center justify-center shadow-lg shadow-primary/20">
-            <Wallet className="h-6 w-6 text-white" />
+    <div className="min-h-screen flex flex-col bg-[#020617] text-white selection:bg-primary/30">
+      <div className="fixed inset-0 pointer-events-none overflow-hidden">
+        <div className="absolute top-[-10%] left-[-10%] w-[50%] h-[50%] bg-primary/10 blur-[150px] rounded-full" />
+        <div className="absolute bottom-[-10%] right-[-10%] w-[50%] h-[50%] bg-accent/5 blur-[150px] rounded-full" />
+      </div>
+
+      <header className="px-8 h-24 flex items-center justify-between sticky top-0 z-50 bg-[#020617]/50 backdrop-blur-2xl border-b border-white/5">
+        <div className="flex items-center gap-4">
+          <div className="w-12 h-12 rounded-2xl bg-primary flex items-center justify-center shadow-2xl shadow-primary/30">
+            <BrainCircuit className="h-7 w-7 text-white" />
           </div>
-          <span className="text-2xl font-black tracking-tighter text-primary">Spendwise</span>
+          <span className="text-2xl font-black tracking-tighter italic">SpendWise</span>
         </div>
-        <div className="flex gap-3">
-          <Button variant="ghost" className="font-bold rounded-full" asChild>
-            <Link href="/login">Login</Link>
-          </Button>
-          <Button className="font-bold rounded-full px-6 shadow-lg shadow-primary/20" asChild>
-            <Link href="/register">Join Now</Link>
-          </Button>
-        </div>
+        <Button className="rounded-2xl h-12 px-8 font-black text-[10px] uppercase tracking-widest bg-primary shadow-xl shadow-primary/20" asChild>
+          <Link href="/login">Initialize Session</Link>
+        </Button>
       </header>
 
-      <main className="flex-1">
-        <section className="px-6 py-24 text-center max-w-5xl mx-auto space-y-8">
-          <div className="inline-flex items-center gap-2 bg-primary/10 text-primary px-4 py-2 rounded-full text-xs font-black uppercase tracking-widest">
-            <Sparkles className="h-3 w-3" />
-            AI-Powered Insights
-          </div>
-          <h1 className="text-5xl md:text-7xl font-black tracking-tighter leading-[0.9] mb-6">
-            Financial Freedom <br />
-            <span className="text-primary">Simplified.</span>
-          </h1>
-          <p className="text-xl text-muted-foreground max-w-2xl mx-auto font-medium leading-relaxed">
-            The intelligent, minimal expense tracker designed for modern life. Take control of every cent with beautiful automation.
-          </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center pt-4">
-            <Button size="lg" className="rounded-[1.5rem] h-16 px-10 text-lg font-black shadow-2xl shadow-primary/30" asChild>
-              <Link href="/register">
-                Get Started Free <ArrowRight className="ml-2 h-6 w-6" />
+      <main className="flex-1 relative z-10">
+        <section className="px-8 py-32 text-center max-w-5xl mx-auto space-y-10">
+          <motion.div 
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="inline-flex items-center gap-3 bg-primary/10 text-primary px-6 py-2.5 rounded-full border border-primary/20"
+          >
+            <Sparkles className="h-4 w-4 animate-pulse" />
+            <span className="text-[10px] font-black uppercase tracking-[0.2em]">Quantum Strategic Intelligence</span>
+          </motion.div>
+          
+          <motion.h1 
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.1 }}
+            className="text-6xl md:text-8xl font-black tracking-tighter leading-[0.85] italic"
+          >
+            Wealth Matrix <br />
+            <span className="text-primary text-glow">Mastered.</span>
+          </motion.h1>
+          
+          <motion.p 
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.2 }}
+            className="text-xl text-white/40 max-w-2xl mx-auto font-bold leading-relaxed tracking-tight"
+          >
+            The world's most advanced AI financial terminal. Simple identity access. Infinite commercial insights.
+          </motion.p>
+          
+          <motion.div 
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.3 }}
+            className="flex flex-col sm:flex-row gap-6 justify-center pt-8"
+          >
+            <Button size="lg" className="rounded-[2rem] h-20 px-12 text-lg font-black bg-primary shadow-3xl shadow-primary/40 group overflow-hidden relative" asChild>
+              <Link href="/login">
+                <span className="relative z-10">Enter the Matrix</span>
+                <ArrowRight className="ml-3 h-6 w-6 relative z-10 group-hover:translate-x-2 transition-transform" />
+                <div className="absolute inset-0 bg-gradient-to-r from-primary via-accent to-primary opacity-0 group-hover:opacity-100 transition-opacity" />
               </Link>
             </Button>
-            <Button variant="secondary" size="lg" className="rounded-[1.5rem] h-16 px-10 text-lg font-bold">
-              Watch Demo
-            </Button>
-          </div>
+          </motion.div>
         </section>
 
-        <section className="px-6 py-24 bg-muted/30">
-          <div className="max-w-6xl mx-auto grid md:grid-cols-3 gap-8">
-            <div className="p-10 rounded-[3rem] glass-card text-left space-y-6">
-              <div className="w-14 h-14 rounded-2xl bg-primary/10 flex items-center justify-center">
-                <TrendingUp className="h-7 w-7 text-primary" />
-              </div>
-              <h3 className="text-2xl font-black tracking-tight">Smart Trends</h3>
-              <p className="text-muted-foreground font-medium">Visualize your spending patterns with beautiful, reactive charts and weekly breakdowns.</p>
-            </div>
-            <div className="p-10 rounded-[3rem] glass-card text-left space-y-6">
-              <div className="w-14 h-14 rounded-2xl bg-green-500/10 flex items-center justify-center">
-                <Wallet className="h-7 w-7 text-green-600" />
-              </div>
-              <h3 className="text-2xl font-black tracking-tight">Zero-Effort</h3>
-              <p className="text-muted-foreground font-medium">Add expenses in seconds. Sync across all your devices instantly with robust cloud storage.</p>
-            </div>
-            <div className="p-10 rounded-[3rem] glass-card text-left space-y-6">
-              <div className="w-14 h-14 rounded-2xl bg-accent/10 flex items-center justify-center">
-                <ShieldCheck className="h-7 w-7 text-accent" />
-              </div>
-              <h3 className="text-2xl font-black tracking-tight">Encrypted</h3>
-              <p className="text-muted-foreground font-medium">Your data is your business. We use military-grade security to keep your finances private.</p>
-            </div>
+        <section className="px-8 py-32 border-t border-white/5 bg-white/[0.02]">
+          <div className="max-w-7xl mx-auto grid md:grid-cols-3 gap-10">
+            {[
+              { title: 'Neural Trends', icon: TrendingUp, text: 'Real-time temporal analysis of your commercial evolution.', color: 'text-primary' },
+              { title: 'Easy Access', icon: Wallet, text: 'No passwords. No friction. Just your neural identity.', color: 'text-accent' },
+              { title: 'Strategic Shield', icon: ShieldCheck, text: 'Quantum-grade encryption for your private matrix logs.', color: 'text-emerald-400' }
+            ].map((feature, i) => (
+              <motion.div 
+                key={feature.title}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{ delay: i * 0.1 }}
+                className="p-12 rounded-[3rem] glass-dark space-y-8 border border-white/5 hover:bg-white/[0.05] transition-all group"
+              >
+                <div className={cn("w-16 h-16 rounded-2xl bg-white/[0.03] flex items-center justify-center border border-white/5 group-hover:scale-110 transition-transform", feature.color)}>
+                  <feature.icon className="h-8 w-8" />
+                </div>
+                <div className="space-y-4">
+                  <h3 className="text-3xl font-black italic tracking-tighter">{feature.title}</h3>
+                  <p className="text-white/40 font-bold leading-relaxed text-base">{feature.text}</p>
+                </div>
+              </motion.div>
+            ))}
           </div>
         </section>
       </main>
 
-      <footer className="py-12 border-t px-6 flex flex-col md:flex-row items-center justify-between gap-6 bg-white/50">
-        <div className="flex items-center gap-2">
-          <div className="w-6 h-6 rounded-lg bg-primary/20 flex items-center justify-center">
-            <Wallet className="h-4 w-4 text-primary" />
+      <footer className="py-20 border-t border-white/5 px-8 flex flex-col md:flex-row items-center justify-between gap-10 relative z-10">
+        <div className="flex items-center gap-4">
+          <div className="w-8 h-8 rounded-xl bg-primary/20 flex items-center justify-center">
+            <BrainCircuit className="h-5 w-5 text-primary" />
           </div>
-          <span className="text-sm font-black tracking-tighter">Spendwise</span>
+          <span className="text-sm font-black tracking-tighter italic uppercase">SpendWise Core</span>
         </div>
-        <p className="text-xs text-muted-foreground font-bold uppercase tracking-widest">
-          &copy; {new Date().getFullYear()} Spendwise Inc. All rights reserved.
+        <p className="text-[10px] text-white/20 font-black uppercase tracking-[0.5em]">
+          &copy; {new Date().getFullYear()} Nexus Financial Terminal. All rights reserved.
         </p>
       </footer>
     </div>
