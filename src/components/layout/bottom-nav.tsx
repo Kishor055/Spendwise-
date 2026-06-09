@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { LayoutDashboard, ReceiptText, UserCircle, Plus, PieChart, Bell, Target } from 'lucide-react';
+import { LayoutDashboard, ReceiptText, UserCircle, Plus, PieChart, Bell, Target, LineChart } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import {
   Dialog,
@@ -17,9 +17,9 @@ import { motion } from 'framer-motion';
 
 const navItems = [
   { href: '/dashboard', label: 'Matrix', icon: LayoutDashboard },
-  { href: '/transactions', label: 'Logs', icon: ReceiptText },
+  { href: '/market', label: 'Pulse', icon: LineChart },
   { href: '/plus', label: 'Add', icon: Plus, isAction: true },
-  { href: '/reminders', label: 'Alerts', icon: Bell },
+  { href: '/transactions', label: 'Logs', icon: ReceiptText },
   { href: '/profile', label: 'Identity', icon: UserCircle },
 ];
 
