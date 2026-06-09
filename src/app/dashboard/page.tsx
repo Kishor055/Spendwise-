@@ -21,12 +21,15 @@ import {
   CircleDollarSign,
   Flame,
   ShieldCheck,
-  LayoutGrid
+  LayoutGrid,
+  Zap,
+  Clock
 } from 'lucide-react';
 import { format } from 'date-fns';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { TransactionForm } from '@/components/transactions/transaction-form';
+import { getBalanceForecast } from '@/ai/flows/predictive-forecast-flow';
 import {
   Dialog,
   DialogContent,
@@ -45,7 +48,9 @@ import {
   Cell,
   XAxis,
   YAxis,
-  CartesianGrid
+  CartesianGrid,
+  BarChart,
+  Bar
 } from 'recharts';
 import { motion } from 'framer-motion';
 
@@ -65,6 +70,8 @@ export default function DashboardPage() {
   const firestore = useFirestore();
   const [isAddOpen, setIsAddOpen] = useState(false);
   const [mounted, setMounted] = useState(false);
+  const [forecast, setForecast] = useState<any>(null);
+  const [isForecasting, setIsForecasting] = useState(false);
 
   useEffect(() => {
     setMounted(true);
@@ -79,7 +86,13 @@ export default function DashboardPage() {
     );
   }, [firestore, user]);
 
+  const remindersQuery = useMemoFirebase(() => {
+    if (!firestore || !user) return null;
+    return query(collection(firestore, 'users', user.uid, 'reminders'), limit(10));
+  }, [firestore, user]);
+
   const { data: transactions, isLoading: isTransactionsLoading } = useCollection<Transaction>(transactionsQuery);
+  const { data: reminders } = useCollection(remindersQuery);
 
   const stats = useMemo(() => {
     if (!transactions) return { balance: 0, income: 0, expense: 0, savings: 0, healthScore: 0, budget: 50000 };
@@ -101,6 +114,35 @@ export default function DashboardPage() {
     return { ...totals, savings, healthScore, budget: 50000 };
   }, [transactions]);
 
+  useEffect(() => {
+    async function runForecast() {
+      if (!transactions || transactions.length < 5 || isForecasting) return;
+      setIsForecasting(true);
+      try {
+        const result = await getBalanceForecast({
+          currentBalance: stats.balance,
+          transactions: transactions.map(t => ({
+            amount: t.amount,
+            type: t.type,
+            date: t.date?.seconds ? new Date(t.date.seconds * 1000).toISOString() : new Date().toISOString()
+          })),
+          reminders: (reminders || []).map(r => ({
+            amount: r.amount,
+            dueDate: r.dueDate
+          }))
+        });
+        setForecast(result);
+      } catch (e) {
+        console.error("Forecasting Error:", e);
+      } finally {
+        setIsForecasting(false);
+      }
+    }
+    if (mounted && transactions && transactions.length > 5) {
+      runForecast();
+    }
+  }, [mounted, transactions, reminders, stats.balance]);
+
   const categoryData = useMemo(() => {
     if (!transactions) return [];
     const cats: Record<string, number> = {};
@@ -114,24 +156,6 @@ export default function DashboardPage() {
       percent: Math.round((value / totalExpense) * 100)
     })).sort((a, b) => b.value - a.value).slice(0, 5);
   }, [transactions, stats.expense]);
-
-  const trendData = useMemo(() => {
-    if (!transactions || transactions.length === 0) return [];
-    return Array.from({ length: 7 }).map((_, i) => {
-      const d = new Date();
-      d.setDate(d.getDate() - (6 - i));
-      const dateStr = format(d, 'd MMM');
-      const dayTxs = transactions.filter(t => {
-        const txDate = new Date(t.date?.seconds * 1000);
-        return format(txDate, 'yyyy-MM-dd') === format(d, 'yyyy-MM-dd');
-      });
-      return {
-        name: dateStr,
-        income: dayTxs.filter(t => t.type === 'income').reduce((sum, t) => sum + t.amount, 0),
-        expense: dayTxs.filter(t => t.type === 'expense').reduce((sum, t) => sum + t.amount, 0),
-      };
-    });
-  }, [transactions]);
 
   if (!mounted || isUserLoading || (isTransactionsLoading && !transactions)) {
     return (
@@ -157,8 +181,8 @@ export default function DashboardPage() {
               </div>
             </div>
             <div>
-              <h1 className="text-2xl font-black tracking-tight leading-none italic">Elite Matrix</h1>
-              <p className="text-[10px] text-white/40 font-black uppercase tracking-[0.4em] mt-2">SpendWise Premium Active</p>
+              <h1 className="text-2xl font-black tracking-tight leading-none italic">SpendWise 3.0</h1>
+              <p className="text-[10px] text-white/40 font-black uppercase tracking-[0.4em] mt-2">Quantum Neural Terminal</p>
             </div>
           </div>
           <div className="flex items-center gap-4">
@@ -195,6 +219,76 @@ export default function DashboardPage() {
                 </motion.div>
              </Link>
            ))}
+        </section>
+
+        {/* 3.0 Flagship: Predictive Pulse */}
+        <section>
+          <Card className="rounded-[3rem] border-none glass-dark p-10 relative overflow-hidden">
+             <div className="absolute top-0 right-0 p-10 opacity-5">
+                <Zap className="h-32 w-32 animate-pulse" />
+             </div>
+             <div className="relative z-10">
+                <div className="flex items-center justify-between mb-8">
+                   <div>
+                      <h2 className="text-xl font-black italic tracking-tighter flex items-center gap-3">
+                         <TrendingUp className="h-5 w-5 text-accent" />
+                         Predictive Pulse
+                      </h2>
+                      <p className="text-[10px] text-white/30 font-black uppercase tracking-[0.4em] mt-1">AI-Powered Cash Flow Forecasting</p>
+                   </div>
+                   {isForecasting && <Loader2 className="h-5 w-5 animate-spin text-accent" />}
+                </div>
+
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-10">
+                   <div className="lg:col-span-2 h-[200px] w-full">
+                      {forecast ? (
+                         <ResponsiveContainer width="100%" height="100%">
+                            <BarChart data={forecast.forecast}>
+                               <CartesianGrid strokeDasharray="3 3" vertical={false} strokeOpacity={0.03} />
+                               <XAxis dataKey="days" tickFormatter={(v) => `${v}d`} axisLine={false} tickLine={false} tick={{ fontSize: 10, fontWeight: 900, fill: 'rgba(255,255,255,0.2)' }} />
+                               <YAxis hide />
+                               <Tooltip 
+                                  contentStyle={{ background: '#0a0a16', border: 'none', borderRadius: '1rem', fontSize: '10px', fontWeight: '900' }}
+                                  cursor={{ fill: 'rgba(255,255,255,0.05)' }}
+                                />
+                               <Bar dataKey="predictedBalance" radius={[10, 10, 0, 0]}>
+                                  {forecast.forecast.map((entry: any, index: number) => (
+                                     <Cell key={`cell-${index}`} fill={entry.riskLevel === 'HIGH' ? '#ef4444' : entry.riskLevel === 'MEDIUM' ? '#f59e0b' : '#10b981'} />
+                                  ))}
+                               </Bar>
+                            </BarChart>
+                         </ResponsiveContainer>
+                      ) : (
+                         <div className="h-full flex items-center justify-center bg-white/[0.02] rounded-[2rem] border border-dashed border-white/5">
+                            <p className="text-[10px] font-black uppercase tracking-widest text-white/10">Awaiting Neural Projection...</p>
+                         </div>
+                      )}
+                   </div>
+                   <div className="flex flex-col justify-center space-y-6">
+                      {forecast ? (
+                         <>
+                            <div className="p-6 bg-white/[0.03] rounded-[2rem] border border-white/5">
+                               <p className="text-[10px] font-black uppercase tracking-widest text-accent mb-2">Neural Insight</p>
+                               <p className="text-sm font-bold leading-relaxed">{forecast.insight}</p>
+                            </div>
+                            <div className="flex items-center gap-4">
+                               <div className={cn(
+                                  "w-3 h-3 rounded-full animate-pulse",
+                                  forecast.forecast[0].riskLevel === 'HIGH' ? "bg-rose-500" : "bg-emerald-500"
+                               )} />
+                               <span className="text-[10px] font-black uppercase tracking-[0.2em] text-white/40">Risk Level: {forecast.forecast[0].riskLevel}</span>
+                            </div>
+                         </>
+                      ) : (
+                         <div className="space-y-4 animate-pulse">
+                            <div className="h-10 bg-white/5 rounded-xl w-full" />
+                            <div className="h-20 bg-white/5 rounded-xl w-full" />
+                         </div>
+                      )}
+                   </div>
+                </div>
+             </div>
+          </Card>
         </section>
 
         <section className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
@@ -320,81 +414,6 @@ export default function DashboardPage() {
             </div>
           </Card>
         </div>
-
-        <section className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-            <Card className="rounded-[3rem] border-none glass-dark p-8 overflow-hidden relative">
-               <div className="absolute top-0 right-0 w-32 h-32 bg-primary/20 blur-[80px] rounded-full" />
-               <CardHeader className="p-0 mb-8 flex flex-row justify-between items-center">
-                  <CardTitle className="text-[10px] font-black uppercase tracking-[0.3em] text-white/30 flex items-center gap-3">
-                     Quantum Actions <Sparkles className="h-4 w-4 text-accent animate-pulse" />
-                  </CardTitle>
-               </CardHeader>
-               <div className="pt-6 grid grid-cols-2 md:grid-cols-4 gap-4">
-                  <Dialog open={isAddOpen} onOpenChange={setIsAddOpen}>
-                    <DialogTrigger asChild>
-                      <Button className="flex flex-col gap-3 h-28 rounded-[2rem] bg-primary shadow-2xl shadow-primary/20 hover:scale-105 transition-all">
-                        <Plus className="h-7 w-7" />
-                        <span className="text-[8px] font-black uppercase tracking-[0.2em]">New Log</span>
-                      </Button>
-                    </DialogTrigger>
-                    <DialogContent className="sm:max-w-[500px] glass rounded-[3rem] border-white/10 p-0 overflow-hidden">
-                      <div className="p-10">
-                        <DialogHeader className="mb-8">
-                          <DialogTitle className="text-3xl font-black italic tracking-tighter">New Entry</DialogTitle>
-                        </DialogHeader>
-                        <TransactionForm onSuccess={() => setIsAddOpen(false)} />
-                      </div>
-                    </DialogContent>
-                  </Dialog>
-                  <Button variant="ghost" className="flex flex-col gap-3 h-28 rounded-[2rem] glass border-white/10 hover:bg-white/10 hover:scale-105 transition-all" asChild>
-                    <Link href="/budget">
-                      <LayoutGrid className="h-7 w-7 text-accent" />
-                      <span className="text-[8px] font-black uppercase tracking-[0.2em]">Budgets</span>
-                    </Link>
-                  </Button>
-                  <Button variant="ghost" className="flex flex-col gap-3 h-28 rounded-[2rem] glass border-white/10 hover:bg-white/10 hover:scale-105 transition-all" asChild>
-                    <Link href="/reminders">
-                      <Bell className="h-7 w-7 text-emerald-400" />
-                      <span className="text-[8px] font-black uppercase tracking-[0.2em]">Alerts</span>
-                    </Link>
-                  </Button>
-                  <Button variant="ghost" className="flex flex-col gap-3 h-28 rounded-[2rem] glass border-white/10 hover:bg-white/10 hover:scale-105 transition-all" asChild>
-                    <Link href="/ai-assistant">
-                      <Sparkles className="h-7 w-7 text-primary" />
-                      <span className="text-[8px] font-black uppercase tracking-[0.2em]">AI Advisor</span>
-                    </Link>
-                  </Button>
-               </div>
-            </Card>
-
-            <Card className="rounded-[3rem] border-none glass-dark p-8">
-              <CardHeader className="p-0 mb-8">
-                <CardTitle className="text-[10px] font-black uppercase tracking-[0.3em] text-white/30">Universal Trends</CardTitle>
-              </CardHeader>
-              <div className="h-[200px] w-full">
-                <ResponsiveContainer width="100%" height="100%">
-                   <AreaChart data={trendData}>
-                      <defs>
-                         <linearGradient id="colorInc" x1="0" y1="0" x2="0" y2="1">
-                            <stop offset="5%" stopColor="#10B981" stopOpacity={0.3}/>
-                            <stop offset="95%" stopColor="#10B981" stopOpacity={0}/>
-                         </linearGradient>
-                         <linearGradient id="colorExp" x1="0" y1="0" x2="0" y2="1">
-                            <stop offset="5%" stopColor="#8B5CF6" stopOpacity={0.3}/>
-                            <stop offset="95%" stopColor="#8B5CF6" stopOpacity={0}/>
-                         </linearGradient>
-                      </defs>
-                      <CartesianGrid strokeDasharray="3 3" vertical={false} strokeOpacity={0.03} />
-                      <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fontSize: 9, fontWeight: 900, fill: 'rgba(255,255,255,0.2)' }} />
-                      <YAxis hide />
-                      <Tooltip contentStyle={{ background: '#0a0a16', border: 'none', borderRadius: '1.5rem', fontSize: '10px', fontWeight: '900' }} />
-                      <Area type="monotone" dataKey="income" stroke="#10B981" strokeWidth={4} fillOpacity={1} fill="url(#colorInc)" />
-                      <Area type="monotone" dataKey="expense" stroke="#8B5CF6" strokeWidth={4} fillOpacity={1} fill="url(#colorExp)" />
-                   </AreaChart>
-                </ResponsiveContainer>
-              </div>
-            </Card>
-        </section>
       </main>
 
       <BottomNav />
