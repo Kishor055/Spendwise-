@@ -1,4 +1,3 @@
-
 'use client';
 
 import { useState, useEffect } from 'react';
@@ -35,7 +34,7 @@ export default function LoginPage() {
     
     setLoading(true);
     try {
-      // Create a valid Firebase session anonymously
+      // Create a valid Firebase session anonymously (Simple Identity Mode)
       const userCredential = await signInAnonymously(auth);
       const user = userCredential.user;
 
@@ -57,16 +56,17 @@ export default function LoginPage() {
       }, { merge: true });
 
       toast({ 
-        title: 'Nexus Sync Complete', 
-        description: `Welcome, ${name}. Your financial matrix is initialized.` 
+        title: 'Neural Link Established', 
+        description: `Identity verified. Welcome back, ${name}.` 
       });
       
       router.push('/dashboard');
     } catch (error: any) {
+      console.error('Auth Error:', error);
       toast({
         variant: 'destructive',
         title: 'Neural Link Error',
-        description: error.message || 'Failed to establish connection.',
+        description: 'Failed to establish connection. Ensure identity parameters are correct.',
       });
     } finally {
       setLoading(false);
@@ -100,7 +100,7 @@ export default function LoginPage() {
             </div>
             <div className="space-y-2">
               <CardTitle className="text-3xl font-black italic tracking-tighter">Identity Portal</CardTitle>
-              <p className="text-[10px] text-white/30 font-black uppercase tracking-[0.4em]">Simple Nexus Access</p>
+              <p className="text-[10px] text-white/30 font-black uppercase tracking-[0.4em]">Neural Login v4.0</p>
             </div>
           </CardHeader>
 
@@ -108,7 +108,7 @@ export default function LoginPage() {
             <form onSubmit={handleSimpleLogin} className="space-y-8">
               <div className="space-y-6">
                 <div className="space-y-2">
-                  <Label className="text-[10px] font-black uppercase tracking-widest text-white/40 ml-4">Entity Name</Label>
+                  <Label className="text-[10px] font-black uppercase tracking-widest text-white/40 ml-4">Full Name</Label>
                   <div className="relative">
                     <User className="absolute left-5 top-1/2 -translate-y-1/2 h-4 w-4 text-white/20" />
                     <Input 
@@ -116,13 +116,14 @@ export default function LoginPage() {
                       value={name} 
                       onChange={(e) => setName(e.target.value)} 
                       required 
+                      suppressHydrationWarning
                       className="h-14 rounded-2xl glass border-white/5 pl-14 text-sm font-bold placeholder:text-white/10"
                     />
                   </div>
                 </div>
 
                 <div className="space-y-2">
-                  <Label className="text-[10px] font-black uppercase tracking-widest text-white/40 ml-4">Neural Address</Label>
+                  <Label className="text-[10px] font-black uppercase tracking-widest text-white/40 ml-4">Neural Address (Email)</Label>
                   <div className="relative">
                     <Mail className="absolute left-5 top-1/2 -translate-y-1/2 h-4 w-4 text-white/20" />
                     <Input 
@@ -131,6 +132,7 @@ export default function LoginPage() {
                       value={email} 
                       onChange={(e) => setEmail(e.target.value)} 
                       required 
+                      suppressHydrationWarning
                       className="h-14 rounded-2xl glass border-white/5 pl-14 text-sm font-bold placeholder:text-white/10"
                     />
                   </div>
@@ -145,7 +147,7 @@ export default function LoginPage() {
                 {loading ? (
                   <Loader2 className="h-4 w-4 animate-spin" />
                 ) : (
-                  <>Enter Matrix <ChevronRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" /></>
+                  <>Enter the Matrix <ChevronRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" /></>
                 )}
               </Button>
             </form>
@@ -153,7 +155,7 @@ export default function LoginPage() {
             <div className="mt-10 pt-10 border-t border-white/5 text-center">
               <div className="inline-flex items-center gap-2 text-accent/40 bg-accent/5 px-4 py-2 rounded-full border border-accent/10">
                 <Sparkles className="h-3 w-3" />
-                <span className="text-[8px] font-black uppercase tracking-widest">Quantum Encryption Active</span>
+                <span className="text-[8px] font-black uppercase tracking-widest">Quantum Identity Encryption</span>
               </div>
             </div>
           </CardContent>

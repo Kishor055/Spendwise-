@@ -101,7 +101,8 @@ export default function AIAssistantPage() {
         }
       }]);
     } catch (error) {
-      setMessages(prev => [...prev, { role: 'assistant', content: "Neural link interrupted. Re-syncing..." }]);
+      console.error('Advisor Error:', error);
+      setMessages(prev => [...prev, { role: 'assistant', content: "Neural link interrupted. Ensure Gemini API key is valid and re-syncing..." }]);
     } finally {
       setIsTyping(false);
     }
@@ -142,7 +143,7 @@ export default function AIAssistantPage() {
            </div>
            <div>
               <h2 className="text-xl font-black italic tracking-tighter uppercase tracking-[0.2em]">Strategic Wealth Terminal</h2>
-              <p className="text-[10px] text-white/30 font-black uppercase tracking-[0.4em] mt-3">Cross-referencing Jobs & Markets...</p>
+              <p className="text-[10px] text-white/30 font-black uppercase tracking-[0.4em] mt-3">Cross-referencing Matrix with Job Markets...</p>
            </div>
         </div>
 
@@ -202,7 +203,7 @@ export default function AIAssistantPage() {
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex justify-start">
             <div className="glass p-6 rounded-[2.5rem] rounded-tl-none border-white/10 flex items-center gap-4">
               <Loader2 className="h-5 w-5 animate-spin text-accent" />
-              <span className="text-[10px] font-black text-accent uppercase tracking-[0.4em]">Retrieving Matrix Data...</span>
+              <span className="text-[10px] font-black text-accent uppercase tracking-[0.4em]">Synthesizing Neural Matrix...</span>
             </div>
           </motion.div>
         )}
