@@ -1,79 +1,65 @@
-# 💰 SpendWise 2.0 — AI-Powered Fintech Ecosystem
+# 💰 SpendWise 3.0 — The Neural Financial Co-Pilot
 
-SpendWise is a production-grade, AI-driven personal finance and expense management platform. Designed with a futuristic "Fintech Noir" aesthetic, it leverages advanced AI to provide deep financial insights, automated tracking, and strategic wealth planning.
+SpendWise is a production-grade, AI-driven personal finance ecosystem designed for the modern professional. Moving beyond traditional "ledger-only" apps, SpendWise 3.0 introduces a **Neural Financial Terminal** that acts as a proactive co-pilot for your wealth, job market standing, and long-term financial health.
 
 ---
 
 ## 🚀 Vision
-SpendWise transforms traditional expense tracking into a **Neural Financial Terminal**. It doesn't just record transactions; it analyzes patterns, predicts trends, and coaches users toward financial freedom using the power of Generative AI.
+In an era of fragmented digital spending, SpendWise centralizes your financial matrix. It leverages **Gemini 2.5 Flash** to analyze spending DNA, predict future cash flow, and correlate personal habits with professional stability. Our design philosophy, **"Fintech Noir,"** combines high-contrast glassmorphism with physics-based interactions to provide an elite command-center experience.
 
 ---
 
-## 🌟 Key Features
+## 🧠 Core Intelligence Modules
 
-### 🧠 Neural Command Center (Dashboard)
-- **Quantum Analytics**: Real-time visualization of Liquidity, Inflow, Outflow, and Burn Rate.
-- **Financial Vitality Index**: A sophisticated health gauge that calculates saving efficiency.
-- **Temporal Pulse**: Interactive Area charts for 7-day spending trends.
+### 1. AI Financial Twin (Copilot)
+*   **Contextual RAG**: Retrieves your entire transaction history, budgets, and goals to provide holistic advice.
+*   **Job Market Correlation**: Analyzes how your spending affects your "Professional Burn Rate" and market readiness.
+*   **Voice & Vision**: Log expenses via natural language ("Spent 500 on dinner") or by uploading receipt photos for OCR extraction.
 
-### 🤖 Nexus AI Assistant
-- **AI Financial Advisor**: A specialized Genkit-powered agent for personalized wealth advice based on local spending habits.
-- **Money Wrapped**: Viral-style social recaps of your monthly and yearly financial journey.
-- **Strategic Prompting**: Pre-built commands for instant budget analysis and savings tips.
+### 2. Quantum Pulse (Analytics)
+*   **Predictive Forecasting**: AI-driven projections of account balances for 7, 30, and 90-day windows.
+*   **Subscription Intelligence**: Automatically detects recurring "leaks" and calculates annual projected losses.
+*   **Neural Distribution**: Interactive Recharts visualizations of sector-wise outflows and efficiency metrics.
 
-### 💳 Universal Transaction Engine
-- **Multi-Sector Tracking**: Comprehensive categorization (Food, Shopping, Travel, EMI, etc.).
-- **Evidence Logging**: Receipt upload capability and encrypted notes.
-- **Universal History**: Searchable, filterable ledger with one-click CSV export.
-
-### 🎯 Strategic Control (Budgets & Goals)
-- **Sector Limits**: Category-wise budget enforcement with real-time overspending alerts.
-- **Manifest Goals**: Target-based savings tracking for high-value acquisitions.
-- **Recursive Bills**: A dedicated reminder system for Rent, EMI, and Utilities.
-
-### 🔐 Security & Authority
-- **Nexus Terminal (Admin)**: Global oversight for system entities and security status.
-- **Encryption Protocol**: Secure Firebase-backed authentication (Google, Email, OTP).
-- **Matrix Permissions**: Robust Firestore security rules ensuring total data privacy.
+### 3. Strategic Control (Budgets & Goals)
+*   **Sector Limits**: Category-wise budget enforcement with real-time "Danger Zone" notifications.
+*   **Manifestation Goals**: Track high-value acquisitions with smart-saving progress bars.
+*   **Temporal Alerts**: A bill reminder system for EMI, Rent, and Utilities.
 
 ---
 
 ## 🎨 Design Philosophy: "Fintech Noir"
-SpendWise uses **Glassmorphism 2.0/3.0** principles:
-- **Depth & Translucency**: Layered interfaces with 20px+ blur.
-- **High-Contrast Legibility**: Deep `#020617` backgrounds with vibrant neon accents.
-- **Physics-Based UI**: Smooth, hardware-accelerated transitions via `framer-motion`.
+*   **Glassmorphism 3.0**: Deep `#020617` backgrounds with 20px+ blur layers.
+*   **Neural Accents**: High-vibrancy primary colors (Indigo/Cyan) used for critical data signals.
+*   **Micro-Interactions**: Framer Motion powered hardware-accelerated transitions.
 
 ---
 
-## 🛠️ Tech Stack
+## 🛠️ Technology Stack
 
 | Layer | Technology |
 | :--- | :--- |
-| **Frontend** | Next.js 15 (App Router), React 19, TypeScript |
-| **Styling** | Tailwind CSS, ShadCN UI, Lucide Icons |
-| **Animation** | Framer Motion, Tailwind Animate |
-| **Backend** | Firebase (Auth, Firestore) |
-| **AI Engine** | Genkit, Google Gemini 2.5 Flash |
-| **Charts** | Recharts |
+| **Framework** | Next.js 15 (App Router), React 19, TypeScript |
+| **AI Engine** | Genkit, Google Gemini 2.5 Flash (Multi-modal) |
+| **Backend** | Firebase Auth (Simple Identity), Firestore (NoSQL) |
+| **Styling** | Tailwind CSS 3.4, ShadCN UI, Lucide Icons |
+| **Data Viz** | Recharts (Responsive Area & Bar Charts) |
+| **Animation** | Framer Motion 12.0 |
 
 ---
 
-## 📂 Project Structure
+## 📂 Project Architecture
 
 ```bash
 src/
-├── ai/                  # Genkit flows and AI prompt logic
-├── app/                 # Next.js App Router (Pages & Layouts)
-│   ├── (auth)/          # Authentication routes (Login, Register)
-│   ├── dashboard/       # Main Command Center
-│   ├── analytics/       # Data visualization hub
-│   ├── budget/          # Sector limit management
-│   └── ai-assistant/    # Nexus AI Terminal
+├── ai/                  # Genkit flows (Categorization, Analysis, RAG)
+├── app/                 # Next.js 15 App Router pages
+│   ├── dashboard/       # Neural Command Center
+│   ├── ai-assistant/    # Multi-modal AI Terminal
+│   ├── market/          # Quantum Strategic Analysis
+│   └── transactions/    # Universal Ledger
 ├── components/          # Reusable UI & Complex Widgets
-│   ├── ui/              # ShadCN base components
-│   └── layout/          # Global navigation (Pill-nav)
-├── firebase/            # Firebase SDK config & Non-blocking hooks
+├── firebase/            # SDK configuration & Non-blocking hooks
 └── lib/                 # Shared utilities and types
 ```
 
@@ -81,23 +67,23 @@ src/
 
 ## ⚡ Quick Start
 
-### 1. Initialize Project
-```bash
-npm install
-```
+1. **Clone & Install**
+   ```bash
+   npm install
+   ```
 
-### 2. Set Up Environment
-Create a `.env.local` file with your Firebase and Google AI credentials:
-```env
-NEXT_PUBLIC_FIREBASE_API_KEY=your_key
-NEXT_PUBLIC_FIREBASE_PROJECT_ID=your_id
-GOOGLE_GENAI_API_KEY=your_gemini_key
-```
+2. **Environment Configuration**
+   Create `.env.local`:
+   ```env
+   NEXT_PUBLIC_FIREBASE_API_KEY=your_key
+   NEXT_PUBLIC_FIREBASE_PROJECT_ID=your_id
+   GOOGLE_GENAI_API_KEY=your_gemini_key
+   ```
 
-### 3. Launch Nexus
-```bash
-npm run dev
-```
+3. **Launch Terminal**
+   ```bash
+   npm run dev
+   ```
 
 ---
 
@@ -108,4 +94,4 @@ npm run dev
 ---
 
 ## 📜 License
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+This project is licensed under the MIT License.
