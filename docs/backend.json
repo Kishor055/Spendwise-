@@ -1,9 +1,10 @@
+
 {
   "entities": {
     "UserProfile": {
       "title": "UserProfile",
       "type": "object",
-      "description": "User profile with basic settings and preferences.",
+      "description": "User profile with basic settings, gamification stats, and SaaS tier info.",
       "properties": {
         "id": { "type": "string" },
         "name": { "type": "string" },
@@ -13,31 +14,34 @@
         "createdAt": { "type": "string", "format": "date-time" },
         "onboarded": { "type": "boolean", "default": false },
         "streak": { "type": "number", "default": 0 },
-        "rank": { "type": "string", "default": "Novice" }
+        "rank": { "type": "string", "enum": ["Novice", "Strategist", "Elite", "Oracle"], "default": "Novice" },
+        "subscriptionTier": { "type": "string", "enum": ["Free", "Pro", "Elite"], "default": "Free" }
       },
       "required": ["id", "name", "email", "createdAt"]
     },
     "Transaction": {
       "title": "Transaction",
       "type": "object",
-      "description": "Financial transaction records.",
+      "description": "Financial transaction records with AI categorization data.",
       "properties": {
         "id": { "type": "string" },
         "userId": { "type": "string" },
         "type": { "type": "string", "enum": ["income", "expense"] },
         "amount": { "type": "number" },
-        "category": { "type": "string", "enum": ["Food", "Shopping", "Travel", "Recharge", "Electricity", "Fuel", "Rent", "EMI", "Entertainment", "Healthcare", "Salary", "Freelance", "Gift", "Investment", "Other"] },
+        "category": { "type": "string" },
+        "merchant": { "type": "string" },
         "note": { "type": "string" },
         "date": { "type": "string", "format": "date-time" },
         "createdAt": { "type": "string", "format": "date-time" },
-        "receiptUrl": { "type": "string" }
+        "aiCategorized": { "type": "boolean" },
+        "confidence": { "type": "number" }
       },
-      "required": ["id", "userId", "type", "amount", "category", "date", "createdAt"]
+      "required": ["id", "userId", "type", "amount", "category", "date"]
     },
     "Goal": {
       "title": "Goal",
       "type": "object",
-      "description": "Financial savings goals.",
+      "description": "Strategic savings goals with deadline and AI estimation logic.",
       "properties": {
         "id": { "type": "string" },
         "userId": { "type": "string" },
@@ -45,14 +49,15 @@
         "targetAmount": { "type": "number" },
         "currentAmount": { "type": "number", "default": 0 },
         "deadline": { "type": "string", "format": "date-time" },
-        "createdAt": { "type": "string", "format": "date-time" }
+        "createdAt": { "type": "string", "format": "date-time" },
+        "priority": { "type": "string", "enum": ["Low", "Medium", "High"], "default": "Medium" }
       },
       "required": ["id", "userId", "title", "targetAmount", "createdAt"]
     },
     "Budget": {
       "title": "Budget",
       "type": "object",
-      "description": "Category-wise budget limits.",
+      "description": "Category-wise budget limits with monthly tracking.",
       "properties": {
         "id": { "type": "string" },
         "userId": { "type": "string" },
@@ -65,42 +70,42 @@
     "Reminder": {
       "title": "Reminder",
       "type": "object",
-      "description": "Bill and payment reminders.",
+      "description": "Bill and payment reminders with notification status.",
       "properties": {
         "id": { "type": "string" },
         "userId": { "type": "string" },
         "title": { "type": "string" },
         "amount": { "type": "number" },
         "dueDate": { "type": "string", "format": "date-time" },
-        "type": { "type": "string", "enum": ["Electricity", "EMI", "Rent", "Credit Card", "Recharge", "Other"] },
+        "type": { "type": "string" },
         "notified": { "type": "boolean", "default": false }
       },
-      "required": ["id", "userId", "title", "amount", "dueDate", "type"]
+      "required": ["id", "userId", "title", "amount", "dueDate"]
     }
   },
   "auth": {
-    "providers": ["password", "google", "phone"]
+    "providers": ["password", "google", "anonymous"]
   },
   "firestore": {
     "/users/{userId}": {
       "schema": { "$ref": "#/entities/UserProfile" },
-      "description": "User profile data."
+      "description": "Global user identity and gamification record."
     },
     "/users/{userId}/transactions/{transactionId}": {
       "schema": { "$ref": "#/entities/Transaction" },
-      "description": "User transactions."
+      "description": "Universal ledger history."
     },
     "/users/{userId}/goals/{goalId}": {
       "schema": { "$ref": "#/entities/Goal" },
-      "description": "User financial goals."
+      "description": "Strategic manifestation targets."
     },
     "/users/{userId}/budgets/{budgetId}": {
       "schema": { "$ref": "#/entities/Budget" },
-      "description": "User category budgets."
+      "description": "Sector resource allocation limits."
     },
     "/users/{userId}/reminders/{reminderId}": {
       "schema": { "$ref": "#/entities/Reminder" },
-      "description": "User bill reminders."
+      "description": "Temporal payment alerts."
     }
   }
 }
