@@ -1,12 +1,11 @@
-
 "use client";
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { format } from 'date-fns';
-import { CalendarIcon, Loader2, Upload } from 'lucide-react';
+import { CalendarIcon, Loader2, Upload, Sparkles, AlertCircle } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { Calendar } from '@/components/ui/calendar';
@@ -36,6 +35,7 @@ import { Label } from '@/components/ui/label';
 import { collection, serverTimestamp, Timestamp } from 'firebase/firestore';
 import { useUser, useFirestore, addDocumentNonBlocking } from '@/firebase';
 import { useToast } from '@/hooks/use-toast';
+import { categorizeTransaction } from '@/ai/flows/ai-categorization-flow';
 
 const transactionSchema = z.object({
   amount: z.coerce.number().positive('Amount must be greater than 0'),
@@ -43,6 +43,7 @@ const transactionSchema = z.object({
   category: z.string().min(1, 'Category is required'),
   date: z.date(),
   note: z.string().optional(),
+  merchant: z.string().optional(),
 });
 
 const CATEGORIES = {
@@ -52,6 +53,8 @@ const CATEGORIES = {
 
 export function TransactionForm({ onSuccess }: { onSuccess?: () => void }) {
   const [loading, setLoading] = useState(false);
+  const [isCategorizing, setIsCategorizing] = useState(false);
+  const [aiConfidence, setAiConfidence] = useState<number | null>(null);
   const { user } = useUser();
   const firestore = useFirestore();
   const { toast } = useToast();
@@ -64,10 +67,31 @@ export function TransactionForm({ onSuccess }: { onSuccess?: () => void }) {
       category: '',
       date: new Date(),
       note: '',
+      merchant: '',
     },
   });
 
   const transactionType = form.watch('type');
+  const merchantName = form.watch('merchant');
+
+  useEffect(() => {
+    const delayDebounceFn = setTimeout(async () => {
+      if (merchantName && merchantName.length > 2 && transactionType === 'expense') {
+        setIsCategorizing(true);
+        try {
+          const result = await categorizeTransaction({ description: merchantName });
+          form.setValue('category', result.category);
+          setAiConfidence(result.confidence);
+        } catch (e) {
+          console.error("Categorization failed", e);
+        } finally {
+          setIsCategorizing(false);
+        }
+      }
+    }, 1000);
+
+    return () => clearTimeout(delayDebounceFn);
+  }, [merchantName, transactionType, form]);
 
   async function onSubmit(values: z.infer<typeof transactionSchema>) {
     if (!user || !firestore) return;
@@ -80,19 +104,15 @@ export function TransactionForm({ onSuccess }: { onSuccess?: () => void }) {
         userId: user.uid,
         date: Timestamp.fromDate(values.date),
         createdAt: serverTimestamp(),
+        aiCategorized: !!aiConfidence,
+        confidence: aiConfidence || 0,
       });
       
-      toast({ title: 'Success', description: 'Transaction recorded in the matrix.' });
-      form.reset({
-        amount: 0,
-        type: values.type,
-        category: '',
-        date: new Date(),
-        note: '',
-      });
+      toast({ title: 'Protocol Executed', description: 'Transaction manifest synchronized.' });
+      form.reset();
       onSuccess?.();
     } catch (error) {
-      toast({ variant: 'destructive', title: 'Error', description: 'Failed to sync transaction' });
+      toast({ variant: 'destructive', title: 'Neural Error', description: 'Failed to sync with matrix.' });
     } finally {
       setLoading(false);
     }
@@ -123,7 +143,7 @@ export function TransactionForm({ onSuccess }: { onSuccess?: () => void }) {
                           : "bg-white/[0.03] border-white/5 hover:bg-white/10 text-white/40"
                       )}
                     >
-                      Expense
+                      Outflow
                     </Label>
                   </div>
                   <div className="flex items-center space-x-2">
@@ -137,36 +157,11 @@ export function TransactionForm({ onSuccess }: { onSuccess?: () => void }) {
                           : "bg-white/[0.03] border-white/5 hover:bg-white/10 text-white/40"
                       )}
                     >
-                      Income
+                      Inflow
                     </Label>
                   </div>
                 </RadioGroup>
               </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-
-        <FormField
-          control={form.control}
-          name="amount"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel className="text-[10px] font-black uppercase tracking-widest text-white/40 ml-4">Quantifiable Amount</FormLabel>
-              <FormControl>
-                <div className="relative">
-                  <span className="absolute left-6 top-1/2 -translate-y-1/2 font-black text-xl text-white/20">₹</span>
-                  <Input 
-                    type="number" 
-                    placeholder="0.00" 
-                    step="0.01" 
-                    className="pl-14 h-16 rounded-[2rem] glass border-white/10 text-2xl font-black placeholder:text-white/10"
-                    {...field}
-                    value={field.value || ''}
-                  />
-                </div>
-              </FormControl>
-              <FormMessage />
             </FormItem>
           )}
         />
@@ -174,10 +169,62 @@ export function TransactionForm({ onSuccess }: { onSuccess?: () => void }) {
         <div className="grid md:grid-cols-2 gap-6">
           <FormField
             control={form.control}
+            name="merchant"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel className="text-[10px] font-black uppercase tracking-widest text-white/40 ml-4">Merchant / Entity</FormLabel>
+                <FormControl>
+                  <div className="relative">
+                     <Input 
+                      placeholder="e.g. Swiggy, Uber" 
+                      className="h-16 rounded-[2rem] glass border-white/10 font-bold px-6 placeholder:text-white/10"
+                      {...field}
+                    />
+                    {isCategorizing && (
+                       <Loader2 className="absolute right-6 top-1/2 -translate-y-1/2 h-4 w-4 animate-spin text-accent" />
+                    )}
+                  </div>
+                </FormControl>
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            control={form.control}
+            name="amount"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel className="text-[10px] font-black uppercase tracking-widest text-white/40 ml-4">Quantifiable Value</FormLabel>
+                <FormControl>
+                  <div className="relative">
+                    <span className="absolute left-6 top-1/2 -translate-y-1/2 font-black text-xl text-white/20">₹</span>
+                    <Input 
+                      type="number" 
+                      placeholder="0.00" 
+                      className="pl-14 h-16 rounded-[2rem] glass border-white/10 text-2xl font-black"
+                      {...field}
+                    />
+                  </div>
+                </FormControl>
+              </FormItem>
+            )}
+          />
+        </div>
+
+        <div className="grid md:grid-cols-2 gap-6">
+          <FormField
+            control={form.control}
             name="category"
             render={({ field }) => (
               <FormItem>
-                <FormLabel className="text-[10px] font-black uppercase tracking-widest text-white/40 ml-4">Sector</FormLabel>
+                <FormLabel className="text-[10px] font-black uppercase tracking-widest text-white/40 ml-4 flex items-center gap-2">
+                  Sector
+                  {aiConfidence && (
+                    <span className="text-[8px] bg-accent/10 text-accent px-2 py-0.5 rounded-full flex items-center gap-1 animate-pulse">
+                      <Sparkles className="h-2 w-2" /> AI Suggested
+                    </span>
+                  )}
+                </FormLabel>
                 <Select onValueChange={field.onChange} value={field.value}>
                   <FormControl>
                     <SelectTrigger className="h-16 rounded-[2rem] glass border-white/10 font-bold px-6">
@@ -190,7 +237,6 @@ export function TransactionForm({ onSuccess }: { onSuccess?: () => void }) {
                     ))}
                   </SelectContent>
                 </Select>
-                <FormMessage />
               </FormItem>
             )}
           />
@@ -206,33 +252,17 @@ export function TransactionForm({ onSuccess }: { onSuccess?: () => void }) {
                     <FormControl>
                       <Button
                         variant={"outline"}
-                        className={cn(
-                          "h-16 rounded-[2rem] glass border-white/10 text-left font-bold px-6",
-                          !field.value && "text-white/20"
-                        )}
+                        className={cn("h-16 rounded-[2rem] glass border-white/10 text-left font-bold px-6", !field.value && "text-white/20")}
                       >
-                        {field.value ? (
-                          format(field.value, "PPP")
-                        ) : (
-                          <span>Pick temporal point</span>
-                        )}
+                        {field.value ? format(field.value, "PPP") : "Temporal Data"}
                         <CalendarIcon className="ml-auto h-4 w-4 opacity-30" />
                       </Button>
                     </FormControl>
                   </PopoverTrigger>
                   <PopoverContent className="w-auto p-0 glass border-white/10" align="start">
-                    <Calendar
-                      mode="single"
-                      selected={field.value}
-                      onSelect={field.onChange}
-                      disabled={(date) =>
-                        date > new Date() || date < new Date("1900-01-01")
-                      }
-                      initialFocus
-                    />
+                    <Calendar mode="single" selected={field.value} onSelect={field.onChange} initialFocus />
                   </PopoverContent>
                 </Popover>
-                <FormMessage />
               </FormItem>
             )}
           />
@@ -243,29 +273,15 @@ export function TransactionForm({ onSuccess }: { onSuccess?: () => void }) {
           name="note"
           render={({ field }) => (
             <FormItem>
-              <FormLabel className="text-[10px] font-black uppercase tracking-widest text-white/40 ml-4">Matrix Note (Optional)</FormLabel>
+              <FormLabel className="text-[10px] font-black uppercase tracking-widest text-white/40 ml-4">Matrix Note</FormLabel>
               <FormControl>
-                <Input 
-                  placeholder="Encryption note..." 
-                  className="h-16 rounded-[2rem] glass border-white/10 font-bold px-6 placeholder:text-white/10"
-                  {...field} 
-                  value={field.value || ''}
-                />
+                <Input placeholder="Additional metadata..." className="h-16 rounded-[2rem] glass border-white/10 font-bold px-6" {...field} />
               </FormControl>
-              <FormMessage />
             </FormItem>
           )}
         />
 
-        <div className="space-y-3">
-          <Label className="text-[10px] font-black uppercase tracking-widest text-white/40 ml-4">Evidence (Receipt)</Label>
-          <div className="h-32 rounded-[2rem] border-2 border-dashed border-white/10 flex flex-col items-center justify-center gap-2 group cursor-pointer hover:border-primary/40 transition-all hover:bg-white/[0.02]">
-            <Upload className="h-6 w-6 text-white/20 group-hover:text-primary transition-colors" />
-            <span className="text-[10px] font-black uppercase tracking-widest text-white/20">Upload Receipt</span>
-          </div>
-        </div>
-
-        <Button type="submit" className="w-full h-20 rounded-[2.5rem] bg-primary hover:bg-primary/80 text-white font-black text-xs uppercase tracking-[0.4em] shadow-2xl shadow-primary/20 transition-all active:scale-95" disabled={loading}>
+        <Button type="submit" className="w-full h-20 rounded-[2.5rem] bg-primary text-white font-black text-xs uppercase tracking-[0.4em] shadow-2xl transition-all active:scale-95" disabled={loading}>
           {loading ? <Loader2 className="h-6 w-6 animate-spin" /> : 'Execute Synchronization'}
         </Button>
       </form>

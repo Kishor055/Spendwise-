@@ -1,11 +1,10 @@
-
 "use client";
 
 import { useMemo, useState, useEffect } from 'react';
 import { useUser, useFirestore, useCollection, useMemoFirebase } from '@/firebase';
 import { collection, query, orderBy, limit } from 'firebase/firestore';
 import { BottomNav } from '@/components/layout/bottom-nav';
-import { Card, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { 
   Loader2, 
   Plus, 
@@ -23,12 +22,14 @@ import {
   ShieldCheck,
   LayoutGrid,
   Zap,
-  Clock
+  Clock,
+  ChevronRight,
+  ArrowUpRight,
+  ArrowDownRight
 } from 'lucide-react';
 import { format } from 'date-fns';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
-import { TransactionForm } from '@/components/transactions/transaction-form';
 import { getBalanceForecast } from '@/ai/flows/predictive-forecast-flow';
 import {
   Dialog,
@@ -68,7 +69,6 @@ const PIE_COLORS = ['#8B5CF6', '#EC4899', '#06B6D4', '#10B981', '#F59E0B', '#EF4
 export default function DashboardPage() {
   const { user, isUserLoading } = useUser();
   const firestore = useFirestore();
-  const [isAddOpen, setIsAddOpen] = useState(false);
   const [mounted, setMounted] = useState(false);
   const [forecast, setForecast] = useState<any>(null);
   const [isForecasting, setIsForecasting] = useState(false);
@@ -91,11 +91,18 @@ export default function DashboardPage() {
     return query(collection(firestore, 'users', user.uid, 'reminders'), limit(10));
   }, [firestore, user]);
 
+  const budgetsQuery = useMemoFirebase(() => {
+    if (!firestore || !user) return null;
+    return query(collection(firestore, 'users', user.uid, 'budgets'));
+  }, [firestore, user]);
+
   const { data: transactions, isLoading: isTransactionsLoading } = useCollection<Transaction>(transactionsQuery);
   const { data: reminders } = useCollection(remindersQuery);
+  const { data: budgets } = useCollection(budgetsQuery);
 
   const stats = useMemo(() => {
-    if (!transactions) return { balance: 0, income: 0, expense: 0, savings: 0, healthScore: 0, budget: 50000 };
+    if (!transactions) return { balance: 0, income: 0, expense: 0, savings: 0, healthScore: 0, monthlyBudget: 50000 };
+    
     const totals = transactions.reduce((acc, tx) => {
       if (tx.type === 'income') {
         acc.income += tx.amount;
@@ -108,11 +115,17 @@ export default function DashboardPage() {
     }, { balance: 0, income: 0, expense: 0 });
 
     const savings = Math.max(0, totals.income - totals.expense);
-    const savingsRate = totals.income > 0 ? savings / totals.income : 0;
-    const healthScore = Math.max(0, Math.min(100, Math.round(savingsRate * 100 + 40)));
+    const savingsRate = totals.income > 0 ? (savings / totals.income) * 100 : 0;
+    
+    // Comprehensive Health Score Logic
+    const budgetAdherence = budgets && budgets.length > 0 
+      ? 100 - (budgets.filter(b => (transactions.filter(t => t.category === b.category && t.type === 'expense').reduce((sum, t) => sum + t.amount, 0)) > b.limit).length / budgets.length) * 100
+      : 100;
 
-    return { ...totals, savings, healthScore, budget: 50000 };
-  }, [transactions]);
+    const healthScore = Math.round((savingsRate * 0.6) + (budgetAdherence * 0.4));
+
+    return { ...totals, savings, healthScore, monthlyBudget: 50000 };
+  }, [transactions, budgets]);
 
   useEffect(() => {
     async function runForecast() {
@@ -221,7 +234,7 @@ export default function DashboardPage() {
            ))}
         </section>
 
-        {/* 3.0 Flagship: Predictive Pulse */}
+        {/* Predictive Section */}
         <section>
           <Card className="rounded-[3rem] border-none glass-dark p-10 relative overflow-hidden">
              <div className="absolute top-0 right-0 p-10 opacity-5">
@@ -230,17 +243,17 @@ export default function DashboardPage() {
              <div className="relative z-10">
                 <div className="flex items-center justify-between mb-8">
                    <div>
-                      <h2 className="text-xl font-black italic tracking-tighter flex items-center gap-3">
+                      <h2 className="text-xl font-black italic tracking-tighter flex items-center gap-3 text-glow">
                          <TrendingUp className="h-5 w-5 text-accent" />
-                         Predictive Pulse
+                         Predictive Cash Flow
                       </h2>
-                      <p className="text-[10px] text-white/30 font-black uppercase tracking-[0.4em] mt-1">AI-Powered Cash Flow Forecasting</p>
+                      <p className="text-[10px] text-white/30 font-black uppercase tracking-[0.4em] mt-1">AI-Powered Temporal Projection</p>
                    </div>
                    {isForecasting && <Loader2 className="h-5 w-5 animate-spin text-accent" />}
                 </div>
 
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-10">
-                   <div className="lg:col-span-2 h-[200px] w-full">
+                   <div className="lg:col-span-2 h-[220px] w-full">
                       {forecast ? (
                          <ResponsiveContainer width="100%" height="100%">
                             <BarChart data={forecast.forecast}>
@@ -260,29 +273,29 @@ export default function DashboardPage() {
                          </ResponsiveContainer>
                       ) : (
                          <div className="h-full flex items-center justify-center bg-white/[0.02] rounded-[2rem] border border-dashed border-white/5">
-                            <p className="text-[10px] font-black uppercase tracking-widest text-white/10">Awaiting Neural Projection...</p>
+                            <p className="text-[10px] font-black uppercase tracking-widest text-white/10">Synchronizing temporal vectors...</p>
                          </div>
                       )}
                    </div>
                    <div className="flex flex-col justify-center space-y-6">
                       {forecast ? (
                          <>
-                            <div className="p-6 bg-white/[0.03] rounded-[2rem] border border-white/5">
-                               <p className="text-[10px] font-black uppercase tracking-widest text-accent mb-2">Neural Insight</p>
-                               <p className="text-sm font-bold leading-relaxed">{forecast.insight}</p>
+                            <div className="p-6 bg-white/[0.03] rounded-[2.5rem] border border-white/5">
+                               <p className="text-[8px] font-black uppercase tracking-[0.3em] text-accent mb-3">Intelligence Insight</p>
+                               <p className="text-sm font-bold leading-relaxed text-white/80 italic">"{forecast.insight}"</p>
                             </div>
-                            <div className="flex items-center gap-4">
+                            <div className="flex items-center gap-4 px-4">
                                <div className={cn(
                                   "w-3 h-3 rounded-full animate-pulse",
-                                  forecast.forecast[0].riskLevel === 'HIGH' ? "bg-rose-500" : "bg-emerald-500"
+                                  forecast.forecast[0].riskLevel === 'HIGH' ? "bg-rose-500" : "bg-emerald-500 shadow-[0_0_10px_#10b981]"
                                )} />
-                               <span className="text-[10px] font-black uppercase tracking-[0.2em] text-white/40">Risk Level: {forecast.forecast[0].riskLevel}</span>
+                               <span className="text-[9px] font-black uppercase tracking-[0.2em] text-white/40">Risk Status: {forecast.forecast[0].riskLevel}</span>
                             </div>
                          </>
                       ) : (
                          <div className="space-y-4 animate-pulse">
                             <div className="h-10 bg-white/5 rounded-xl w-full" />
-                            <div className="h-20 bg-white/5 rounded-xl w-full" />
+                            <div className="h-24 bg-white/5 rounded-2xl w-full" />
                          </div>
                       )}
                    </div>
@@ -293,10 +306,10 @@ export default function DashboardPage() {
 
         <section className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
           {[
-            { label: 'Available Capital', value: stats.balance, icon: Wallet2, color: 'text-primary' },
-            { label: 'Monthly Inflow', value: stats.income, icon: TrendingUp, color: 'text-emerald-400' },
-            { label: 'Current Burn', value: stats.expense, icon: TrendingDown, color: 'text-rose-400' },
-            { label: 'Reserve Power', value: stats.budget - stats.expense, icon: CircleDollarSign, color: 'text-accent' },
+            { label: 'Available Liquidity', value: stats.balance, icon: Wallet2, color: 'text-primary' },
+            { label: 'Matrix Inflow', value: stats.income, icon: TrendingUp, color: 'text-emerald-400' },
+            { label: 'Resource Outflow', value: stats.expense, icon: TrendingDown, color: 'text-rose-400' },
+            { label: 'Strategic Reserve', value: stats.savings, icon: CircleDollarSign, color: 'text-accent' },
           ].map((item, i) => (
             <motion.div 
               key={item.label} 
@@ -318,99 +331,98 @@ export default function DashboardPage() {
         </section>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          <Card className="rounded-[3rem] border-none glass-dark lg:col-span-1 p-8">
-            <CardHeader className="p-0 mb-8 flex justify-between items-center">
-              <CardTitle className="text-[10px] font-black uppercase tracking-[0.3em] text-white/30">Temporal Budget</CardTitle>
-              <Button variant="ghost" size="sm" asChild>
-                 <Link href="/budget"><Plus className="h-4 w-4" /></Link>
-              </Button>
-            </CardHeader>
-            <div className="flex flex-col items-center">
-              <div className="relative w-full h-[240px]">
-                <ResponsiveContainer width="100%" height="100%">
-                  <PieChart>
-                    <Pie
-                      data={[
-                        { name: 'Consumed', value: stats.expense },
-                        { name: 'Available', value: Math.max(0, stats.budget - stats.expense) }
-                      ]}
-                      innerRadius={80}
-                      outerRadius={105}
-                      paddingAngle={10}
-                      dataKey="value"
-                      stroke="none"
-                    >
-                      <Cell fill="#8B5CF6" />
-                      <Cell fill="rgba(255,255,255,0.03)" />
-                    </Pie>
-                  </PieChart>
-                </ResponsiveContainer>
+          <Card className="rounded-[3rem] border-none glass-dark p-8 relative overflow-hidden">
+             <div className="absolute top-0 right-0 p-8 opacity-10">
+                <LayoutGrid className="h-10 w-10 text-primary" />
+             </div>
+             <CardHeader className="p-0 mb-8">
+                <CardTitle className="text-[10px] font-black uppercase tracking-[0.3em] text-white/30">Sector Utilization</CardTitle>
+             </CardHeader>
+             <div className="space-y-6">
+                {categoryData.length > 0 ? categoryData.map((item, i) => (
+                   <div key={item.name} className="space-y-2">
+                      <div className="flex justify-between items-center text-[10px] font-black uppercase tracking-widest px-1">
+                         <span>{item.name}</span>
+                         <span className="text-white/40 italic">₹{item.value.toLocaleString()} ({item.percent}%)</span>
+                      </div>
+                      <div className="h-1.5 w-full bg-white/[0.03] rounded-full overflow-hidden">
+                         <div 
+                            className="h-full bg-primary rounded-full transition-all duration-1000" 
+                            style={{ width: `${item.percent}%`, backgroundColor: PIE_COLORS[i % PIE_COLORS.length] }} 
+                         />
+                      </div>
+                   </div>
+                )) : (
+                   <div className="h-40 flex items-center justify-center opacity-10">
+                      <p className="text-[10px] font-black uppercase tracking-widest">No sector data</p>
+                   </div>
+                )}
+             </div>
+          </Card>
+
+          <Card className="rounded-[3rem] border-none glass-dark p-8 flex flex-col items-center justify-center">
+             <div className="relative w-56 h-56 mb-8">
+                <svg className="w-full h-full -rotate-90" viewBox="0 0 100 100">
+                   <circle className="text-white/[0.03]" strokeWidth="8" stroke="currentColor" fill="transparent" r="42" cx="50" cy="50" />
+                   <circle 
+                      className="text-accent accent-glow transition-all duration-[2000ms] ease-out" 
+                      strokeWidth="8" 
+                      strokeDasharray={264} 
+                      strokeDashoffset={264 - (264 * stats.healthScore) / 100} 
+                      strokeLinecap="round" 
+                      stroke="currentColor" 
+                      fill="transparent" 
+                      r="42" 
+                      cx="50" 
+                      cy="50" 
+                   />
+                </svg>
                 <div className="absolute inset-0 flex flex-col items-center justify-center">
-                  <span className="text-5xl font-black tracking-tighter italic">{Math.round((stats.expense / stats.budget) * 100)}%</span>
-                  <p className="text-[9px] font-black text-white/20 uppercase tracking-[0.3em] mt-2">Consumed</p>
+                  <span className="text-6xl font-black italic tracking-tighter accent-glow">{stats.healthScore}</span>
+                  <span className="text-[10px] font-black text-accent uppercase tracking-[0.4em] mt-2">Vitality Index</span>
                 </div>
-              </div>
-            </div>
+             </div>
+             <div className="text-center space-y-2">
+                <p className="text-[10px] font-black uppercase tracking-widest text-emerald-400">
+                   {stats.healthScore > 70 ? 'Superior Standing' : stats.healthScore > 40 ? 'Stable Matrix' : 'Critical Correction'}
+                </p>
+                <p className="text-xs font-bold text-white/30">Based on savings efficiency & budget protocols</p>
+             </div>
           </Card>
 
-          <Card className="rounded-[3rem] border-none glass-dark lg:col-span-1 p-8">
-            <CardHeader className="p-0 mb-8 flex flex-row justify-between items-center">
-              <CardTitle className="text-[10px] font-black uppercase tracking-[0.3em] text-white/30">Sector Power</CardTitle>
-              <Button variant="ghost" size="sm" className="h-8 text-[9px] font-black uppercase tracking-widest text-white/20" asChild>
-                <Link href="/analytics">Expand</Link>
+          <Card className="rounded-[3rem] border-none glass-dark p-8">
+            <CardHeader className="p-0 mb-8 flex justify-between items-center">
+              <CardTitle className="text-[10px] font-black uppercase tracking-[0.3em] text-white/30">Recent Manifestations</CardTitle>
+              <Button variant="ghost" size="sm" asChild className="h-8 text-[9px] font-black uppercase tracking-widest text-white/20">
+                <Link href="/transactions">History</Link>
               </Button>
             </CardHeader>
-            <div className="h-[240px] w-full mb-8">
-              <ResponsiveContainer width="100%" height="100%">
-                <PieChart>
-                  <Pie
-                    data={categoryData}
-                    cx="50%"
-                    cy="50%"
-                    innerRadius={70}
-                    outerRadius={95}
-                    dataKey="value"
-                    stroke="none"
-                  >
-                    {categoryData.map((entry, index) => (
-                      <Cell key={`cell-${index}`} fill={PIE_COLORS[index % PIE_COLORS.length]} />
-                    ))}
-                  </Pie>
-                  <Tooltip contentStyle={{ borderRadius: '1.5rem', border: 'none', background: '#0a0a16', fontSize: '11px', fontWeight: '900' }} />
-                </PieChart>
-              </ResponsiveContainer>
-            </div>
-          </Card>
-
-          <Card className="rounded-[3rem] border-none glass-dark lg:col-span-1 p-8">
-            <CardHeader className="p-0 mb-10">
-              <CardTitle className="text-[10px] font-black uppercase tracking-[0.3em] text-white/30 flex justify-between items-center">
-                Financial Vitality
-                <Activity className="h-5 w-5 text-accent" />
-              </CardTitle>
-            </CardHeader>
-            <div className="flex flex-col items-center justify-center text-center flex-1">
-               <div className="relative w-48 h-48 mb-10">
-                  <svg className="w-full h-full -rotate-90" viewBox="0 0 100 100">
-                     <circle className="text-white/[0.03]" strokeWidth="8" stroke="currentColor" fill="transparent" r="42" cx="50" cy="50" />
-                     <circle 
-                        className="text-accent transition-all duration-[2000ms] ease-out" 
-                        strokeWidth="8" 
-                        strokeDasharray={264} 
-                        strokeDashoffset={264 - (264 * stats.healthScore) / 100} 
-                        strokeLinecap="round" 
-                        stroke="currentColor" 
-                        fill="transparent" 
-                        r="42" 
-                        cx="50" 
-                        cy="50" 
-                     />
-                  </svg>
-                  <div className="absolute inset-0 flex flex-col items-center justify-center">
-                    <span className="text-6xl font-black italic tracking-tighter accent-glow">{stats.healthScore}</span>
-                    <span className="text-[10px] font-black text-accent uppercase tracking-[0.4em] mt-2">Optimal</span>
+            <div className="space-y-4">
+              {transactions?.slice(0, 4).map((tx) => (
+                <div key={tx.id} className="flex items-center justify-between p-4 bg-white/[0.02] rounded-2xl border border-white/5">
+                  <div className="flex items-center gap-4">
+                     <div className={cn(
+                       "w-10 h-10 rounded-xl flex items-center justify-center border border-white/5",
+                       tx.type === 'income' ? "bg-accent/10 text-accent" : "bg-primary/10 text-primary"
+                     )}>
+                        {tx.type === 'income' ? <ArrowUpRight className="h-5 w-5" /> : <ArrowDownRight className="h-5 w-5" />}
+                     </div>
+                     <div>
+                        <p className="text-sm font-black tracking-tight">{tx.category}</p>
+                        <p className="text-[8px] font-black uppercase tracking-widest text-white/20">{format(tx.date?.seconds ? new Date(tx.date.seconds * 1000) : new Date(), 'MMM dd')}</p>
+                     </div>
                   </div>
-               </div>
+                  <p className={cn("text-sm font-black italic", tx.type === 'income' ? "text-accent" : "text-white")}>
+                     {tx.type === 'income' ? '+' : '-'}₹{tx.amount.toLocaleString()}
+                  </p>
+                </div>
+              ))}
+              {(!transactions || transactions.length === 0) && (
+                <div className="h-40 flex flex-col items-center justify-center opacity-10">
+                   <Clock className="h-8 w-8 mb-4" />
+                   <p className="text-[10px] font-black uppercase tracking-widest">Awaiting Logs</p>
+                </div>
+              )}
             </div>
           </Card>
         </div>
