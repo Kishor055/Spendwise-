@@ -11,3 +11,4 @@ import './flows/ai-categorization-flow';
 import './flows/budget-generator-flow';
 import './flows/financial-health-flow';
 import './flows/anomaly-detection-flow';
+import './flows/investment-advisor-flow';

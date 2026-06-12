@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { LayoutDashboard, ReceiptText, UserCircle, Plus, PieChart, Bell, Target, LineChart, CreditCard } from 'lucide-react';
+import { LayoutDashboard, ReceiptText, UserCircle, Plus, PieChart, Bell, Target, LineChart, CreditCard, TrendingUp } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import {
   Dialog,
@@ -17,7 +17,7 @@ import { motion } from 'framer-motion';
 
 const navItems = [
   { href: '/dashboard', label: 'Matrix', icon: LayoutDashboard },
-  { href: '/market', label: 'Pulse', icon: LineChart },
+  { href: '/investments', label: 'Wealth', icon: TrendingUp },
   { href: '/plus', label: 'Add', icon: Plus, isAction: true },
   { href: '/subscriptions', label: 'Leaks', icon: CreditCard },
   { href: '/profile', label: 'Identity', icon: UserCircle },
