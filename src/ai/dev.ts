@@ -12,3 +12,6 @@ import './flows/budget-generator-flow';
 import './flows/financial-health-flow';
 import './flows/anomaly-detection-flow';
 import './flows/investment-advisor-flow';
+import './flows/monthly-report-flow';
+import './flows/habit-analysis-flow';
+import './flows/goal-predictor-flow';
