@@ -39,10 +39,18 @@
       radial-gradient(at 50% 50%, hsla(263, 70%, 50%, 0.05) 0px, transparent 70%);
     background-attachment: fixed;
   }
+  
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-headline italic tracking-tighter;
+  }
 }
 
 .glass {
   @apply bg-[#0a0a16]/40 backdrop-blur-2xl border border-white/10 shadow-[0_8px_32px_rgba(0,0,0,0.5)];
+}
+
+.glass-dark {
+  @apply bg-[#05050c]/60 backdrop-blur-3xl border border-white/5 shadow-2xl;
 }
 
 .glass-card {
@@ -54,11 +62,11 @@
 }
 
 .text-glow {
-  text-shadow: 0 0 15px hsla(var(--primary), 0.6);
+  text-shadow: 0 0 20px hsla(var(--primary), 0.6);
 }
 
 .accent-glow {
-  text-shadow: 0 0 15px hsla(var(--accent), 0.6);
+  text-shadow: 0 0 20px hsla(var(--accent), 0.6);
 }
 
 .scrollbar-hide::-webkit-scrollbar {
@@ -75,4 +83,18 @@
 
 [role="progressbar"] > div {
   @apply transition-all duration-1000 ease-in-out;
+}
+
+.animate-gradient-x {
+  background-size: 200% 200%;
+  animation: gradient-x 15s ease infinite;
+}
+
+@keyframes gradient-x {
+  0%, 100% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+}
+
+.animate-spin-slow {
+  animation: spin 8s linear infinite;
 }

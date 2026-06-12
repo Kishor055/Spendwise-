@@ -1,13 +1,16 @@
-# 💰 SpendWise 3.0 — The Neural Financial Co-Pilot
+# 💰 SpendWise 3.0 — AI-Powered Financial Intelligence
+
+[![Next.js 15](https://img.shields.io/badge/Next.js-15-black?style=for-the-badge&logo=next.js)](https://nextjs.org/)
+[![Genkit AI](https://img.shields.io/badge/Genkit-1.0-blue?style=for-the-badge&logo=google-cloud)](https://firebase.google.com/docs/genkit)
+[![Firebase](https://img.shields.io/badge/Firebase-BaaS-orange?style=for-the-badge&logo=firebase)](https://firebase.google.com/)
+[![Tailwind CSS](https://img.shields.io/badge/Tailwind-3.4-38B2AC?style=for-the-badge&logo=tailwind-css)](https://tailwindcss.com/)
 
 SpendWise is a production-grade, AI-driven personal finance ecosystem designed for the modern professional. Moving beyond traditional "ledger-only" apps, SpendWise 3.0 introduces a **Neural Financial Terminal** that acts as a proactive co-pilot for your wealth, job market standing, and long-term financial health.
 
 ---
 
-## 🚀 Vision
+## 🚀 The Vision
 In an era of fragmented digital spending, SpendWise centralizes your financial matrix. It leverages **Gemini 2.5 Flash** to analyze spending DNA, predict future cash flow, and correlate personal habits with professional stability. Our design philosophy, **"Fintech Noir,"** combines high-contrast glassmorphism with physics-based interactions to provide an elite command-center experience.
-
----
 
 ## 🧠 Core Intelligence Modules
 
@@ -28,39 +31,41 @@ In an era of fragmented digital spending, SpendWise centralizes your financial m
 
 ---
 
-## 🎨 Design Philosophy: "Fintech Noir"
-*   **Glassmorphism 3.0**: Deep `#020617` backgrounds with 20px+ blur layers.
-*   **Neural Accents**: High-vibrancy primary colors (Indigo/Cyan) used for critical data signals.
-*   **Micro-Interactions**: Framer Motion powered hardware-accelerated transitions.
+## 🏗️ System Architecture
+
+SpendWise 3.0 follows a **Modular Neural Architecture**:
+
+-   **Frontend**: Next.js 15 (App Router) with React 19 for high-performance server-side rendering and client interactivity.
+-   **AI Layer**: Google Genkit v1.0 orchestrating Gemini 2.5 Flash for RAG, OCR, and predictive modeling.
+-   **Backend**: Firebase (Auth & Firestore) providing a real-time, zero-trust data matrix.
+-   **Visuals**: Framer Motion for micro-interactions and Recharts for quantum data visualization.
 
 ---
 
-## 🛠️ Technology Stack
+## 🛠️ Tech Stack
 
 | Layer | Technology |
 | :--- | :--- |
-| **Framework** | Next.js 15 (App Router), React 19, TypeScript |
-| **AI Engine** | Genkit, Google Gemini 2.5 Flash (Multi-modal) |
-| **Backend** | Firebase Auth (Simple Identity), Firestore (NoSQL) |
+| **Framework** | Next.js 15, TypeScript |
+| **AI Engine** | Genkit, Gemini 2.5 Flash (Multi-modal) |
+| **Backend** | Firebase Auth, Cloud Firestore |
 | **Styling** | Tailwind CSS 3.4, ShadCN UI, Lucide Icons |
-| **Data Viz** | Recharts (Responsive Area & Bar Charts) |
 | **Animation** | Framer Motion 12.0 |
+| **Data Viz** | Recharts 2.x |
 
 ---
 
-## 📂 Project Architecture
+## 📂 Folder Structure
 
 ```bash
 src/
 ├── ai/                  # Genkit flows (Categorization, Analysis, RAG)
-├── app/                 # Next.js 15 App Router pages
-│   ├── dashboard/       # Neural Command Center
-│   ├── ai-assistant/    # Multi-modal AI Terminal
-│   ├── market/          # Quantum Strategic Analysis
-│   └── transactions/    # Universal Ledger
-├── components/          # Reusable UI & Complex Widgets
-├── firebase/            # SDK configuration & Non-blocking hooks
-└── lib/                 # Shared utilities and types
+├── app/                 # Next.js 15 App Router pages (Feature-based)
+├── components/          # Reusable UI (Atomic Design)
+├── firebase/            # SDK configuration & Specialized hooks
+├── hooks/               # Custom React hooks for business logic
+├── lib/                 # Shared utilities and types
+└── services/            # Domain-specific logic
 ```
 
 ---
@@ -69,6 +74,8 @@ src/
 
 1. **Clone & Install**
    ```bash
+   git clone https://github.com/your-username/spendwise-3.0.git
+   cd spendwise-3.0
    npm install
    ```
 
@@ -87,11 +94,15 @@ src/
 
 ---
 
+## 📜 Documentation
+- [Problem Statement](problem.md)
+- [Architecture Blueprint](docs/ARCHITECTURE.md)
+- [Contributing Guide](CONTRIBUTING.md)
+- [Security Policy](SECURITY.md)
+
 ## 👨‍💻 Author
 **SpendWise Core Team**
 *Specializing in AI-Driven Fintech Solutions.*
 
----
-
-## 📜 License
+## ⚖️ License
 This project is licensed under the MIT License.
