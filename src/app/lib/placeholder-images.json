@@ -1,4 +1,3 @@
-
 {
   "placeholderImages": [
     {
@@ -12,6 +11,12 @@
       "description": "Generic user avatar",
       "imageUrl": "https://picsum.photos/seed/user1/200/200",
       "imageHint": "user profile"
+    },
+    {
+      "id": "goa-trip",
+      "description": "Dream Goal: Goa Trip",
+      "imageUrl": "https://picsum.photos/seed/goa/600/400",
+      "imageHint": "beach resort"
     }
   ]
 }
