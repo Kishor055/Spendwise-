@@ -27,7 +27,9 @@ import {
   Mic,
   Image as ImageIcon,
   Camera,
-  FileText
+  FileText,
+  History,
+  Info
 } from 'lucide-react';
 import Link from 'next/link';
 import { cn } from '@/lib/utils';
@@ -55,7 +57,10 @@ interface Message {
   scanResult?: {
     merchant: string;
     amount: number;
+    taxAmount?: number;
     category: string;
+    date: string;
+    items?: Array<{ name: string; price: number }>;
   };
 }
 
@@ -74,7 +79,7 @@ export default function AIAssistantPage() {
   const [isPurchaseMode, setIsPurchaseMode] = useState(false);
   const [purchaseItem, setPurchaseItem] = useState({ name: '', price: '' });
   const [messages, setMessages] = useState<Message[]>([
-    { role: 'assistant', content: "Welcome to the Nexus Intelligence Hub. SpendWise 3.0 Vision is active. I am your AI Financial Twin. Ready for simulation." }
+    { role: 'assistant', content: "Nexus Intelligence Hub active. Scan receipts or speak to log transactions. I can also simulate purchase impact on your net worth." }
   ]);
   const [isTyping, setIsTyping] = useState(false);
   const [isRecording, setIsRecording] = useState(false);
@@ -111,7 +116,7 @@ export default function AIAssistantPage() {
     if (!file || !user || !firestore) return;
 
     setIsTyping(true);
-    setMessages(prev => [...prev, { role: 'user', content: "Scanning receipt..." }]);
+    setMessages(prev => [...prev, { role: 'user', content: "Initializing Vision OCR Protocol..." }]);
 
     try {
       const reader = new FileReader();
@@ -121,13 +126,13 @@ export default function AIAssistantPage() {
         
         setMessages(prev => [...prev, { 
           role: 'assistant', 
-          content: `I've analyzed the receipt from ${response.merchant}. Total: ₹${response.amount}. Should I sync this to your ledger?`,
+          content: `Vision scan complete. I've extracted ${response.merchant} with high confidence. Tax (GST) identified: ₹${response.taxAmount || 0}. Ready for ledger synchronization.`,
           scanResult: response
         }]);
       };
       reader.readAsDataURL(file);
     } catch (error) {
-      toast({ variant: 'destructive', title: 'OCR Failed', description: 'Could not parse the receipt image.' });
+      toast({ variant: 'destructive', title: 'Neural Link Error', description: 'OCR pipeline failed to resolve the image.' });
     } finally {
       setIsTyping(false);
     }
@@ -144,59 +149,30 @@ export default function AIAssistantPage() {
       date: Timestamp.fromDate(new Date(result.date)),
       createdAt: serverTimestamp(),
       userId: user.uid,
-      note: 'Auto-scanned receipt'
+      note: 'AI Scanned: ' + (result.taxAmount ? `Incl. ₹${result.taxAmount} GST` : 'Receipt Scan')
     });
-    toast({ title: 'Synced', description: 'Transaction added to universal history.' });
+    toast({ title: 'Protocol Executed', description: 'Transaction manifest synchronized with universal history.' });
   };
 
   const handleVoiceIntent = async () => {
-    if (!input.trim() || !user) return;
+    const messageToSend = input;
+    if (!messageToSend.trim() || !user) return;
     setIsTyping(true);
-    setMessages(prev => [...prev, { role: 'user', content: input }]);
+    setMessages(prev => [...prev, { role: 'user', content: messageToSend }]);
     setInput('');
 
     try {
-      const response = await processVoiceIntent({ text: input });
+      const response = await processVoiceIntent({ text: messageToSend });
       if (response.isConfidenceHigh) {
-        setMessages(prev => [...prev, { role: 'assistant', content: `Understood. Logged ${response.amount} for ${response.category}. Status: Synced.` }]);
-        syncToLedger(response);
+        setMessages(prev => [...prev, { role: 'assistant', content: `Nexus mapped intent: ${response.type} of ₹${response.amount} for ${response.category}. Synchronizing...` }]);
+        syncToLedger({ ...response, date: new Date().toISOString(), merchant: response.note });
       } else {
-        setMessages(prev => [...prev, { role: 'assistant', content: "I heard you, but I'm not 100% sure about the details. Could you clarify?" }]);
+        setMessages(prev => [...prev, { role: 'assistant', content: "Intent unclear. Please re-state the quantifiable value and sector." }]);
       }
     } catch (error) {
       console.error(error);
     } finally {
       setIsTyping(false);
-    }
-  };
-
-  const handlePurchaseAdvice = async () => {
-    if (!purchaseItem.name || !purchaseItem.price || !user) return;
-    
-    const priceNum = parseFloat(purchaseItem.price);
-    setMessages(prev => [...prev, { role: 'user', content: `Should I buy ${purchaseItem.name} for ₹${priceNum}?` }]);
-    setIsPurchaseMode(false);
-    setIsTyping(true);
-
-    try {
-      const response = await advisePurchase({
-        itemName: purchaseItem.name,
-        price: priceNum,
-        transactions: (transactions || []).map(t => ({ amount: t.amount, type: t.type, category: t.category })),
-        budgets: (budgets || []).map(b => ({ category: b.category, limit: b.limit })),
-        goals: (goals || []).map(g => ({ title: g.title, targetAmount: g.targetAmount, currentAmount: g.currentAmount }))
-      });
-
-      setMessages(prev => [...prev, { 
-        role: 'assistant', 
-        content: `I've simulated the purchase of ${purchaseItem.name}. Here is my twin-analysis.`,
-        purchaseAdvice: response
-      }]);
-    } catch (error) {
-      console.error(error);
-    } finally {
-      setIsTyping(false);
-      setPurchaseItem({ name: '', price: '' });
     }
   };
 
@@ -266,7 +242,7 @@ export default function AIAssistantPage() {
         <div className="flex gap-2">
            <input type="file" ref={fileInputRef} onChange={handleFileUpload} accept="image/*" className="hidden" />
            <Button variant="ghost" size="icon" className="glass h-12 w-12 rounded-2xl" onClick={() => fileInputRef.current?.click()}>
-              <Camera className="h-5 w-5 text-accent" />
+              <FileText className="h-5 w-5 text-accent" />
            </Button>
            <Button variant="ghost" size="icon" className="glass h-12 w-12 rounded-2xl" onClick={() => setIsRecording(!isRecording)}>
               <Mic className={cn("h-5 w-5", isRecording ? "text-rose-500 animate-pulse" : "text-primary")} />
@@ -292,21 +268,54 @@ export default function AIAssistantPage() {
                 <p className="text-base font-bold leading-relaxed tracking-tight text-white/90">{msg.content}</p>
                 
                 {msg.scanResult && (
-                  <div className="mt-6 p-4 bg-white/5 rounded-2xl border border-white/10 space-y-4">
+                  <div className="mt-6 p-6 bg-white/5 rounded-3xl border border-white/10 space-y-6">
                      <div className="flex justify-between items-center">
-                        <span className="text-[10px] font-black uppercase text-accent">Detected Expense</span>
-                        <Button variant="ghost" size="sm" className="h-8 text-[8px] bg-accent/20 text-accent font-black" onClick={() => syncToLedger(msg.scanResult)}>Sync to Ledger</Button>
+                        <div className="flex items-center gap-2">
+                           <FileText className="h-4 w-4 text-accent" />
+                           <span className="text-[10px] font-black uppercase text-accent tracking-widest">Vision Data Extracted</span>
+                        </div>
+                        <Button 
+                          variant="ghost" 
+                          size="sm" 
+                          className="h-10 px-6 text-[9px] bg-accent/20 text-accent font-black uppercase tracking-widest rounded-xl hover:bg-accent hover:text-white transition-all" 
+                          onClick={() => syncToLedger(msg.scanResult)}
+                        >
+                          Sync to Matrix
+                        </Button>
                      </div>
-                     <div className="grid grid-cols-2 gap-4">
+                     <div className="grid grid-cols-2 gap-8">
                         <div>
-                           <p className="text-[8px] font-black uppercase text-white/20">Merchant</p>
-                           <p className="font-bold">{msg.scanResult.merchant}</p>
+                           <p className="text-[8px] font-black uppercase text-white/20 tracking-[0.2em] mb-1">Entity</p>
+                           <p className="font-black text-lg">{msg.scanResult.merchant}</p>
                         </div>
                         <div>
-                           <p className="text-[8px] font-black uppercase text-white/20">Amount</p>
-                           <p className="font-bold">₹{msg.scanResult.amount}</p>
+                           <p className="text-[8px] font-black uppercase text-white/20 tracking-[0.2em] mb-1">Quantifiable Value</p>
+                           <p className="font-black text-lg italic">₹{msg.scanResult.amount.toLocaleString()}</p>
+                        </div>
+                        {msg.scanResult.taxAmount && (
+                          <div className="col-span-2 pt-4 border-t border-white/5 flex justify-between">
+                             <span className="text-[9px] font-black uppercase text-white/30">Tax Vector (GST)</span>
+                             <span className="text-[10px] font-black text-emerald-400">₹{msg.scanResult.taxAmount}</span>
+                          </div>
+                        )}
+                        <div className="col-span-2">
+                           <p className="text-[8px] font-black uppercase text-white/20 tracking-[0.2em] mb-1">Temporal Point</p>
+                           <p className="text-sm font-bold text-white/60">{msg.scanResult.date}</p>
                         </div>
                      </div>
+                     {msg.scanResult.items && msg.scanResult.items.length > 0 && (
+                        <div className="space-y-3 pt-4 border-t border-white/5">
+                           <p className="text-[8px] font-black uppercase text-white/20 tracking-[0.2em]">Matrix Line Items</p>
+                           <div className="space-y-2">
+                              {msg.scanResult.items.slice(0, 3).map((item, idx) => (
+                                <div key={idx} className="flex justify-between text-[11px] font-bold">
+                                   <span className="text-white/40">{item.name}</span>
+                                   <span>₹{item.price}</span>
+                                </div>
+                              ))}
+                           </div>
+                        </div>
+                     )}
                   </div>
                 )}
 
@@ -324,6 +333,25 @@ export default function AIAssistantPage() {
                         <p className="text-xl font-black italic">{msg.purchaseAdvice.decision}</p>
                      </div>
                      <p className="text-sm font-bold leading-relaxed text-white/80">{msg.purchaseAdvice.reasoning}</p>
+                  </div>
+                )}
+
+                {msg.strategicInfo && (
+                  <div className="mt-8 p-6 glass-dark rounded-[2rem] border-white/10 space-y-6">
+                    <div className="flex items-center justify-between">
+                       <h4 className="text-[10px] font-black uppercase tracking-[0.3em] text-primary">Strategic Pulse</h4>
+                       <span className="text-lg font-black italic text-primary">{msg.strategicInfo.rating}/100</span>
+                    </div>
+                    <div className="space-y-4">
+                       <div>
+                          <p className="text-[8px] font-black uppercase text-white/20 mb-1">Commercial Action</p>
+                          <p className="text-xs font-bold leading-relaxed">{msg.strategicInfo.action}</p>
+                       </div>
+                       <div>
+                          <p className="text-[8px] font-black uppercase text-white/20 mb-1">Market Readiness</p>
+                          <p className="text-[11px] font-medium leading-relaxed text-white/60">{msg.strategicInfo.marketCorrelation}</p>
+                       </div>
+                    </div>
                   </div>
                 )}
               </div>
