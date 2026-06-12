@@ -4,7 +4,6 @@ import { useState, useRef, useEffect } from 'react';
 import { useUser, useFirestore, useCollection, useMemoFirebase } from '@/firebase';
 import { collection, query, orderBy, limit } from 'firebase/firestore';
 import { askFinancialAdvisor } from '@/ai/flows/financial-advisor-flow';
-import { advisePurchase } from '@/ai/flows/purchase-advisor-flow';
 import { scanReceipt } from '@/ai/flows/receipt-scanner-flow';
 import { processVoiceIntent } from '@/ai/flows/voice-intent-flow';
 import { BottomNav } from '@/components/layout/bottom-nav';
@@ -13,28 +12,21 @@ import { Input } from '@/components/ui/input';
 import { 
   Sparkles, 
   Send, 
-  Bot, 
   Loader2, 
   ChevronLeft, 
   Briefcase, 
-  Zap, 
-  ShieldCheck, 
-  Target,
   ShoppingCart,
   AlertTriangle,
   CheckCircle2,
   XCircle,
   Mic,
-  Image as ImageIcon,
-  Camera,
   FileText,
-  History,
-  Info
+  Zap,
+  Check
 } from 'lucide-react';
 import Link from 'next/link';
 import { cn } from '@/lib/utils';
 import { motion, AnimatePresence } from 'framer-motion';
-import Image from 'next/image';
 import { useToast } from '@/hooks/use-toast';
 import { addDocumentNonBlocking } from '@/firebase';
 import { serverTimestamp, Timestamp } from 'firebase/firestore';
@@ -60,7 +52,8 @@ interface Message {
     taxAmount?: number;
     category: string;
     date: string;
-    items?: Array<{ name: string; price: number }>;
+    items?: Array<{ name: string; price: number; quantity?: number }>;
+    confidence: number;
   };
 }
 
@@ -76,8 +69,6 @@ export default function AIAssistantPage() {
   const firestore = useFirestore();
   const { toast } = useToast();
   const [input, setInput] = useState('');
-  const [isPurchaseMode, setIsPurchaseMode] = useState(false);
-  const [purchaseItem, setPurchaseItem] = useState({ name: '', price: '' });
   const [messages, setMessages] = useState<Message[]>([
     { role: 'assistant', content: "Nexus Intelligence Hub active. Scan receipts or speak to log transactions. I can also simulate purchase impact on your net worth." }
   ]);
@@ -126,7 +117,7 @@ export default function AIAssistantPage() {
         
         setMessages(prev => [...prev, { 
           role: 'assistant', 
-          content: `Vision scan complete. I've extracted ${response.merchant} with high confidence. Tax (GST) identified: ₹${response.taxAmount || 0}. Ready for ledger synchronization.`,
+          content: `Vision scan complete. I've extracted ${response.merchant} with ${Math.round(response.confidence * 100)}% confidence. Sector mapped: ${response.category}.`,
           scanResult: response
         }]);
       };
@@ -154,36 +145,9 @@ export default function AIAssistantPage() {
     toast({ title: 'Protocol Executed', description: 'Transaction manifest synchronized with universal history.' });
   };
 
-  const handleVoiceIntent = async () => {
-    const messageToSend = input;
-    if (!messageToSend.trim() || !user) return;
-    setIsTyping(true);
-    setMessages(prev => [...prev, { role: 'user', content: messageToSend }]);
-    setInput('');
-
-    try {
-      const response = await processVoiceIntent({ text: messageToSend });
-      if (response.isConfidenceHigh) {
-        setMessages(prev => [...prev, { role: 'assistant', content: `Nexus mapped intent: ${response.type} of ₹${response.amount} for ${response.category}. Synchronizing...` }]);
-        syncToLedger({ ...response, date: new Date().toISOString(), merchant: response.note });
-      } else {
-        setMessages(prev => [...prev, { role: 'assistant', content: "Intent unclear. Please re-state the quantifiable value and sector." }]);
-      }
-    } catch (error) {
-      console.error(error);
-    } finally {
-      setIsTyping(false);
-    }
-  };
-
   const handleSend = async (customMessage?: string) => {
     const messageToSend = customMessage || input;
     if (!messageToSend.trim() || isTyping || !user) return;
-
-    if (messageToSend.toLowerCase().startsWith("should i buy")) {
-      setIsPurchaseMode(true);
-      return;
-    }
 
     setInput('');
     setMessages(prev => [...prev, { role: 'user', content: messageToSend }]);
@@ -271,17 +235,13 @@ export default function AIAssistantPage() {
                   <div className="mt-6 p-6 bg-white/5 rounded-3xl border border-white/10 space-y-6">
                      <div className="flex justify-between items-center">
                         <div className="flex items-center gap-2">
-                           <FileText className="h-4 w-4 text-accent" />
-                           <span className="text-[10px] font-black uppercase text-accent tracking-widest">Vision Data Extracted</span>
+                           <Zap className="h-4 w-4 text-accent" />
+                           <span className="text-[10px] font-black uppercase text-accent tracking-widest">Quantum Vision Analysis</span>
                         </div>
-                        <Button 
-                          variant="ghost" 
-                          size="sm" 
-                          className="h-10 px-6 text-[9px] bg-accent/20 text-accent font-black uppercase tracking-widest rounded-xl hover:bg-accent hover:text-white transition-all" 
-                          onClick={() => syncToLedger(msg.scanResult)}
-                        >
-                          Sync to Matrix
-                        </Button>
+                        <div className="flex items-center gap-2 px-3 py-1 bg-emerald-500/10 rounded-full border border-emerald-500/20">
+                           <Check className="h-3 w-3 text-emerald-500" />
+                           <span className="text-[8px] font-black text-emerald-500 uppercase tracking-widest">{Math.round(msg.scanResult.confidence * 100)}% Match</span>
+                        </div>
                      </div>
                      <div className="grid grid-cols-2 gap-8">
                         <div>
@@ -289,50 +249,27 @@ export default function AIAssistantPage() {
                            <p className="font-black text-lg">{msg.scanResult.merchant}</p>
                         </div>
                         <div>
-                           <p className="text-[8px] font-black uppercase text-white/20 tracking-[0.2em] mb-1">Quantifiable Value</p>
-                           <p className="font-black text-lg italic">₹{msg.scanResult.amount.toLocaleString()}</p>
+                           <p className="text-[8px] font-black uppercase text-white/20 tracking-[0.2em] mb-1">Total Vector</p>
+                           <p className="font-black text-lg italic text-primary">₹{msg.scanResult.amount.toLocaleString()}</p>
                         </div>
                         {msg.scanResult.taxAmount && (
                           <div className="col-span-2 pt-4 border-t border-white/5 flex justify-between">
                              <span className="text-[9px] font-black uppercase text-white/30">Tax Vector (GST)</span>
-                             <span className="text-[10px] font-black text-emerald-400">₹{msg.scanResult.taxAmount}</span>
+                             <span className="text-[10px] font-black text-accent">₹{msg.scanResult.taxAmount}</span>
                           </div>
                         )}
                         <div className="col-span-2">
-                           <p className="text-[8px] font-black uppercase text-white/20 tracking-[0.2em] mb-1">Temporal Point</p>
+                           <p className="text-[8px] font-black uppercase text-white/20 tracking-[0.2em] mb-1">Temporal Data</p>
                            <p className="text-sm font-bold text-white/60">{msg.scanResult.date}</p>
                         </div>
                      </div>
-                     {msg.scanResult.items && msg.scanResult.items.length > 0 && (
-                        <div className="space-y-3 pt-4 border-t border-white/5">
-                           <p className="text-[8px] font-black uppercase text-white/20 tracking-[0.2em]">Matrix Line Items</p>
-                           <div className="space-y-2">
-                              {msg.scanResult.items.slice(0, 3).map((item, idx) => (
-                                <div key={idx} className="flex justify-between text-[11px] font-bold">
-                                   <span className="text-white/40">{item.name}</span>
-                                   <span>₹{item.price}</span>
-                                </div>
-                              ))}
-                           </div>
-                        </div>
-                     )}
-                  </div>
-                )}
 
-                {msg.purchaseAdvice && (
-                   <div className="mt-8 pt-8 border-t border-white/10 space-y-6">
-                     <div className={cn(
-                       "flex items-center gap-4 p-5 rounded-2xl border",
-                       msg.purchaseAdvice.decision === 'BUY' ? "bg-emerald-500/10 border-emerald-500/20 text-emerald-500" :
-                       msg.purchaseAdvice.decision === 'WAIT' ? "bg-orange-500/10 border-orange-500/20 text-orange-500" :
-                       "bg-rose-500/10 border-rose-500/20 text-rose-500"
-                     )}>
-                        {msg.purchaseAdvice.decision === 'BUY' ? <CheckCircle2 className="h-6 w-6" /> :
-                         msg.purchaseAdvice.decision === 'WAIT' ? <AlertTriangle className="h-6 w-6" /> :
-                         <XCircle className="h-6 w-6" />}
-                        <p className="text-xl font-black italic">{msg.purchaseAdvice.decision}</p>
-                     </div>
-                     <p className="text-sm font-bold leading-relaxed text-white/80">{msg.purchaseAdvice.reasoning}</p>
+                     <Button 
+                        className="w-full h-14 rounded-2xl bg-primary text-white font-black uppercase text-[10px] tracking-widest shadow-xl shadow-primary/20" 
+                        onClick={() => syncToLedger(msg.scanResult)}
+                      >
+                        Synchronize with Ledger
+                      </Button>
                   </div>
                 )}
 
@@ -382,7 +319,6 @@ export default function AIAssistantPage() {
                 )}
                 onClick={() => {
                   if (s.action === 'scan') fileInputRef.current?.click();
-                  else if (s.isSpecial) setIsPurchaseMode(true);
                   else handleSend(s.label);
                 }}
               >
@@ -397,12 +333,12 @@ export default function AIAssistantPage() {
               className="h-20 rounded-[2.5rem] glass border-white/10 shadow-3xl text-lg font-bold placeholder:text-white/20 px-10 pr-24"
               value={input}
               onChange={(e) => setInput(e.target.value)}
-              onKeyDown={(e) => e.key === 'Enter' && (isRecording ? handleVoiceIntent() : handleSend())}
+              onKeyDown={(e) => e.key === 'Enter' && handleSend()}
             />
             <Button 
               size="icon" 
               className="absolute right-4 h-14 w-14 rounded-[1.5rem] bg-primary hover:bg-primary/80"
-              onClick={() => isRecording ? handleVoiceIntent() : handleSend()}
+              onClick={() => handleSend()}
               disabled={isTyping || !input.trim()}
             >
               <Send className="h-6 w-6" />

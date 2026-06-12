@@ -2,6 +2,7 @@
 /**
  * @fileOverview SpendWise 3.0 Vision Engine.
  * Multi-modal AI flow for high-precision financial extraction from receipts/bills.
+ * Optimized for Gemini 2.5 Flash to replace traditional OCR pipelines.
  */
 
 import { ai } from '@/ai/genkit';
@@ -15,15 +16,15 @@ const ReceiptScannerOutputSchema = z.object({
   merchant: z.string().describe('Name of the merchant found on the receipt.'),
   amount: z.number().describe('The final total amount paid (inclusive of taxes).'),
   taxAmount: z.number().optional().describe('Total tax amount (GST/VAT) extracted from the receipt.'),
-  date: z.string().describe('Transaction date in ISO 8601 format.'),
+  date: z.string().describe('Transaction date in ISO 8601 format (YYYY-MM-DD).'),
   category: z.enum(['Food', 'Shopping', 'Travel', 'Recharge', 'Electricity', 'Fuel', 'Rent', 'EMI', 'Entertainment', 'Healthcare', 'Other']),
   items: z.array(z.object({
     name: z.string(),
     price: z.number(),
     quantity: z.number().optional()
-  })).optional(),
+  })).optional().describe('Individual line items extracted from the bill.'),
   currency: z.string().default('INR'),
-  confidence: z.number().describe('AI confidence score from 0 to 1.')
+  confidence: z.number().describe('AI confidence score from 0 to 1 based on image clarity and data consistency.')
 });
 
 export async function scanReceipt(input: z.infer<typeof ReceiptScannerInputSchema>) {
@@ -34,14 +35,14 @@ const receiptPrompt = ai.definePrompt({
   name: 'receiptScannerPrompt',
   input: { schema: ReceiptScannerInputSchema },
   output: { schema: ReceiptScannerOutputSchema },
-  prompt: `You are the SpendWise Vision Intelligence, a state-of-the-art financial OCR agent. 
+  prompt: `You are the SpendWise Vision Intelligence, a state-of-the-art financial OCR agent designed for elite fintech terminals.
 Analyze the provided receipt image and extract the following parameters with surgical precision:
 
 1. MERCHANT: Identify the business name. If it's a logo, name the brand.
 2. TOTAL AMOUNT: The final amount paid. Ensure no currency symbols are included in the number.
-3. TAX/GST: Look for Tax, GST, CGST+SGST, or VAT fields. Provide the combined tax total.
-4. DATE: Identify the transaction date. Convert it to YYYY-MM-DD.
-5. CATEGORY: Map the merchant to the most appropriate financial sector.
+3. TAX/GST: Look for Tax, GST, CGST+SGST, or VAT fields. Provide the combined numerical tax total.
+4. DATE: Identify the transaction date. Convert it to YYYY-MM-DD format.
+5. CATEGORY: Map the merchant to the most appropriate financial sector (Food, Shopping, etc.).
 6. LINE ITEMS: List the individual items, their prices, and quantities if visible.
 
 Photo Data: {{media url=imageUri}}
@@ -49,7 +50,7 @@ Photo Data: {{media url=imageUri}}
 Rules:
 - If a value is unclear, use your best logical inference based on the receipt context.
 - Default currency is INR (₹) unless clearly specified otherwise.
-- Set the confidence score based on the clarity of the image.`,
+- Set the confidence score based on the clarity of the image. A low-resolution or blurry image should have a score below 0.6.`,
 });
 
 const receiptScannerFlow = ai.defineFlow(
