@@ -9,3 +9,4 @@ import './flows/voice-intent-flow';
 import './flows/subscription-analyzer-flow';
 import './flows/ai-categorization-flow';
 import './flows/budget-generator-flow';
+import './flows/financial-health-flow';

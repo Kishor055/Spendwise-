@@ -24,12 +24,15 @@ import {
   LayoutGrid,
   BarChart3,
   LineChart,
-  Activity
+  Activity,
+  AlertCircle,
+  CheckCircle2
 } from 'lucide-react';
 import { format } from 'date-fns';
 import { cn } from '@/lib/utils';
 import { getBalanceForecast } from '@/ai/flows/predictive-forecast-flow';
 import { analyzeSubscriptions } from '@/ai/flows/subscription-analyzer-flow';
+import { getFinancialHealthScore } from '@/ai/flows/financial-health-flow';
 import Link from 'next/link';
 import { 
   ResponsiveContainer, 
@@ -53,6 +56,7 @@ export default function DashboardPage() {
   const [mounted, setMounted] = useState(false);
   const [forecast, setForecast] = useState<any>(null);
   const [subsAnalysis, setSubsAnalysis] = useState<any>(null);
+  const [healthAnalysis, setHealthAnalysis] = useState<any>(null);
   const [isIntelligenceRunning, setIsIntelligenceRunning] = useState(false);
 
   useEffect(() => {
@@ -81,9 +85,15 @@ export default function DashboardPage() {
     return query(collection(firestore, 'users', user.uid, 'reminders'));
   }, [firestore, user]);
 
+  const goalsQuery = useMemoFirebase(() => {
+    if (!firestore || !user) return null;
+    return query(collection(firestore, 'users', user.uid, 'goals'));
+  }, [firestore, user]);
+
   const { data: transactions, isLoading: isTransactionsLoading } = useCollection(transactionsQuery);
   const { data: budgets } = useCollection(budgetsQuery);
   const { data: reminders } = useCollection(remindersQuery);
+  const { data: goals } = useCollection(goalsQuery);
 
   const stats = useMemo(() => {
     if (!transactions) return { balance: 0, income: 0, expense: 0, healthScore: 0 };
@@ -101,9 +111,14 @@ export default function DashboardPage() {
       if (!transactions || transactions.length < 5 || isIntelligenceRunning) return;
       setIsIntelligenceRunning(true);
       try {
-        const [f, s] = await Promise.all([
+        const currentBalance = stats.balance;
+        const totalEmergencyFund = (goals || [])
+          .filter(g => g.title.toLowerCase().includes('emergency'))
+          .reduce((sum, g) => sum + g.currentAmount, 0) + currentBalance;
+
+        const [f, s, h] = await Promise.all([
           getBalanceForecast({
-            currentBalance: stats.balance,
+            currentBalance,
             transactions: transactions.map(t => ({ 
               amount: t.amount, 
               type: t.type, 
@@ -115,10 +130,22 @@ export default function DashboardPage() {
           }),
           analyzeSubscriptions({
             transactions: transactions.filter(t => t.type === 'expense').map(t => ({ merchant: t.merchant || t.category, category: t.category, amount: t.amount, date: t.date?.seconds ? new Date(t.date.seconds * 1000).toISOString() : new Date().toISOString() }))
+          }),
+          getFinancialHealthScore({
+            income: stats.income || 50000,
+            expenses: stats.expense,
+            budgets: (budgets || []).map(b => ({
+              category: b.category,
+              limit: b.limit,
+              spent: transactions.filter(t => t.category === b.category && t.type === 'expense').reduce((s, tx) => s + tx.amount, 0)
+            })),
+            emergencyFund: totalEmergencyFund,
+            totalDebt: 0
           })
         ]);
         setForecast(f);
         setSubsAnalysis(s);
+        setHealthAnalysis(h);
       } catch (e) {
         console.error('Intelligence Error:', e);
       } finally {
@@ -126,7 +153,7 @@ export default function DashboardPage() {
       }
     }
     if (mounted && transactions && transactions.length > 5) runIntelligence();
-  }, [mounted, transactions, stats.balance, reminders, budgets]);
+  }, [mounted, transactions, stats.balance, reminders, budgets, goals]);
 
   if (!mounted || isUserLoading || (isTransactionsLoading && !transactions)) {
     return (
@@ -175,10 +202,78 @@ export default function DashboardPage() {
       </header>
 
       <main className="px-8 py-12 space-y-12 max-w-7xl mx-auto relative z-10">
+        {healthAnalysis && (
+          <motion.section 
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            className="p-8 rounded-[3.5rem] glass border border-primary/20 relative overflow-hidden group"
+          >
+            <div className="absolute top-0 right-0 p-10 opacity-5">
+              <ShieldCheck className="h-32 w-32 text-primary" />
+            </div>
+            <div className="flex flex-col md:flex-row items-center gap-12">
+               <div className="relative flex flex-col items-center">
+                  <svg className="w-48 h-48 transform -rotate-90">
+                    <circle cx="96" cy="96" r="88" stroke="currentColor" strokeWidth="12" fill="transparent" className="text-white/5" />
+                    <circle 
+                      cx="96" cy="96" r="88" stroke="currentColor" strokeWidth="12" fill="transparent" 
+                      strokeDasharray={552.92}
+                      strokeDashoffset={552.92 - (552.92 * healthAnalysis.score) / 100}
+                      className={cn(
+                        "transition-all duration-1000",
+                        healthAnalysis.riskLevel === 'EXCELLENT' ? "text-primary" : 
+                        healthAnalysis.riskLevel === 'GOOD' ? "text-emerald-500" : 
+                        healthAnalysis.riskLevel === 'AVERAGE' ? "text-accent" : "text-rose-500"
+                      )}
+                    />
+                  </svg>
+                  <div className="absolute inset-0 flex flex-col items-center justify-center">
+                    <span className="text-5xl font-black italic tracking-tighter">{healthAnalysis.score}</span>
+                    <span className="text-[8px] font-black uppercase tracking-[0.4em] text-white/40">Vitality Index</span>
+                  </div>
+               </div>
+               <div className="flex-1 space-y-6">
+                  <div className="flex items-center gap-4">
+                    <span className={cn(
+                      "px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest border",
+                      healthAnalysis.riskLevel === 'EXCELLENT' ? "bg-primary/10 border-primary/20 text-primary" : 
+                      healthAnalysis.riskLevel === 'GOOD' ? "bg-emerald-500/10 border-emerald-500/20 text-emerald-500" : 
+                      healthAnalysis.riskLevel === 'AVERAGE' ? "bg-accent/10 border-accent/20 text-accent" : "bg-rose-500/10 border-rose-500/20 text-rose-500"
+                    )}>
+                      Status: {healthAnalysis.riskLevel}
+                    </span>
+                    <p className="text-xs font-bold text-white/40 italic">{healthAnalysis.strategicInsight}</p>
+                  </div>
+                  <div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
+                     {[
+                       { label: 'Savings Rate', val: `${Math.round(healthAnalysis.metrics.savingsRate * 100)}%` },
+                       { label: 'Budget Adherence', val: `${Math.round(healthAnalysis.metrics.budgetAdherence * 100)}%` },
+                       { label: 'Debt/Income', val: `${Math.round(healthAnalysis.metrics.debtToIncome * 100)}%` },
+                       { label: 'Buffer Status', val: healthAnalysis.metrics.emergencyFundStatus }
+                     ].map((m) => (
+                       <div key={m.label}>
+                          <p className="text-[8px] font-black uppercase text-white/20 tracking-widest">{m.label}</p>
+                          <p className="text-lg font-black">{m.val}</p>
+                       </div>
+                     ))}
+                  </div>
+                  <div className="space-y-3 pt-4 border-t border-white/5">
+                     {healthAnalysis.recommendations.map((rec: string, i: number) => (
+                       <div key={i} className="flex items-center gap-3 text-xs font-medium text-white/70">
+                          <CheckCircle2 className="h-4 w-4 text-primary shrink-0" />
+                          {rec}
+                       </div>
+                     ))}
+                  </div>
+               </div>
+            </div>
+          </motion.section>
+        )}
+
         <section className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           {[
             { label: 'Neural Streak', value: `${profile?.streak || 12} Days`, icon: Flame, color: 'text-orange-500', bg: 'bg-orange-500/10' },
-            { label: 'Vitality Score', value: `${stats.healthScore}%`, icon: ShieldCheck, color: 'text-emerald-400', bg: 'bg-emerald-400/10' },
+            { label: 'Vitality Score', value: `${healthAnalysis?.score || stats.healthScore}%`, icon: ShieldCheck, color: 'text-emerald-400', bg: 'bg-emerald-400/10' },
             { label: 'Matrix Rank', value: profile?.rank || 'Elite', icon: Trophy, color: 'text-primary', bg: 'bg-primary/10' },
             { label: 'Liquidity', value: `₹${stats.balance.toLocaleString()}`, icon: Wallet2, color: 'text-accent', bg: 'bg-accent/10' },
           ].map((item, i) => (
