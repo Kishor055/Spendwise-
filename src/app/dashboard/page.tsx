@@ -12,7 +12,6 @@ import {
   BrainCircuit,
   Wallet2,
   TrendingDown,
-  CircleDollarSign,
   ShieldCheck,
   Zap,
   ArrowUpRight,
@@ -26,13 +25,16 @@ import {
   LineChart,
   Activity,
   AlertCircle,
-  CheckCircle2
+  CheckCircle2,
+  ShieldAlert,
+  ShieldX
 } from 'lucide-react';
 import { format } from 'date-fns';
 import { cn } from '@/lib/utils';
 import { getBalanceForecast } from '@/ai/flows/predictive-forecast-flow';
 import { analyzeSubscriptions } from '@/ai/flows/subscription-analyzer-flow';
 import { getFinancialHealthScore } from '@/ai/flows/financial-health-flow';
+import { detectAnomalies } from '@/ai/flows/anomaly-detection-flow';
 import Link from 'next/link';
 import { 
   ResponsiveContainer, 
@@ -57,6 +59,7 @@ export default function DashboardPage() {
   const [forecast, setForecast] = useState<any>(null);
   const [subsAnalysis, setSubsAnalysis] = useState<any>(null);
   const [healthAnalysis, setHealthAnalysis] = useState<any>(null);
+  const [anomalies, setAnomalies] = useState<any>(null);
   const [isIntelligenceRunning, setIsIntelligenceRunning] = useState(false);
 
   useEffect(() => {
@@ -116,7 +119,7 @@ export default function DashboardPage() {
           .filter(g => g.title.toLowerCase().includes('emergency'))
           .reduce((sum, g) => sum + g.currentAmount, 0) + currentBalance;
 
-        const [f, s, h] = await Promise.all([
+        const [f, s, h, a] = await Promise.all([
           getBalanceForecast({
             currentBalance,
             transactions: transactions.map(t => ({ 
@@ -141,11 +144,22 @@ export default function DashboardPage() {
             })),
             emergencyFund: totalEmergencyFund,
             totalDebt: 0
+          }),
+          detectAnomalies({
+            transactions: transactions.map(t => ({
+              id: t.id,
+              amount: t.amount,
+              merchant: t.merchant || t.category,
+              category: t.category,
+              date: t.date?.seconds ? new Date(t.date.seconds * 1000).toISOString() : new Date().toISOString()
+            })),
+            typicalDailySpend: (stats.expense / 30) || 1000
           })
         ]);
         setForecast(f);
         setSubsAnalysis(s);
         setHealthAnalysis(h);
+        setAnomalies(a);
       } catch (e) {
         console.error('Intelligence Error:', e);
       } finally {
@@ -202,6 +216,42 @@ export default function DashboardPage() {
       </header>
 
       <main className="px-8 py-12 space-y-12 max-w-7xl mx-auto relative z-10">
+        {/* Anomaly Alerts Terminal */}
+        {anomalies?.anomalies?.length > 0 && (
+          <motion.section 
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="space-y-4"
+          >
+            <div className="flex items-center justify-between px-4">
+              <h2 className="text-xs font-black uppercase tracking-[0.4em] text-rose-500 flex items-center gap-3">
+                <ShieldAlert className="h-5 w-5" /> Neural Security Alerts
+              </h2>
+              <span className="text-[8px] font-black uppercase tracking-widest text-rose-500/40">{anomalies.overallRiskLevel} PROTOCOL</span>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {anomalies.anomalies.map((anomaly: any, i: number) => (
+                <div key={i} className="p-6 rounded-[2rem] glass-dark border border-rose-500/20 bg-rose-500/5 flex items-start gap-5 group">
+                  <div className={cn(
+                    "w-12 h-12 rounded-2xl flex items-center justify-center shrink-0 border",
+                    anomaly.severity === 'CRITICAL' ? "bg-rose-500/20 text-rose-500 border-rose-500/30" : "bg-orange-500/10 text-orange-500 border-orange-500/20"
+                  )}>
+                    <ShieldX className="h-6 w-6" />
+                  </div>
+                  <div className="space-y-2">
+                    <p className="text-[10px] font-black uppercase text-rose-500/60 tracking-widest">Anomaly Detected</p>
+                    <p className="text-sm font-bold leading-tight">{anomaly.reason}</p>
+                    <div className="flex items-center gap-3 pt-2">
+                      <span className="text-[9px] font-black uppercase tracking-widest bg-rose-500 text-white px-2 py-0.5 rounded-full">Risk: {anomaly.riskScore}</span>
+                      <span className="text-[9px] font-black uppercase tracking-widest text-white/20 italic">{anomaly.severity}</span>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </motion.section>
+        )}
+
         {healthAnalysis && (
           <motion.section 
             initial={{ opacity: 0, scale: 0.95 }}
