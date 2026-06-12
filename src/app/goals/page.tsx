@@ -18,7 +18,10 @@ import {
   Zap,
   Calendar,
   Sparkles,
-  ArrowRight
+  ArrowRight,
+  TrendingUp,
+  BrainCircuit,
+  Loader2
 } from 'lucide-react';
 import Link from 'next/link';
 import { addDocumentNonBlocking, deleteDocumentNonBlocking, updateDocumentNonBlocking } from '@/firebase';
@@ -106,11 +109,11 @@ export default function GoalsPage() {
           </div>
           <div className="relative z-10">
             <div className="inline-flex items-center gap-3 bg-accent/10 px-6 py-2 rounded-full border border-accent/20 mb-6">
-              <Zap className="h-4 w-4 text-accent" />
+              <BrainCircuit className="h-4 w-4 text-accent" />
               <span className="text-[10px] font-black uppercase tracking-widest text-accent">Dream Planner v4.0</span>
             </div>
             <h2 className="text-5xl font-black tracking-tighter italic leading-none">Manifest<br />Everything.</h2>
-            <p className="text-white/40 font-bold max-w-sm mt-6 text-sm">Convert your liquid capital into high-value commercial assets. AI calculates your daily manifestation path.</p>
+            <p className="text-white/40 font-bold max-w-sm mt-6 text-sm leading-relaxed">Convert your liquid capital into high-value commercial assets. AI calculates your daily manifestation path.</p>
           </div>
         </section>
 
@@ -120,34 +123,34 @@ export default function GoalsPage() {
               initial={{ opacity: 0, y: -20 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -20 }}
-              className="p-10 rounded-[3rem] glass border border-white/10 space-y-8"
+              className="p-10 rounded-[3rem] glass border border-white/10 space-y-8 shadow-3xl"
             >
               <h3 className="text-xs font-black uppercase tracking-[0.4em] text-accent">Initialize Target Parameter</h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div className="space-y-2">
                   <label className="text-[9px] font-black uppercase tracking-widest text-white/30 ml-4">Target Identity</label>
-                  <Input placeholder="E.g. Nexus Laptop, Tesla Model S" value={title} onChange={(e) => setTitle(e.target.value)} className="h-14 rounded-2xl glass border-white/5 px-6 font-bold" />
+                  <Input placeholder="E.g. Tesla Model S, Luxury Villa" value={title} onChange={(e) => setTitle(e.target.value)} className="h-14 rounded-2xl glass border-white/5 px-6 font-bold" />
                 </div>
                 <div className="space-y-2">
                   <label className="text-[9px] font-black uppercase tracking-widest text-white/30 ml-4">Quantifiable Value (₹)</label>
-                  <Input type="number" placeholder="Target Amount" value={target} onChange={(e) => setTarget(e.target.value)} className="h-14 rounded-2xl glass border-white/5 px-6 font-bold" />
+                  <Input type="number" placeholder="Value Vector" value={target} onChange={(e) => setTarget(e.target.value)} className="h-14 rounded-2xl glass border-white/5 px-6 font-bold" />
                 </div>
                 <div className="space-y-2 md:col-span-2">
                   <label className="text-[9px] font-black uppercase tracking-widest text-white/30 ml-4">Manifestation Deadline</label>
                   <Input type="date" value={deadline} onChange={(e) => setDeadline(e.target.value)} className="h-14 rounded-2xl glass border-white/5 px-6 font-bold" />
                 </div>
               </div>
-              <Button className="w-full h-16 rounded-[2rem] bg-accent text-accent-foreground font-black uppercase text-[10px] tracking-[0.4em] shadow-3xl shadow-accent/20" onClick={handleAdd}>Enable Target Protocol</Button>
+              <Button className="w-full h-16 rounded-[2rem] bg-accent text-accent-foreground font-black uppercase text-[10px] tracking-[0.4em] shadow-3xl shadow-accent/20 hover:bg-accent/90" onClick={handleAdd}>Enable Target Protocol</Button>
             </motion.div>
           )}
         </AnimatePresence>
 
-        <div className="grid grid-cols-1 gap-6">
+        <div className="grid grid-cols-1 gap-8">
           {isLoading ? (
-            <div className="py-20 flex justify-center"><Loader2 className="h-10 w-10 animate-spin opacity-20" /></div>
+            <div className="py-20 flex justify-center"><Loader2 className="h-12 w-12 animate-spin text-accent" /></div>
           ) : !goals || goals.length === 0 ? (
             <div className="text-center py-32 opacity-10 flex flex-col items-center gap-6">
-               <Target className="h-20 w-20" />
+               <Target className="h-24 w-24" />
                <p className="font-black uppercase tracking-[0.5em] text-[10px]">No Strategic Targets Identified</p>
             </div>
           ) : (
@@ -161,28 +164,35 @@ export default function GoalsPage() {
                   initial={{ opacity: 0, x: -20 }}
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ delay: i * 0.1 }}
-                  className="p-10 rounded-[3.5rem] glass-dark border border-white/[0.02] space-y-8 group hover:bg-white/[0.04] transition-all"
+                  className="p-10 rounded-[3.5rem] glass-dark border border-white/[0.03] space-y-10 group hover:bg-white/[0.05] transition-all shadow-2xl relative overflow-hidden"
                 >
-                  <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
-                    <div className="flex items-center gap-6">
-                      <div className="w-20 h-20 rounded-3xl bg-accent/5 flex items-center justify-center text-accent border border-accent/10 group-hover:scale-110 transition-transform">
-                        <Trophy className="h-10 w-10" />
+                  {progress === 100 && (
+                     <div className="absolute top-0 right-0 p-8 bg-emerald-500/10 text-emerald-500 rounded-bl-[3rem] font-black uppercase text-[8px] tracking-[0.3em] flex items-center gap-2">
+                        <Trophy className="h-3 w-3" /> Manifested
+                     </div>
+                  )}
+
+                  <div className="flex flex-col md:flex-row md:items-center justify-between gap-8">
+                    <div className="flex items-center gap-8">
+                      <div className="w-24 h-24 rounded-3xl bg-accent/5 flex items-center justify-center text-accent border border-accent/10 group-hover:scale-110 transition-transform shadow-xl">
+                        <Target className="h-10 w-10" />
                       </div>
                       <div>
-                        <h3 className="text-2xl font-black tracking-tighter italic">{goal.title}</h3>
-                        <div className="flex items-center gap-4 mt-2">
-                           <span className="text-[9px] font-black uppercase tracking-widest text-accent flex items-center gap-2">
-                              <Calendar className="h-3 w-3" />
-                              {goal.deadline ? `Due ${new Date(goal.deadline).toLocaleDateString()}` : "Open Timeline"}
+                        <h3 className="text-3xl font-black tracking-tighter italic">{goal.title}</h3>
+                        <div className="flex items-center gap-5 mt-3">
+                           <span className="text-[10px] font-black uppercase tracking-widest text-accent flex items-center gap-2">
+                              <Calendar className="h-4 w-4" />
+                              {goal.deadline ? format(new Date(goal.deadline), 'MMM dd, yyyy') : "Open Temporal Path"}
                            </span>
-                           <span className="text-[9px] font-black uppercase tracking-widest text-white/20">₹{goal.targetAmount.toLocaleString()} Total</span>
+                           <span className="h-1 w-1 rounded-full bg-white/10" />
+                           <span className="text-[10px] font-black uppercase tracking-widest text-white/20 italic">₹{goal.targetAmount.toLocaleString()} Total</span>
                         </div>
                       </div>
                     </div>
-                    <div className="flex items-center gap-4 self-end md:self-auto">
+                    <div className="flex items-center gap-6 self-end md:self-auto">
                        <div className="text-right">
-                          <p className="text-[9px] font-black uppercase tracking-widest text-white/20">Collected</p>
-                          <p className="text-2xl font-black italic">₹{goal.currentAmount.toLocaleString()}</p>
+                          <p className="text-[9px] font-black uppercase tracking-widest text-white/20 mb-1">Accumulated Vector</p>
+                          <p className="text-3xl font-black italic tracking-tighter">₹{goal.currentAmount.toLocaleString()}</p>
                        </div>
                        <Button variant="ghost" size="icon" className="h-12 w-12 text-white/10 hover:text-rose-500 rounded-2xl bg-white/[0.02]" onClick={() => handleDelete(goal.id)}>
                          <Trash2 className="h-5 w-5" />
@@ -190,21 +200,33 @@ export default function GoalsPage() {
                     </div>
                   </div>
 
-                  <div className="space-y-4">
-                    <div className="flex justify-between items-center text-[9px] font-black uppercase tracking-[0.2em]">
-                      <span className="text-accent flex items-center gap-2"><Sparkles className="h-3 w-3" /> {Math.round(progress)}% Optimized</span>
-                      <span className="text-white/20">₹{remaining.toLocaleString()} Remaining</span>
+                  <div className="space-y-6">
+                    <div className="flex justify-between items-center text-[10px] font-black uppercase tracking-[0.3em]">
+                      <span className="text-accent flex items-center gap-3">
+                         <TrendingUp className="h-4 w-4" /> 
+                         {Math.round(progress)}% Optimized
+                      </span>
+                      <span className="text-white/20 italic">Gap: ₹{remaining.toLocaleString()}</span>
                     </div>
-                    <Progress value={progress} className="h-3 bg-white/[0.03]" indicatorClassName="bg-accent shadow-[0_0_20px_rgba(191,100,50,0.4)]" />
+                    <div className="relative">
+                       <Progress value={progress} className="h-4 bg-white/[0.03]" indicatorClassName="bg-accent shadow-[0_0_30px_rgba(191,100,50,0.6)]" />
+                       {progress > 0 && progress < 100 && (
+                         <div 
+                           className="absolute top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-white shadow-3xl flex items-center justify-center transition-all duration-1000"
+                           style={{ left: `calc(${progress}% - 16px)` }}
+                         >
+                            <Sparkles className="h-4 w-4 text-accent" />
+                         </div>
+                       )}
+                    </div>
                   </div>
 
-                  <div className="flex flex-wrap gap-3">
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                     {[1000, 5000, 10000, 50000].map((amount) => (
                       <Button 
                         key={amount} 
                         variant="ghost" 
-                        size="sm" 
-                        className="flex-1 min-w-[100px] h-14 rounded-2xl glass-dark hover:bg-primary/20 hover:text-primary transition-all font-black text-[10px] uppercase tracking-widest border-white/5"
+                        className="h-16 rounded-[1.8rem] bg-white/[0.03] border border-white/5 hover:bg-primary/20 hover:text-primary transition-all font-black text-[10px] uppercase tracking-widest"
                         onClick={() => handleAddMoney(goal.id, goal.currentAmount, amount)}
                       >
                         +₹{amount.toLocaleString()}
@@ -221,4 +243,3 @@ export default function GoalsPage() {
     </div>
   );
 }
-
