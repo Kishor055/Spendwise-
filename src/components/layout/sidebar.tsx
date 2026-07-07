@@ -1,3 +1,4 @@
+
 'use client';
 
 import Link from 'next/link';
@@ -16,7 +17,9 @@ import {
   Settings,
   LogOut,
   BrainCircuit,
-  TrendingUp
+  TrendingUp,
+  Globe,
+  Briefcase
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { signOut } from 'firebase/auth';
@@ -29,6 +32,8 @@ const navItems = [
   { href: '/budget', label: 'Budgets', icon: PieChart },
   { href: '/goals', label: 'Goals', icon: Target },
   { href: '/analytics', label: 'Analytics', icon: TrendingUp },
+  { href: '/market', label: 'Market Intelligence', icon: Globe },
+  { href: '/investments', label: 'Wealth Terminal', icon: Briefcase },
   { href: '/subscriptions', label: 'Subscriptions', icon: CreditCard },
   { href: '/reminders', label: 'Bills & Reminders', icon: Bell },
   { href: '/reports', label: 'Reports', icon: FileText },

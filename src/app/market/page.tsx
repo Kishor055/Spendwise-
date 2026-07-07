@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useState } from 'react';
@@ -16,13 +17,14 @@ import {
   Building2, 
   Activity,
   Zap,
-  Cpu
+  Cpu,
+  Globe,
+  ShieldCheck,
+  ArrowUpRight
 } from 'lucide-react';
 import Link from 'next/link';
 import { cn } from '@/lib/utils';
 import { 
-  LineChart, 
-  Line, 
   XAxis, 
   YAxis, 
   CartesianGrid, 
@@ -77,16 +79,16 @@ export default function MarketAnalysisPage() {
           <div className="text-center space-y-4">
              <div className="inline-flex items-center gap-3 bg-accent/10 px-6 py-2 rounded-full border border-accent/20">
                 <Cpu className="h-4 w-4 text-accent animate-spin-slow" />
-                <span className="text-[10px] font-black uppercase tracking-widest text-accent">AI Analysis Engine v4.0</span>
+                <span className="text-[10px] font-black uppercase tracking-widest text-accent">Python Core Engine Active</span>
              </div>
-             <h2 className="text-4xl font-black tracking-tighter italic">Analyze the Matrix.</h2>
-             <p className="text-white/40 font-medium max-w-md mx-auto">Query any company or industry sector to receive deep-space strategic insights and commercial projections.</p>
+             <h2 className="text-5xl font-black tracking-tighter italic">Analyze the Matrix.</h2>
+             <p className="text-white/40 font-medium max-w-md mx-auto">Query any company or industry sector to receive stochastic projections and job market correlation analysis.</p>
           </div>
 
           <form onSubmit={handleAnalyze} className="relative group">
             <div className="absolute -inset-1 bg-gradient-to-r from-primary to-accent rounded-[2.5rem] blur opacity-10 group-focus-within:opacity-40 transition duration-700"></div>
             <Input 
-              placeholder="Enter Company or Sector (e.g. Nvidia, AI Chips, Real Estate)..." 
+              placeholder="Enter Entity (e.g. Nvidia, AI Chips, Real Estate)..." 
               className="h-20 rounded-[2.5rem] glass border-white/10 shadow-3xl text-lg font-bold placeholder:text-white/20 px-10 pr-28"
               value={query}
               onChange={(e) => setQuery(e.target.value)}
@@ -94,7 +96,7 @@ export default function MarketAnalysisPage() {
             <Button 
               type="submit"
               size="icon" 
-              className="absolute right-4 top-4 h-12 w-12 rounded-[1.5rem] bg-primary hover:bg-primary/80 transition-all"
+              className="absolute right-4 top-4 h-12 w-12 rounded-[1.5rem] bg-primary hover:bg-primary/80 transition-all shadow-xl shadow-primary/20"
               disabled={isLoading || !query.trim()}
             >
               {isLoading ? <Loader2 className="h-6 w-6 animate-spin" /> : <Search className="h-6 w-6" />}
@@ -117,11 +119,11 @@ export default function MarketAnalysisPage() {
                   <div className="flex items-center justify-between">
                      <CardTitle className="text-[10px] font-black uppercase tracking-[0.3em] text-white/30 flex items-center gap-4">
                         <Activity className="h-5 w-5 text-accent" />
-                        Performance Trajectory
+                        Commercial Performance Vector
                      </CardTitle>
                      <div className="flex items-center gap-2 bg-emerald-500/10 px-4 py-1.5 rounded-full border border-emerald-500/20">
-                        <TrendingUp className="h-3 w-3 text-emerald-500" />
-                        <span className="text-[8px] font-black uppercase tracking-widest text-emerald-500">Live Simulation</span>
+                        <Globe className="h-3 w-3 text-emerald-500" />
+                        <span className="text-[8px] font-black uppercase tracking-widest text-emerald-500">Stochastic Modeling</span>
                      </div>
                   </div>
                 </CardHeader>
@@ -138,7 +140,7 @@ export default function MarketAnalysisPage() {
                       <XAxis dataKey="timestamp" axisLine={false} tickLine={false} tick={{ fontSize: 9, fontWeight: 900, fill: 'rgba(255,255,255,0.2)' }} />
                       <YAxis hide />
                       <Tooltip 
-                        contentStyle={{ borderRadius: '1.5rem', border: 'none', background: '#0a0a16', fontWeight: '900', fontSize: '11px' }}
+                        contentStyle={{ borderRadius: '1.5rem', border: 'none', background: '#0a0a16', fontWeight: '900', fontSize: '11px', boxShadow: '0 20px 40px rgba(0,0,0,0.5)' }}
                       />
                       <Area type="monotone" dataKey="value" stroke="hsl(var(--accent))" strokeWidth={4} fillOpacity={1} fill="url(#colorPulse)" />
                     </AreaChart>
@@ -147,13 +149,13 @@ export default function MarketAnalysisPage() {
                 <div className="mt-10 pt-10 border-t border-white/5 grid grid-cols-1 md:grid-cols-2 gap-10">
                    <div className="space-y-4">
                       <h4 className="text-[10px] font-black uppercase tracking-widest text-accent flex items-center gap-3">
-                         <Building2 className="h-4 w-4" /> Commercial Context
+                         <Building2 className="h-4 w-4" /> Market Synthesis
                       </h4>
                       <p className="text-sm font-medium leading-relaxed text-white/70">{analysis.overview}</p>
                    </div>
                    <div className="space-y-4">
                       <h4 className="text-[10px] font-black uppercase tracking-widest text-primary flex items-center gap-3">
-                         <Zap className="h-4 w-4" /> Strategic Utility
+                         <Zap className="h-4 w-4" /> Commercial Utility
                       </h4>
                       <p className="text-sm font-medium leading-relaxed text-white/70">{analysis.commercialUse}</p>
                    </div>
@@ -161,19 +163,36 @@ export default function MarketAnalysisPage() {
               </Card>
 
               <div className="space-y-8">
-                 <Card className="rounded-[3rem] border-none glass-dark p-8 group hover:bg-white/[0.05] transition-all">
+                 <Card className="rounded-[3rem] border-none glass-dark p-8 group hover:bg-white/[0.05] transition-all relative overflow-hidden">
+                    <div className="absolute top-0 right-0 p-4 opacity-5 group-hover:scale-110 transition-transform">
+                       <ShieldCheck size={80} />
+                    </div>
                     <CardHeader className="p-0 mb-6">
                        <CardTitle className="text-[10px] font-black uppercase tracking-[0.3em] text-white/30 flex items-center gap-4">
                           <Briefcase className="h-5 w-5 text-emerald-400" />
-                          Job Market Impact
+                          Career Resilience
                        </CardTitle>
                     </CardHeader>
-                    <CardContent className="p-0">
+                    <CardContent className="p-0 space-y-6">
                        <p className="text-sm font-bold leading-relaxed">{analysis.jobMarketImpact}</p>
+                       <div className="pt-4 border-t border-white/5">
+                          <p className="text-[9px] font-black uppercase text-white/20 mb-2">Market Relevance Score</p>
+                          <div className="flex items-center gap-4">
+                             <div className="h-2 flex-1 bg-white/5 rounded-full overflow-hidden">
+                                <motion.div 
+                                  initial={{ width: 0 }} 
+                                  animate={{ width: `${analysis.professionalResilienceScore}%` }} 
+                                  className="h-full bg-emerald-500 shadow-[0_0_10px_rgba(16,185,129,0.5)]" 
+                                />
+                             </div>
+                             <span className="text-xs font-black text-emerald-500">{analysis.professionalResilienceScore}%</span>
+                          </div>
+                       </div>
                     </CardContent>
                  </Card>
 
-                 <Card className="rounded-[3rem] border-none bg-primary/20 p-8 border border-primary/20">
+                 <Card className="rounded-[3rem] border-none bg-primary/20 p-8 border border-primary/20 relative group overflow-hidden">
+                    <div className="absolute inset-0 bg-gradient-to-br from-primary/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
                     <CardHeader className="p-0 mb-6">
                        <CardTitle className="text-[10px] font-black uppercase tracking-[0.3em] text-white/50 flex items-center gap-4">
                           <Zap className="h-5 w-5" />
@@ -181,17 +200,18 @@ export default function MarketAnalysisPage() {
                        </CardTitle>
                     </CardHeader>
                     <CardContent className="p-0">
-                       <p className="text-lg font-black italic tracking-tight">{analysis.marketSentiment}</p>
+                       <p className="text-2xl font-black italic tracking-tighter text-glow">{analysis.marketSentiment}</p>
+                       <p className="text-[9px] font-black uppercase text-white/40 mt-4 tracking-widest">Aggregated News Vector: Stable</p>
                     </CardContent>
                  </Card>
 
-                 <div className="p-8 rounded-[3rem] glass flex items-center gap-6">
-                    <div className="w-16 h-16 rounded-2xl bg-white/[0.03] flex items-center justify-center border border-white/5">
+                 <div className="p-8 rounded-[3rem] glass flex items-center gap-6 group hover:bg-white/[0.05] transition-all cursor-default border-white/10 shadow-3xl">
+                    <div className="w-16 h-16 rounded-2xl bg-white/[0.03] flex items-center justify-center border border-white/5 group-hover:scale-110 transition-transform">
                        <TrendingUp className="h-8 w-8 text-accent" />
                     </div>
                     <div>
                        <p className="text-[9px] font-black uppercase tracking-widest text-white/30">Volatility Index</p>
-                       <p className="text-2xl font-black italic tracking-tighter">Low Stability</p>
+                       <p className="text-2xl font-black italic tracking-tighter">Low Hazard</p>
                     </div>
                  </div>
               </div>
@@ -205,13 +225,13 @@ export default function MarketAnalysisPage() {
               >
                 <div className="relative">
                    <div className="absolute inset-0 bg-primary/20 blur-[100px] rounded-full animate-pulse" />
-                   <div className="relative glass-dark p-12 rounded-full border-white/5">
-                      <LineChartIcon className="h-20 w-20 text-white/10" />
+                   <div className="relative glass-dark p-12 rounded-full border-white/5 shadow-2xl">
+                      <Globe className="h-20 w-20 text-white/10" />
                    </div>
                 </div>
                 <div>
                    <h3 className="text-xl font-black tracking-widest uppercase opacity-20">Awaiting Search Input</h3>
-                   <p className="text-[10px] font-black uppercase tracking-[0.5em] text-white/10 mt-4">Synthesizing global market data...</p>
+                   <p className="text-[10px] font-black uppercase tracking-[0.5em] text-white/10 mt-4">Connecting to global market matrix...</p>
                 </div>
               </motion.div>
             )
